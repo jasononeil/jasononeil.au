@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/0.10.4/.schema/devbox.schema.json",
-  "packages": [
-    "nodejs@latest",
-    "aider-chat@latest"
-  ],
+  "packages": ["nodejs@latest", "aider-chat@latest"],
   "env": {
     "DEVBOX_COREPACK_ENABLED": "true"
+  },
+  "shell": {
+    "init_hook": ["test -e .envrc.private || cp .envrc.example .envrc.private"]
   }
 }
