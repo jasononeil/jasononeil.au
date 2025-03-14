@@ -90,7 +90,6 @@ Each prompt block is tagged with markdown language “```md” and labeled as te
 Prompt 1: Initialize the Next.js Project and Testing Framework
 
 ```md
-[text]
 Project: Email Delivery System
 
 Task: Scaffold a basic Next.js project and add a simple testing framework.
@@ -107,14 +106,12 @@ Please generate:
 - A sample API route at pages/api/health.js.
 - A Jest configuration file (if necessary) and a sample test file that tests the /api/health endpoint.
 - Brief inline comments where beneficial.
-[/text]
 ```
 
 ──────────────────────────────
 Prompt 2: Configure the Database and Implement the Subscriber Schema
 
 ```md
-[text]
 Project: Email Delivery System (Phase 1)
 
 Task: Set up the database integration and subscriber schema.
@@ -134,14 +131,12 @@ Please generate:
 - Code for setting up the schema (using either an ORM or SQL migration scripts, as preferred).
 - Sample unit tests that verify table creation.
 - Brief comments and documentation to explain your decisions.
-[/text]
 ```
 
 ──────────────────────────────
 Prompt 3: Implement Basic WordPress API Integration
 
 ```md
-[text]
 Project: Email Delivery System (Phase 1 - WordPress Integration)
 
 Task: Connect to the WordPress REST API to fetch blog posts.
@@ -160,14 +155,12 @@ Please generate:
 - A sample Next.js API route (e.g., pages/api/wp-posts.js) that uses your function.
 - Unit tests for your module using Jest.
 - Inline comments to describe critical parts of the code.
-[/text]
 ```
 
 ──────────────────────────────
 Prompt 4: Create a Basic Email Template with Handlebars
 
 ```md
-[text]
 Project: Email Delivery System (Phase 1 - Email Templating)
 
 Task: Implement a basic email templating system using Handlebars.
@@ -186,14 +179,12 @@ Please generate:
 - The lib/templates.js file with the Handlebars setup and sample template.
 - A sample test file for rendering this template.
 - Inline comments to explain your implementation.
-[/text]
 ```
 
 ──────────────────────────────
 Prompt 5: Wire the Core Infrastructure Together
 
 ```md
-[text]
 Project: Email Delivery System (Phase 1 - Integration)
 
 Task: Integrate the previously created modules (Next.js API routes, database, WordPress integration, and email templating) into a cohesive foundation.
@@ -212,14 +203,12 @@ Please generate:
 - The pages/api/compose-email.js endpoint with integration of the WordPress API and Handlebars templating.
 - Integration tests that simulate the full flow.
 - Inline comments that describe the wiring logic and error handling.
-[/text]
 ```
 
 ──────────────────────────────
 Prompt 6: Begin Email Generation & Delivery (Phase 2)
 
 ```md
-[text]
 Project: Email Delivery System (Phase 2 - Email Generation & Delivery)
 
 Task: Extend the email generation process and integrate with SendGrid for delivery.
@@ -247,14 +236,12 @@ Please generate:
 - The API endpoint pages/api/trigger-email/[postId].js integrating all functions.
 - Appropriate tests for each module.
 - Clear inline comments and integration wiring.
-[/text]
 ```
 
 ──────────────────────────────
 Prompt 7: Implement Subscriber Management (Phase 3)
 
 ```md
-[text]
 Project: Email Delivery System (Phase 3 - Subscriber Management)
 
 Task: Implement endpoints and functionality for managing subscribers.
@@ -276,14 +263,12 @@ Please generate:
 - Sample HTML/React forms as standalone components that call these endpoints.
 - Test files for the subscriber flows.
 - Inline documentation that describes the API contract and error handling.
-[/text]
 ```
 
 ──────────────────────────────
 Prompt 8: Final Integration, Logging, and Deployment (Phase 4)
 
 ```md
-[text]
 Project: Email Delivery System (Phase 4 - Refinement & Deployment)
 
 Task: Refine error handling, logging, and prepare the system for deployment.
@@ -304,7 +289,6 @@ Please generate:
 - Dockerfile and environment sample configuration.
 - Integration tests that cover the refined system end-to-end.
 - Inline comments and documentation for deployment.
-[/text]
 ```
 
 ──────────────────────────────
