@@ -1,3 +1,31 @@
+# Email Delivery System for jasononeil.au (a WordPress Blog)
+
+## Project Overview
+This is a small Next.js project to help deliver blog posts via email to people who have subscribed.
+
+I want just enough custom functionality that an off-the-shelf wordpress plugin like MailPoet wasn't my preferred option.
+
+## Project Goals
+- **Improved Email Design:** Create customizable, mobile-responsive email templates that incorporate WordPress content in an email-friendly format.
+- **Robust Subscription Management:** Facilitate seamless subscription, preference updates, and unsubscription through dedicated API endpoints and embeddable forms.
+- **Headless Architecture:** Decouple email delivery functionality from the WordPress core, enabling independent evolution and scaling of the email system.
+- **Enhanced Delivery Reliability:** Leverage SendGrid for efficient email distribution while handling bounces and failures gracefully.
+- **Comprehensive Logging & Analytics:** Enable detailed tracking of system operations and email delivery statuses to support troubleshooting and future optimizations.
+
+## Intended Architecture
+- **Next.js Frontend & API Routes:**
+  - The application uses Next.js to serve both the frontend and API endpoints.
+  - It will host pages for subscribing, managing subscriptions, and unsubscribing.
+  - It will host API routes for sending emails.
+- **MySQL Database Integration:**
+  - The system utilizes a MySQL database (shared with the WordPress instance) to manage subscriber information, preferences, and records of sent emails.
+- **WordPress REST API Communication:**
+  - A dedicated module handles communication with the WordPress REST API, ensuring blog post content, metadata, and media are fetched and transformed appropriately for email.
+- **Handlebars Templating Engine:**
+  - Handlebars is used for dynamic email content generation, allowing customizable and maintainable email templates.
+- **SendGrid Email Delivery:**
+  - Email sending is powered by Twilio SendGrid, because email sender reputations are hard.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -5,13 +33,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -28,9 +50,3 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
