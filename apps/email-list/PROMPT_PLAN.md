@@ -46,7 +46,7 @@ For each phase, we now break the work into very small, incremental steps. Each s
 
 • Phase 1 – Core Infrastructure:
   1.1. Scaffold a basic Next.js project (structure only).
-  1.2. Add a basic testing framework (e.g., Jest) with a “Hello World” test.
+  1.2. Add a basic testing framework (e.g., Vitest) with a “Hello World” test.
   1.3. Create configuration files for connecting to the MySQL database.
   1.4. Define migration files or schema definition for the subscribers and related tables.
   1.5. Implement a simple API route (e.g., /api/health) to check that the Next.js server is running.
@@ -96,7 +96,7 @@ Task: Scaffold a basic Next.js project and add a simple testing framework.
 
 Requirements:
 1. Create a new Next.js application structure.
-2. Integrate Jest for testing with a “Hello World” test that verifies the testing setup works.
+2. Integrate Vitest for testing with a “Hello World” test that verifies the testing setup works.
 3. Provide a minimal Next.js API endpoint at /api/health that returns a JSON response: { "status": "ok" }.
 4. The project should have a package.json with necessary scripts for starting the development server and running tests.
 5. Ensure the code is organized in a modular fashion to allow integration in later steps.
@@ -104,7 +104,7 @@ Requirements:
 Please generate:
 - The Next.js project structure (only the basic scaffolding, list the main folders and files).
 - A sample API route at pages/api/health.js.
-- A Jest configuration file (if necessary) and a sample test file that tests the /api/health endpoint.
+- A Vitest configuration file (if necessary) and a sample test file that tests the /api/health endpoint.
 - Brief inline comments where beneficial.
 ```
 
@@ -153,7 +153,7 @@ Requirements:
 Please generate:
 - Code for lib/wordpress.js implementing the fetch functionality.
 - A sample Next.js API route (e.g., pages/api/wp-posts.js) that uses your function.
-- Unit tests for your module using Jest.
+- Unit tests for your module using Vitest.
 - Inline comments to describe critical parts of the code.
 ```
 
