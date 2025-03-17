@@ -18,7 +18,6 @@ Each section includes early testing steps (both unit and integration tests) to q
 - [x] Set up linting, Prettier, and other code quality tools. Prefer Next.js defaults
 - [x] Add early unit testing framework configuration (e.g. Vitest).
 - [x] Define a basic health endpoint and example test.
-- [ ] Add support for MSW so we can mock the WP API.
 
 ### 2. Database Setup
 
@@ -41,6 +40,7 @@ Each section includes early testing steps (both unit and integration tests) to q
   - Develop integration tests using historical and sample WordPress API responses to validate data formats.
   - Write a manually triggerable integration test that fetches every blog post on the live server and attempts to parse each one using our email template. Log any errors or unknown content types.
   - Consider mocking responses of different WordPress API versions (or known WP installations) to ensure stable handling across versions.
+- [ ] Add support for MSW in Vitest so we can mock the WP API.
 - [ ] Add unit tests for parsing functions and error handling.
 - [ ] Implement robust error handling and retry logic on API calls.
 
