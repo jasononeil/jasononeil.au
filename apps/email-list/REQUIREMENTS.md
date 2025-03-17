@@ -110,6 +110,9 @@ sent_emails:
 4. Fallback mechanisms for email delivery issues
 
 ## Testing Plan
+
+// add sections for local development and CI checks in Github actions ai
+
 1. **Unit Tests**:
    - Content parsing and transformation
    - Template rendering
@@ -128,6 +131,8 @@ sent_emails:
 4. **Content Type Testing**:
    - Test with various WordPress block types
    - Edge case testing with complex/unusual content
+
+// add them ai!
 
 ## Future Considerations
 1. Multiple subscription types (daily, weekly digest, etc.)
