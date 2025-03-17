@@ -1,0 +1,8 @@
+version: "0.5"
+
+processes:
+  setup:
+    command: apps/email-list/scripts/setup_db.sh
+    depends_on:
+      mysql:
+        condition: process_launched

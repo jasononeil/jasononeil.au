@@ -1,34 +1,18 @@
 import { db } from '@/db';
 import { eq, and } from 'drizzle-orm';
 import { subscribers, subscriberPreferences, sentEmails } from '@/db/schema';
-import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
+import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 
-export interface Subscriber {
-  id?: number;
-  email: string;
-  name?: string | null;
-  status: 'active' | 'unsubscribed';
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-export interface SubscriberPreference {
-  subscriberId: number;
-  categoryId: number;
-}
-
-export interface SentEmail {
-  subscriberId: number;
-  postId: number;
-  status: 'sent' | 'failed';
-  errorMessage?: string;
-}
+// Infer types from the schema
+type Subscriber = InferSelectModel<typeof subscribers>;
+type SentEmail = InferSelectModel<typeof sentEmails>;
+type InsertSubscriber = InferInsertModel<typeof subscribers>;
 
 export class SubscriberRepository {
   // Create a new subscriber
-  async createSubscriber(subscriber: Subscriber): Promise<number> {
-    const result = await db.insert(subscribers).values(subscriber) as MySqlRawQueryResult;
-    return Number(result.insertId);
+  async createSubscriber(subscriber: InsertSubscriber): Promise<number> {
+    const result = await db.insert(subscribers).values(subscriber).$returningId();
+    return result[0].id;
   }
 
   // Get a subscriber by email
@@ -47,9 +31,9 @@ export class SubscriberRepository {
 
   // Update a subscriber
   async updateSubscriber(id: number, data: Partial<Subscriber>): Promise<boolean> {
-    const result = await db.update(subscribers).set(data).where(eq(subscribers.id, id)) as MySqlRawQueryResult;
+    const result = await db.update(subscribers).set(data).where(eq(subscribers.id, id));
 
-    return Number(result.rowsAffected) > 0;
+    return Number(result[0].affectedRows) > 0;
   }
 
   // Mark a subscriber as unsubscribed
@@ -57,9 +41,9 @@ export class SubscriberRepository {
     const result = await db
       .update(subscribers)
       .set({ status: 'unsubscribed' })
-      .where(eq(subscribers.email, email)) as MySqlRawQueryResult;
+      .where(eq(subscribers.email, email));
 
-    return Number(result.rowsAffected) > 0;
+    return Number(result[0].affectedRows) > 0;
   }
 
   // Add a category preference for a subscriber
@@ -85,9 +69,9 @@ export class SubscriberRepository {
           eq(subscriberPreferences.subscriberId, subscriberId),
           eq(subscriberPreferences.categoryId, categoryId)
         )
-      ) as MySqlRawQueryResult;
+      );
 
-    return Number(result.rowsAffected) > 0;
+    return Number(result[0].affectedRows) > 0;
   }
 
   // Get all preferences for a subscriber
@@ -102,20 +86,20 @@ export class SubscriberRepository {
 
   // Record a sent email
   async recordSentEmail(sentEmail: SentEmail): Promise<number> {
-    const result = await db.insert(sentEmails).values(sentEmail) as MySqlRawQueryResult;
-    return Number(result.insertId);
+    const result = await db.insert(sentEmails).values(sentEmail).$returningId();
+    return Number(result[0].id);
   }
 
   // Get all active subscribers
   async getActiveSubscribers(): Promise<Subscriber[]> {
     const results = await db.select().from(subscribers).where(eq(subscribers.status, 'active'));
-    return results.map(result => ({
+    return results.map((result) => ({
       id: result.id,
       email: result.email,
       name: result.name,
       status: result.status,
       createdAt: result.createdAt,
-      updatedAt: result.updatedAt
+      updatedAt: result.updatedAt,
     }));
   }
 }
