@@ -132,18 +132,21 @@ sent_emails:
 
 5. **Local Development Testing**:
    - Mock WordPress API responses for local testing
-   - Docker-based local environment with MySQL
-   - Hot-reloading for template and code changes
+   - Integration test that validates content passing on data from a real API
+   - Devbox based local environment with MySQL
+   - Single command to run linting (and integrated into aider)
+   - Single command to run tests (and integrated into aider)
    - Local SendGrid API sandbox mode
-   - Test data generation scripts
 
-6. **CI/CD with GitHub Actions**:
-   - Automated test runs on pull requests
-   - Linting and code quality checks
-   - Type checking with TypeScript
-   - Security scanning for dependencies
-   - Build verification and deployment previews
-   - Automated deployment to staging/production
+6. **CI with GitHub Actions**:
+   - Run linting on pull requests
+   - Run unit tests on pull requests
+   - Run integration tests on pull requests
+
+7. **CD with GitHub Actions**:
+   - Automate deployment to production
+   - Automate database migrations on deployment
+   - Scheduled database backups
 
 ## Future Considerations
 1. Multiple subscription types (daily, weekly digest, etc.)
