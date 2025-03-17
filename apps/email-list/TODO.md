@@ -1,181 +1,148 @@
-# TODO Checklist for Email Delivery System Project
+# TODO: Email Delivery System for WordPress Blog
 
-This checklist covers all the phases and steps required to build the project. Use it to track progress and ensure that no critical tasks are missed.
+This file outlines the tasks and development phases for the email delivery system with a focus on de-risking early. In particular, we’re targeting:
+• API Content Variability and Unforeseen Data Structures
+• Integration Stability with WordPress API Versions
+• Known risk: Unknown WP content types on your blog
+
+Each section includes early testing steps (both unit and integration tests) to quickly identify any issues with API data or our conversion logic.
 
 ---
 
 ## Phase 1: Core Infrastructure
 
-### Next.js Project Setup & Testing Framework
-- [ ] Create a new Next.js project with the basic folder structure.
-  - [ ] Scaffold directories (pages, public, components, lib, config, etc.)
-  - [ ] Create essential files (package.json, next.config.js if needed)
-- [ ] Install project dependencies:
-  - [ ] Next.js and React
-  - [ ] Jest and any testing libraries (e.g., @testing-library/react)
-  - [ ] Other utilities (e.g., dotenv)
-- [ ] Set up Jest configuration.
-  - [ ] Create jest.config.js (or equivalent).
-  - [ ] Ensure proper handling of Next.js environment.
-- [ ] Write a “Hello World” test.
-  - [ ] Create a sample test file (e.g., __tests__/hello.test.js).
-  - [ ] Verify that tests run successfully and output expected results.
-- [ ] Implement a basic API endpoint for health check.
-  - [ ] Create pages/api/health.js that returns `{ "status": "ok" }`.
-  - [ ] Write tests to verify the endpoint responds correctly.
+### 1. Project Setup
+- [ ] Initialize the Next.js application structure.
+- [ ] Set up the Node.js backend environment.
+- [ ] Configure repository structure (e.g., src/, tests/, config/, etc.).
+- [ ] Set up linting, Prettier, and other code quality tools.
+- [ ] Add early unit testing framework configuration (e.g. Vitest).
 
-### Database Integration & Subscriber Schema
-- [ ] Set up MySQL connection configuration.
-  - [ ] Create a configuration file (config/db.js) for managing MySQL connections.
-  - [ ] Ensure environment variables and connection pooling are set up.
-- [ ] Define the database schema:
-  - [ ] Create the `subscribers` table with:
-    - id (primary key)
-    - email (unique)
-    - name (optional)
-    - status (active, unsubscribed)
-    - created_at, updated_at timestamps
-  - [ ] Create the `subscriber_preferences` table with:
-    - id (primary key)
-    - subscriber_id (foreign key)
-    - category_id
-    - created_at
-  - [ ] Create the `sent_emails` table with:
-    - id (primary key)
-    - subscriber_id (foreign key)
-    - post_id
-    - status (sent, failed)
-    - sent_at
-    - error_message (nullable)
-- [ ] Implement migrations or ORM models to create these tables.
-- [ ] Write unit tests (or integration tests) to:
-  - [ ] Verify database connection works.
-  - [ ] Ensure that the schema is created correctly in a test environment.
+### 2. Database Setup
+- [ ] Define MySQL database configuration (shared with WordPress).
+- [ ] Create custom tables:
+  - subscribers
+  - subscriber_preferences
+  - sent_emails
+- [ ] Write migrations or SQL scripts for schema creation.
+- [ ] Add testing scripts for database connection and migrations.
 
-### WordPress API Integration
-- [ ] Create a WordPress integration module (lib/wordpress.js)
-  - [ ] Implement a function to fetch blog posts from the WordPress REST API.
-  - [ ] Parse and return basic metadata: post title, content, publication date, categories, tags, featured image.
-  - [ ] Handle error cases and return a uniform error message.
-- [ ] Create a sample API route to use this module.
-  - [ ] Create pages/api/wp-posts.js to invoke the WordPress module.
-- [ ] Write Jest tests for the WordPress module:
-  - [ ] Use mocks to simulate WordPress API responses.
-  - [ ] Test for error handling and valid data retrieval.
+### 3. WordPress API Integration
+- [ ] Create a module/service to fetch posts via the WordPress REST API.
+- [ ] Implement methods to fetch:
+  - Posts (content, title, publication date)
+  - Categories & tags
+  - Featured images, media, and author information
+- [ ] Early Risk Mitigation:
+  - Develop integration tests using historical and sample WordPress API responses to validate data formats.
+  - Write a manually triggerable integration test that fetches every blog post on the live server and attempts to parse each one using our email template. Log any errors or unknown content types.
+  - Consider mocking responses of different WordPress API versions (or known WP installations) to ensure stable handling across versions.
+- [ ] Add unit tests for parsing functions and error handling.
+- [ ] Implement robust error handling and retry logic on API calls.
 
-### Email Templating with Handlebars
-- [ ] Set up Handlebars in a module (lib/templates.js)
-  - [ ] Configure and initialize Handlebars.
-  - [ ] Create a basic email template that contains:
-    - Header (blog name/logo)
-    - Placeholder for post title and content
-    - Footer (unsubscribe link)
-- [ ] Write renderEmailTemplate function to produce HTML from provided data.
-- [ ] Write unit tests to:
-  - [ ] Validate the rendered HTML contains key sections.
-  - [ ] Ensure dynamic data is correctly inserted into the template.
-
-### Integration of Core Components
-- [ ] Build an API endpoint to compose an email (pages/api/compose-email.js)
-  - [ ] Invoke the WordPress module to fetch a given post.
-  - [ ] Use the Handlebars templating function to render the email.
-  - [ ] Return the rendered HTML in a JSON response.
-- [ ] Write integration tests to:
-  - [ ] Mock the WordPress API call to return test post data.
-  - [ ] Verify that the resulting HTML correctly incorporates the post data.
-  - [ ] Ensure that the complete flow works end-to-end.
+### 4. Basic Handlebars Email Templates
+- [ ] Set up Handlebars as the templating engine.
+- [ ] Create simple HTML/CSS templates:
+  - Header with blog name/logo
+  - Footer with unsubscribe link and preference management
+- [ ] Ensure basic responsive and sans-serif styling.
+- [ ] Create unit tests validating template rendering with various sample data inputs.
 
 ---
 
 ## Phase 2: Email Generation & Delivery
 
-### Enhancing Email Templating & Content Parsing
-- [ ] Extend the Handlebars email template:
-  - [ ] Include dynamic data (post metadata, featured image, more-from-blog section, etc.)
-- [ ] Create a function (e.g., parsePostContent) to convert WordPress block content into email-friendly HTML.
-  - [ ] Support common blocks such as headers, lists, images, etc.
-  - [ ] Implement fallback logic for unsupported blocks.
-- [ ] Write unit tests for content parsing:
-  - [ ] Ensure various block types are correctly converted.
-  - [ ] Cover edge cases.
+### 1. Content Parsing & Transformation
+- [ ] Develop a parser to convert WordPress block content into email-friendly HTML and also plain text.
+- [ ] Ensure conversion logic handles:
+  - Common block types (headers, lists, blockquotes, etc.)
+  - Embedded media and fallback for unsupported blocks
+- [ ] Early Integration Test:
+  - Use the manual trigger test to run the conversion process on all existing WordPress posts and report any parsing anomalies.
+  - Write unit tests for each block type conversion scenario.
 
-### SendGrid Integration for Email Delivery
-- [ ] Set up a SendGrid integration module (lib/sendgrid.js)
-  - [ ] Implement functions to send emails using the SendGrid API.
-  - [ ] Include error handling and appropriate logging for delivery failures.
-- [ ] Write tests to mimic SendGrid responses using mocks.
-  - [ ] Validate that send functions correctly handle success and error cases.
+### 2. Email Composition
+- [ ] Build an email composition system:
+  - Integrate fetched post content, metadata (categories, tags, publish date, author)
+  - Insert featured image if available
+- [ ] Create a “More from the blog” section showing recent posts.
+- [ ] Implement mobile-responsive design in the email template.
+- [ ] Write unit tests to verify that all required content is correctly composed.
 
-### API Endpoint for Triggering Email Delivery
-- [ ] Create an API endpoint (pages/api/trigger-email/[postId].js)
-  - [ ] Accept a post ID, fetch the post using the WordPress API.
-  - [ ] Parse and render the email template with the enhanced content.
-  - [ ] Send the email using the SendGrid module.
-  - [ ] Return a status response detailing delivery success/failure.
-- [ ] Write unit and integration tests covering:
-  - [ ] Content fetching and parsing
-  - [ ] Template rendering with dynamic content
-  - [ ] Email sending via SendGrid
-  - [ ] Complete end-to-end API flow
+### 3. SendGrid Integration
+- [ ] Integrate Twilio SendGrid for sending emails.
+- [ ] Set up configuration for SendGrid API keys and endpoints.
+- [ ] Implement sending functionality with robust error handling:
+  - Retry logic for delivery failures
+  - Logging of send status and errors
+- [ ] Write integration tests for SendGrid endpoints (possibly in sandbox mode).
+
+### 4. Email Triggering Mechanism
+- [ ] Implement a trigger mechanism via:
+  - Scheduled checks / WordPress hooks (via the API)
+  - Manual endpoint `/api/trigger-email/:postId`
+- [ ] Test triggering functionality through unit tests and early integration testing.
 
 ---
 
 ## Phase 3: Subscriber Management
 
-### API Endpoints for Subscriber Flows
-- [ ] Create the `/api/subscribe` endpoint:
-  - [ ] Validate incoming subscription data.
-  - [ ] Insert new subscriber records into the database.
-  - [ ] Return success/error messages.
-- [ ] Create the `/api/preferences` endpoint:
-  - [ ] Allow subscribers to update their preferences (e.g., content categories).
-  - [ ] Validate input and update database records.
-- [ ] Create the `/api/unsubscribe` endpoint:
-  - [ ] Handle unsubscribe requests (mark subscriber as inactive or remove).
-  - [ ] Ensure secure processing of unsubscribe requests.
+### 1. Subscription Forms & API Endpoints
+- [ ] Develop a basic subscribe form that can be embedded in WordPress (e.g. `<form><input type="email">...`).
+- [ ] Create API endpoint: `/api/subscribe`
+  - Validate input and add subscriber to the database
+- [ ] Create API endpoint: `/api/preferences`
+  - Update subscriber category preferences
+- [ ] Create API endpoint: `/api/unsubscribe`
+  - Mark subscriber status as unsubscribed
+- [ ] Write unit tests for each endpoint to validate data handling and error conditions.
 
-### Frontend Forms for Subscription Management
-- [ ] Develop embeddable HTML forms or React components:
-  - [ ] Subscription form (with email input, etc.) for WordPress.
-  - [ ] Preference management form.
-  - [ ] Unsubscribe form.
-- [ ] Write integration tests that:
-  - [ ] Validate full subscriber lifecycle (subscribe, update preferences, unsubscribe).
-  - [ ] Ensure endpoints handle form submissions correctly.
+### 2. Subscription Pages
+- [ ] Build frontend pages for:
+  - Subscription Management
+  - Subscriber Preferences
+  - Unsubscribe confirmation
+- [ ] Ensure secure handling of subscriber data.
+- [ ] Write integration tests simulating full subscriber interactions.
 
 ---
 
-## Phase 4: Refinement & Deployment
+## Phase 4: Analytics, Logging, and Testing
 
-### Error Handling, Logging, and Analytics
-- [ ] Enhance error logging across all modules:
-  - [ ] Implement file-based logging with timestamps and context.
-  - [ ] Integrate logging into the API endpoints and external API calls.
-- [ ] Record delivery information:
-  - [ ] Update `/api/trigger-email` endpoint to log email send statuses (success, failure, error messages).
-  - [ ] Insert send status into the `sent_emails` table.
-- [ ] Refine email templates:
-  - [ ] Ensure mobile-responsive design.
-  - [ ] Validate inline CSS for responsiveness across devices.
+### 1. Logging & Error Handling
+- [ ] Set up file-based logging for system operations and errors with timestamps and context.
+- [ ] Implement fallback mechanisms for:
+  - Unsupported WordPress blocks
+  - Email delivery issues
+- [ ] Write unit tests that simulate errors to ensure correct logging and recovery.
 
-### Deployment Preparations
-- [ ] Create deployment artifacts:
-  - [ ] Dockerfile(s) for containerization.
-  - [ ] Environment configuration files (e.g., .env.example)
-- [ ] Update documentation:
-  - [ ] Deployment steps.
-  - [ ] Configuration parameters and environment variables.
-- [ ] Write final end-to-end integration tests:
-  - [ ] Validate the complete flow in a production-like environment.
-  - [ ] Ensure all components (Next.js, database, SendGrid, WordPress integration) are working together correctly.
+### 2. Comprehensive Testing
+- [ ] End-to-End Tests:
+  - Complete subscription flow (signup → email trigger → unsubscribe)
+  - Test manual email triggering via `/api/trigger-email/:postId`
+- [ ] Configure CI with GitHub Actions:
+  - Linting, unit, and integration tests on every pull request.
+- [ ] Plan for automated deployments and database migration tests.
 
 ---
 
-## General & Additional Tasks
-- [ ] Review inline documentation and ensure clarity.
-- [ ] Verify that every module is covered by both unit and integration tests.
-- [ ] Regularly update the TODO checklist as new tasks emerge from development and testing.
+## Phase 5: Refinement & Deployment
+
+### 1. Template and Parsing Refinements
+- [ ] Optimize parsing logic for complex cases identified during early integration tests.
+- [ ] Enhance email templates for improved responsiveness and data display.
+- [ ] Incorporate user feedback from initial tests and adjust as necessary.
+
+### 2. Production Deployment
+- [ ] Finalize environment settings on Digital Ocean VPS.
+- [ ] Integrate deployment pipelines with GitHub Actions:
+  - Automated deployment, database migration, and backup steps.
+- [ ] Monitor detailed logging and scheduled integration tests post-deployment to catch any emerging issues.
 
 ---
 
-This checklist is designed to guide the development process and ensure incremental progress through small, manageable tasks. Mark items as complete upon successful implementation and testing of each step.
+## Future Considerations (Backlog)
+- [ ] Support for multiple subscription types (daily, weekly digest, etc.)
+- [ ] Enhanced analytics for open and click rates.
+- [ ] A/B testing for variant email templates.
+- [ ] Further integration with static site generation if blog architecture changes.
