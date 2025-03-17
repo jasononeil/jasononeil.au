@@ -111,8 +111,6 @@ sent_emails:
 
 ## Testing Plan
 
-// add sections for local development and CI checks in Github actions ai
-
 1. **Unit Tests**:
    - Content parsing and transformation
    - Template rendering
@@ -132,7 +130,20 @@ sent_emails:
    - Test with various WordPress block types
    - Edge case testing with complex/unusual content
 
-// add them ai!
+5. **Local Development Testing**:
+   - Mock WordPress API responses for local testing
+   - Docker-based local environment with MySQL
+   - Hot-reloading for template and code changes
+   - Local SendGrid API sandbox mode
+   - Test data generation scripts
+
+6. **CI/CD with GitHub Actions**:
+   - Automated test runs on pull requests
+   - Linting and code quality checks
+   - Type checking with TypeScript
+   - Security scanning for dependencies
+   - Build verification and deployment previews
+   - Automated deployment to staging/production
 
 ## Future Considerations
 1. Multiple subscription types (daily, weekly digest, etc.)
