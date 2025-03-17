@@ -1,5 +1,8 @@
 {
   "name": "jasononeil.au",
   "packageManager": "pnpm@9.1.2",
-  "version": "0.0.1"
+  "version": "0.0.1",
+  "scripts": {
+    "email-list": "pnpm --filter email-list"
+  }
 }
