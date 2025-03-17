@@ -12,11 +12,12 @@ Each section includes early testing steps (both unit and integration tests) to q
 ## Phase 1: Core Infrastructure
 
 ### 1. Project Setup
-- [ ] Initialize the Next.js application structure.
-- [ ] Set up the Node.js backend environment.
-- [ ] Configure repository structure (e.g., src/, tests/, config/, etc.).
-- [ ] Set up linting, Prettier, and other code quality tools.
+- [x] Initialize the Next.js application structure.
+- [x] Configure repository structure
+- [ ] Set up linting, Prettier, and other code quality tools. Prefer Next.js defaults
 - [ ] Add early unit testing framework configuration (e.g. Vitest).
+- [ ] Define a basic health endpoint and example test.
+- [ ] Add support for MSW so we can mock the WP API.
 
 ### 2. Database Setup
 - [ ] Define MySQL database configuration (shared with WordPress).
