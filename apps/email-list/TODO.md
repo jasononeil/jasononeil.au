@@ -21,6 +21,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 
 ### 2. Database Setup
 
+- [x] Set up a local MySQL with devbox
 - [ ] Set up Drizzle ORM for MySQL database access
 - [ ] Define MySQL database configuration (shared with WordPress)
 - [ ] Create schema definitions for custom tables:

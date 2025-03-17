@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/0.10.4/.schema/devbox.schema.json",
-  "packages": ["nodejs@latest"],
+  "packages": ["nodejs@latest", "mysql80@latest"],
   "env": {
     "DEVBOX_COREPACK_ENABLED": "true",
     "npm_config_python": "/usr/bin/python3"

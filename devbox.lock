@@ -4,6 +4,71 @@
     "github:NixOS/nixpkgs/nixpkgs-unstable": {
       "resolved": "github:NixOS/nixpkgs/573c650e8a14b2faa0041645ab18aed7e60f0c9a?lastModified=1741865919&narHash=sha256-4thdbnP6dlbdq%2BqZWTsm4ffAwoS8Tiq1YResB%2BRP6WE%3D"
     },
+    "mysql80@latest": {
+      "last_modified": "2025-03-11T17:52:14Z",
+      "plugin_version": "0.0.4",
+      "resolved": "github:NixOS/nixpkgs/0d534853a55b5d02a4ababa1d71921ce8f0aee4c#mysql80",
+      "source": "devbox-search",
+      "version": "8.0.41",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/kngvk0b3cqy6rlmn7ky5qhdrkcwjgm33-mysql-8.0.41",
+              "default": true
+            },
+            {
+              "name": "static",
+              "path": "/nix/store/g4hjlb0hf65ywilakmvhr9ai1zx6p70c-mysql-8.0.41-static"
+            }
+          ],
+          "store_path": "/nix/store/kngvk0b3cqy6rlmn7ky5qhdrkcwjgm33-mysql-8.0.41"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/rp2dsjwf7xa3753pwfprm6hrm9bss60x-mysql-8.0.41",
+              "default": true
+            },
+            {
+              "name": "static",
+              "path": "/nix/store/lpv5qi4bfic353wvlbpv2wr5a7x3r8i3-mysql-8.0.41-static"
+            }
+          ],
+          "store_path": "/nix/store/rp2dsjwf7xa3753pwfprm6hrm9bss60x-mysql-8.0.41"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/d1cl3ygx02qf0ibciwv3qs7i794v4wpn-mysql-8.0.41",
+              "default": true
+            },
+            {
+              "name": "static",
+              "path": "/nix/store/i0fv79xc5s2gk35lzf41yvyj472kmlxa-mysql-8.0.41-static"
+            }
+          ],
+          "store_path": "/nix/store/d1cl3ygx02qf0ibciwv3qs7i794v4wpn-mysql-8.0.41"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/6ncwyfn637aaargy3854cdgdzb23cpx5-mysql-8.0.41",
+              "default": true
+            },
+            {
+              "name": "static",
+              "path": "/nix/store/cx78xbapnjb2b5dzd9hxqhk7qilxhl51-mysql-8.0.41-static"
+            }
+          ],
+          "store_path": "/nix/store/6ncwyfn637aaargy3854cdgdzb23cpx5-mysql-8.0.41"
+        }
+      }
+    },
     "nodejs@latest": {
       "last_modified": "2024-05-17T18:08:26Z",
       "plugin_version": "0.0.2",
