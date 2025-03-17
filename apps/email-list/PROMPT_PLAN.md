@@ -14,30 +14,31 @@ Overview:
 • Testing happens at the unit level (for business logic and content transformation), integration level (WordPress connectivity, database, SendGrid), and E2E for subscription and email delivery flows.
 
 Phases:
+
 1. Phase 1: Core Infrastructure
-  a. Next.js Project Setup
-  b. Database Integration and Subscriber Schema
-  c. Basic WordPress API integration
-  d. Simple Handlebars templates as placeholders
-  e. Write foundational tests (unit tests for API and template rendering)
+     a. Next.js Project Setup
+     b. Database Integration and Subscriber Schema
+     c. Basic WordPress API integration
+     d. Simple Handlebars templates as placeholders
+     e. Write foundational tests (unit tests for API and template rendering)
 
 2. Phase 2: Email Generation & Delivery
-  a. Develop parsing logic to convert WordPress blocks into email-friendly HTML
-  b. Build email composition system using Handlebars templates with dynamic content (post meta, featured image, “more from blog” section, etc.)
-  c. Integrate SendGrid with test endpoints
-  d. Create an API endpoint (/api/trigger-email/:postId) to tie the pieces together
+     a. Develop parsing logic to convert WordPress blocks into email-friendly HTML
+     b. Build email composition system using Handlebars templates with dynamic content (post meta, featured image, “more from blog” section, etc.)
+     c. Integrate SendGrid with test endpoints
+     d. Create an API endpoint (/api/trigger-email/:postId) to tie the pieces together
 
 3. Phase 3: Subscriber Management
-  a. Build API endpoints for subscribing (/api/subscribe), updating preferences (/api/preferences), and unsubscribing (/api/unsubscribe)
-  b. Create embeddable forms (basic HTML snippet) for WordPress
-  c. Tie these endpoints into the database schema
-  d. Implement tests (unit and integration) that cover the subscriber lifecycle
+     a. Build API endpoints for subscribing (/api/subscribe), updating preferences (/api/preferences), and unsubscribing (/api/unsubscribe)
+     b. Create embeddable forms (basic HTML snippet) for WordPress
+     c. Tie these endpoints into the database schema
+     d. Implement tests (unit and integration) that cover the subscriber lifecycle
 
 4. Phase 4: Refinement & Deployment
-  a. Enhance error handling and logging (use file-based logging with timestamps and context)
-  b. Optimize email templates for responsiveness
-  c. Integrate analytics & monitoring
-  d. Final integration tests and deployment configuration
+     a. Enhance error handling and logging (use file-based logging with timestamps and context)
+     b. Optimize email templates for responsiveness
+     c. Integrate analytics & monitoring
+     d. Final integration tests and deployment configuration
 
 ──────────────────────────────
 Step 2. Iterative Chunking
@@ -95,6 +96,7 @@ Project: Email Delivery System
 Task: Scaffold a basic Next.js project and add a simple testing framework.
 
 Requirements:
+
 1. Create a new Next.js application structure.
 2. Integrate Vitest for testing with a “Hello World” test that verifies the testing setup works.
 3. Provide a minimal Next.js API endpoint at /api/health that returns a JSON response: { "status": "ok" }.
@@ -102,6 +104,7 @@ Requirements:
 5. Ensure the code is organized in a modular fashion to allow integration in later steps.
 
 Please generate:
+
 - The Next.js project structure (only the basic scaffolding, list the main folders and files).
 - A sample API route at pages/api/health.js.
 - A Vitest configuration file (if necessary) and a sample test file that tests the /api/health endpoint.
@@ -117,6 +120,7 @@ Project: Email Delivery System (Phase 1)
 Task: Set up the database integration and subscriber schema.
 
 Requirements:
+
 1. Add configuration for connecting to a MySQL database.
 2. Define the subscriber-related tables based on the following schema:
    - subscribers: id (primary key), email (unique), name (optional), status (active, unsubscribed), created_at, updated_at.
@@ -127,6 +131,7 @@ Requirements:
 5. Use best practices for database connection management in Node.js.
 
 Please generate:
+
 - The necessary configuration file (e.g., config/db.js) to manage MySQL connection.
 - Code for setting up the schema (using either an ORM or SQL migration scripts, as preferred).
 - Sample unit tests that verify table creation.
@@ -142,6 +147,7 @@ Project: Email Delivery System (Phase 1 - WordPress Integration)
 Task: Connect to the WordPress REST API to fetch blog posts.
 
 Requirements:
+
 1. Create a module (e.g., lib/wordpress.js) that exports functions for fetching blog posts and basic metadata.
 2. Implement a function that:
    - Sends a HTTP GET request to the WordPress REST API endpoint.
@@ -151,6 +157,7 @@ Requirements:
 4. Follow TDD best practices by wiring a simple API test endpoint in your Next.js API routes that calls this function and returns sample data.
 
 Please generate:
+
 - Code for lib/wordpress.js implementing the fetch functionality.
 - A sample Next.js API route (e.g., pages/api/wp-posts.js) that uses your function.
 - Unit tests for your module using Vitest.
@@ -166,6 +173,7 @@ Project: Email Delivery System (Phase 1 - Email Templating)
 Task: Implement a basic email templating system using Handlebars.
 
 Requirements:
+
 1. Create a module (e.g., lib/templates.js) that sets up Handlebars.
 2. Develop a simple email template that includes:
    - A header (e.g., blog name/logo).
@@ -176,6 +184,7 @@ Requirements:
 5. Ensure the code is modular so that later email template enhancements can build on this.
 
 Please generate:
+
 - The lib/templates.js file with the Handlebars setup and sample template.
 - A sample test file for rendering this template.
 - Inline comments to explain your implementation.
@@ -190,6 +199,7 @@ Project: Email Delivery System (Phase 1 - Integration)
 Task: Integrate the previously created modules (Next.js API routes, database, WordPress integration, and email templating) into a cohesive foundation.
 
 Requirements:
+
 1. Create an API endpoint (e.g., pages/api/compose-email.js) that:
    - Uses the WordPress integration module to fetch a specific post.
    - Calls the email templating function to render an email using the fetched content.
@@ -200,6 +210,7 @@ Requirements:
 3. Ensure that all components from Phases 1 (project, database, content fetching, templating) are wired together and working properly.
 
 Please generate:
+
 - The pages/api/compose-email.js endpoint with integration of the WordPress API and Handlebars templating.
 - Integration tests that simulate the full flow.
 - Inline comments that describe the wiring logic and error handling.
@@ -214,6 +225,7 @@ Project: Email Delivery System (Phase 2 - Email Generation & Delivery)
 Task: Extend the email generation process and integrate with SendGrid for delivery.
 
 Requirements:
+
 1. Enhance the email templating system to transform WordPress block content into email-friendly HTML.
 2. Create a function (e.g., parsePostContent) that converts common WordPress blocks (headers, lists, images, etc.) into a format suitable for email.
 3. Integrate a SendGrid module (e.g., lib/sendgrid.js) that:
@@ -231,6 +243,7 @@ Requirements:
    - Test the API endpoint end-to-end.
 
 Please generate:
+
 - The updated lib/templates.js with parsePostContent added.
 - The lib/sendgrid.js module for sending emails.
 - The API endpoint pages/api/trigger-email/[postId].js integrating all functions.
@@ -247,6 +260,7 @@ Project: Email Delivery System (Phase 3 - Subscriber Management)
 Task: Implement endpoints and functionality for managing subscribers.
 
 Requirements:
+
 1. Create the following API endpoints:
    - /api/subscribe: to create new subscriber entries.
    - /api/preferences: to update subscriber preferences (e.g., categories).
@@ -259,6 +273,7 @@ Requirements:
 4. Write both unit tests (for data validation and DB operations) and integration tests (end-to-end flow from the form -> API endpoint -> DB change).
 
 Please generate:
+
 - Code for the API endpoints (organized in pages/api/) that implement subscribe, preferences, and unsubscribe functionality.
 - Sample HTML/React forms as standalone components that call these endpoints.
 - Test files for the subscriber flows.
@@ -274,6 +289,7 @@ Project: Email Delivery System (Phase 4 - Refinement & Deployment)
 Task: Refine error handling, logging, and prepare the system for deployment.
 
 Requirements:
+
 1. Enhance all API endpoints to include proper error logging. Use a file-based logging mechanism that logs errors with timestamps and API context.
 2. Refactor the email templating and content parsing to be fully mobile responsive (if using inline CSS, ensure responsiveness).
 3. Implement additional analytics/logging to track send statuses (e.g., record successful sends and failures in the sent_emails table).
@@ -284,6 +300,7 @@ Requirements:
 6. Document deployment steps and configuration parameters.
 
 Please generate:
+
 - Code updates for error logging across modules (with sample log file configuration).
 - Updated API endpoints that record send statuses.
 - Dockerfile and environment sample configuration.

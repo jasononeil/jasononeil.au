@@ -12,6 +12,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 ## Phase 1: Core Infrastructure
 
 ### 1. Project Setup
+
 - [x] Initialize the Next.js application structure.
 - [x] Configure repository structure
 - [x] Set up linting, Prettier, and other code quality tools. Prefer Next.js defaults
@@ -20,6 +21,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 - [ ] Add support for MSW so we can mock the WP API.
 
 ### 2. Database Setup
+
 - [ ] Define MySQL database configuration (shared with WordPress).
 - [ ] Create custom tables:
   - subscribers
@@ -29,6 +31,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 - [ ] Add testing scripts for database connection and migrations.
 
 ### 3. WordPress API Integration
+
 - [ ] Create a module/service to fetch posts via the WordPress REST API.
 - [ ] Implement methods to fetch:
   - Posts (content, title, publication date)
@@ -42,6 +45,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 - [ ] Implement robust error handling and retry logic on API calls.
 
 ### 4. Basic Handlebars Email Templates
+
 - [ ] Set up Handlebars as the templating engine.
 - [ ] Create simple HTML/CSS templates:
   - Header with blog name/logo
@@ -54,6 +58,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 ## Phase 2: Email Generation & Delivery
 
 ### 1. Content Parsing & Transformation
+
 - [ ] Develop a parser to convert WordPress block content into email-friendly HTML and also plain text.
 - [ ] Ensure conversion logic handles:
   - Common block types (headers, lists, blockquotes, etc.)
@@ -63,6 +68,7 @@ Each section includes early testing steps (both unit and integration tests) to q
   - Write unit tests for each block type conversion scenario.
 
 ### 2. Email Composition
+
 - [ ] Build an email composition system:
   - Integrate fetched post content, metadata (categories, tags, publish date, author)
   - Insert featured image if available
@@ -71,6 +77,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 - [ ] Write unit tests to verify that all required content is correctly composed.
 
 ### 3. SendGrid Integration
+
 - [ ] Integrate Twilio SendGrid for sending emails.
 - [ ] Set up configuration for SendGrid API keys and endpoints.
 - [ ] Implement sending functionality with robust error handling:
@@ -79,6 +86,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 - [ ] Write integration tests for SendGrid endpoints (possibly in sandbox mode).
 
 ### 4. Email Triggering Mechanism
+
 - [ ] Implement a trigger mechanism via:
   - Scheduled checks / WordPress hooks (via the API)
   - Manual endpoint `/api/trigger-email/:postId`
@@ -89,6 +97,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 ## Phase 3: Subscriber Management
 
 ### 1. Subscription Forms & API Endpoints
+
 - [ ] Develop a basic subscribe form that can be embedded in WordPress (e.g. `<form><input type="email">...`).
 - [ ] Create API endpoint: `/api/subscribe`
   - Validate input and add subscriber to the database
@@ -99,6 +108,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 - [ ] Write unit tests for each endpoint to validate data handling and error conditions.
 
 ### 2. Subscription Pages
+
 - [ ] Build frontend pages for:
   - Subscription Management
   - Subscriber Preferences
@@ -111,6 +121,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 ## Phase 4: Analytics, Logging, and Testing
 
 ### 1. Logging & Error Handling
+
 - [ ] Set up file-based logging for system operations and errors with timestamps and context.
 - [ ] Implement fallback mechanisms for:
   - Unsupported WordPress blocks
@@ -118,6 +129,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 - [ ] Write unit tests that simulate errors to ensure correct logging and recovery.
 
 ### 2. Comprehensive Testing
+
 - [ ] End-to-End Tests:
   - Complete subscription flow (signup → email trigger → unsubscribe)
   - Test manual email triggering via `/api/trigger-email/:postId`
@@ -130,11 +142,13 @@ Each section includes early testing steps (both unit and integration tests) to q
 ## Phase 5: Refinement & Deployment
 
 ### 1. Template and Parsing Refinements
+
 - [ ] Optimize parsing logic for complex cases identified during early integration tests.
 - [ ] Enhance email templates for improved responsiveness and data display.
 - [ ] Incorporate user feedback from initial tests and adjust as necessary.
 
 ### 2. Production Deployment
+
 - [ ] Finalize environment settings on Digital Ocean VPS.
 - [ ] Integrate deployment pipelines with GitHub Actions:
   - Automated deployment, database migration, and backup steps.
@@ -143,6 +157,7 @@ Each section includes early testing steps (both unit and integration tests) to q
 ---
 
 ## Future Considerations (Backlog)
+
 - [ ] Support for multiple subscription types (daily, weekly digest, etc.)
 - [ ] Enhanced analytics for open and click rates.
 - [ ] A/B testing for variant email templates.

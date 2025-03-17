@@ -1,11 +1,13 @@
 # Email Delivery System for jasononeil.au (a WordPress Blog)
 
 ## Project Overview
+
 This is a small Next.js project to help deliver blog posts via email to people who have subscribed.
 
 I want just enough custom functionality that an off-the-shelf wordpress plugin like MailPoet wasn't my preferred option.
 
 ## Project Goals
+
 - **Improved Email Design:** Create customizable, mobile-responsive email templates that incorporate WordPress content in an email-friendly format.
 - **Robust Subscription Management:** Facilitate seamless subscription, preference updates, and unsubscription through dedicated API endpoints and embeddable forms.
 - **Headless Architecture:** Decouple email delivery functionality from the WordPress core, enabling independent evolution and scaling of the email system.
@@ -13,6 +15,7 @@ I want just enough custom functionality that an off-the-shelf wordpress plugin l
 - **Comprehensive Logging & Analytics:** Enable detailed tracking of system operations and email delivery statuses to support troubleshooting and future optimizations.
 
 ## Intended Architecture
+
 - **Next.js Frontend & API Routes:**
   - The application uses Next.js to serve both the frontend and API endpoints.
   - It will host pages for subscribing, managing subscriptions, and unsubscribing.
