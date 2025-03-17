@@ -21,13 +21,16 @@ Each section includes early testing steps (both unit and integration tests) to q
 
 ### 2. Database Setup
 
-- [ ] Define MySQL database configuration (shared with WordPress).
-- [ ] Create custom tables:
+- [ ] Set up Drizzle ORM for MySQL database access
+- [ ] Define MySQL database configuration (shared with WordPress)
+- [ ] Create schema definitions for custom tables:
   - subscribers
   - subscriber_preferences
   - sent_emails
-- [ ] Write migrations or SQL scripts for schema creation.
-- [ ] Add testing scripts for database connection and migrations.
+- [ ] Write Drizzle migrations for schema creation
+- [ ] Create database utility functions for common operations
+- [ ] Add testing scripts for database connection and migrations
+- [ ] Implement repository pattern for subscriber management
 
 ### 3. WordPress API Integration
 
