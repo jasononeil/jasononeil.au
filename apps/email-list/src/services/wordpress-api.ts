@@ -237,7 +237,10 @@ export class WordPressAPI {
     });
 
     const url = `${this.baseUrl}/categories?${params.toString()}`;
-    return this.apiCall<WPCategory[]>(url, `Error fetching categories (page=${page}, perPage=${perPage})`);
+    return this.apiCall<WPCategory[]>(
+      url,
+      `Error fetching categories (page=${page}, perPage=${perPage})`
+    );
   }
 
   /**

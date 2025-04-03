@@ -45,6 +45,15 @@ First, create the basic code:
 - [x] Create a "renderer" type, and a first "markdown" renderer that takes a post and creates a markdown rendering of all the blocks in the post.
 - [x] Write a manually triggerable integration test that fetches every blog post on the live server and attempts to parse each one, outputing a markdown file. Log any errors or unknown content types. After attempting all posts, return non-zero if there were errors or unknown content types.
 
+Now create a test harness
+
+- [x] Create a Next.js page `/app/preview-posts/` that has a 4 column layout
+- [x] Use route parameters to keep track of the current state for pagination / selected post.
+- [x] The first column is titled "Posts" should have a list item for each blog post. Use whatever pagination the API uses.
+- [x] The second pane is titled "Web" and should have an iframe for the actual blog post.
+- [x] The third pane is titled "Markdown" and should have a markdown rendering in a <pre> tag (but with word-wrapping)
+- [x] The fourth pane is titled "HTML Email" and for now just renders "coming soon"
+
 ### 4. Basic Handlebars Email Templates
 
 - [ ] Set up Handlebars as the templating engine.
