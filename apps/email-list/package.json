@@ -12,7 +12,8 @@
     "test": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrations/migrate.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "wp:test-all-posts": "tsx scripts/test-wp-api-integration.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.40.0",
