@@ -35,14 +35,20 @@ Each section includes early testing steps (both unit and integration tests) to q
 
 ### 3. WordPress API Integration
 
-- [ ] Create a module/service to fetch posts via the WordPress REST API.
-- [ ] Implement methods to fetch:
+First, create the basic code:
+
+- [ ] Create a module to fetch posts via the WordPress REST API.
+- [ ] Implement methods to fetch these:
   - Posts (content, title, publication date)
   - Categories & tags
   - Featured images, media, and author information
+- [ ] Create a "renderer" type, and a first "markdown" renderer that takes a post and creates a markdown rendering of all the blocks in the post.
+- [ ] Write a manually triggerable integration test that fetches every blog post on the live server and attempts to parse each one, outputing a markdown file. Log any errors or unknown content types. After attempting all posts, return non-zero if there were errors or unknown content types.
+
+Then make it more solid:
+
 - [ ] Early Risk Mitigation:
   - Develop integration tests using historical and sample WordPress API responses to validate data formats.
-  - Write a manually triggerable integration test that fetches every blog post on the live server and attempts to parse each one using our email template. Log any errors or unknown content types.
   - Consider mocking responses of different WordPress API versions (or known WP installations) to ensure stable handling across versions.
 - [ ] Add support for MSW in Vitest so we can mock the WP API.
 - [ ] Add unit tests for parsing functions and error handling.
