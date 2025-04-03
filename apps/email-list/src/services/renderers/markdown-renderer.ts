@@ -158,16 +158,8 @@ export class MarkdownRenderer implements Renderer {
       });
     });
 
-    // Remove any remaining HTML tags
-    markdown = markdown.replace(/<[^>]*>/g, '');
-
-    // Decode HTML entities
-    markdown = markdown.replace(/&nbsp;/g, ' ');
-    markdown = markdown.replace(/&amp;/g, '&');
-    markdown = markdown.replace(/&lt;/g, '<');
-    markdown = markdown.replace(/&gt;/g, '>');
-    markdown = markdown.replace(/&quot;/g, '"');
-    markdown = markdown.replace(/&#39;/g, "'");
+    // Remove any remaining HTML tags and decode entities
+    markdown = this.stripHtml(markdown)
 
     return markdown.trim();
   }
@@ -176,6 +168,42 @@ export class MarkdownRenderer implements Renderer {
    * Strip HTML tags from a string
    */
   private stripHtml(html: string): string {
-    return html.replace(/<[^>]*>/g, '');
+    return this.decodeHtmlEntities(html.replace(/<[^>]*>/g, ''));
+  }
+
+  /**
+   * Decode all HTML entities in a string
+   */
+  private decodeHtmlEntities(text: string): string {
+    // First pass: handle common HTML entities
+    let decoded = text
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&mdash;/g, '—')
+      .replace(/&ndash;/g, '–')
+      .replace(/&lsquo;/g, '‘')
+      .replace(/&rsquo;/g, '’')
+      .replace(/&ldquo;/g, '“')
+      .replace(/&rdquo;/g, '”')
+      .replace(/&hellip;/g, '…')
+      .replace(/&bull;/g, '•')
+    ;
+
+    // Second pass: handle numeric entities
+    decoded = decoded.replace(/&#(\d+);/g, (match, dec) => {
+      return String.fromCharCode(parseInt(dec, 10));
+    });
+
+    // Third pass: handle hexadecimal entities
+    decoded = decoded.replace(/&#x([0-9a-f]+);/gi, (match, hex) => {
+      return String.fromCharCode(parseInt(hex, 16));
+    });
+
+    // Preserve Unicode characters that might be in the original text
+    return decoded;
   }
 }

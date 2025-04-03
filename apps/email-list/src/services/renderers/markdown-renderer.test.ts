@@ -271,4 +271,62 @@ describe('MarkdownRenderer', () => {
     expect(markdown).toContain('```\nconsole.log("Hello world");\n```');
     expect(markdown).toContain('![Example image](https://example.com/image.jpg)');
   });
+
+  it('should properly decode HTML entities in content', async () => {
+    const postData: PostMetadata = {
+      post: {
+        id: 1,
+        title: { rendered: 'Test HTML Entities' },
+        content: {
+          rendered: `<p>We use a tech radar that mimic&#8217;s the format.</p>
+          <p>The &#8220;radar&#8221; UI doesn&#8217;t lend itself to reading.</p>
+          <p>Common entities: &amp; &lt; &gt; &quot; &#39; &apos;</p>
+          <p>Special characters: &mdash; &ndash; &hellip; &bull;</p>
+          <p>Numeric entities: &#8216; &#8217; &#8220; &#8221; &#8230; &#8226;</p>`,
+          protected: false,
+        },
+        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
+        date: '2023-01-01T12:00:00',
+        modified: '2023-01-02T12:00:00',
+        slug: 'test-post',
+        status: 'publish',
+        type: 'post',
+        link: 'https://example.com/test-post',
+        author: 1,
+        featured_media: 0,
+        categories: [],
+        tags: [],
+      },
+      categories: [],
+      tags: [],
+      author: {
+        id: 1,
+        name: 'Test Author',
+        url: 'https://example.com',
+        description: 'Author description',
+        link: 'https://example.com/author/test-author',
+        slug: 'test-author',
+        avatar_urls: {
+          '24': 'https://example.com/avatar-24.jpg',
+          '48': 'https://example.com/avatar-48.jpg',
+          '96': 'https://example.com/avatar-96.jpg',
+        },
+      },
+    };
+
+    const markdown = await renderer.renderPost(postData);
+
+    // Test apostrophes and quotes
+    expect(markdown).toContain("We use a tech radar that mimic’s the format.");
+    expect(markdown).toContain('The “radar” UI doesn’t lend itself to reading.');
+
+    // Test common entities
+    expect(markdown).toContain(`Common entities: & < > " ' '`);
+
+    // Test special characters
+    expect(markdown).toContain('Special characters: — – … •');
+
+    // Test numeric entities
+    expect(markdown).toContain('Numeric entities: ‘ ’ “ ” … •');
+  });
 });
