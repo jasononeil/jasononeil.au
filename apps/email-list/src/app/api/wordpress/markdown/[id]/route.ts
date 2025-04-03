@@ -4,9 +4,11 @@ import { MarkdownRenderer } from '../../../../../services/renderers/markdown-ren
 
 // Initialize WordPress API with environment variables
 const wpApiUrl = process.env.WP_API_URL || '';
+const wpApiUsername = process.env.WP_API_USERNAME || '';
+const wpApiPassword = process.env.WP_API_PASSWORD || '';
 
 // Create WordPress API instance
-const api = new WordPressAPI(wpApiUrl);
+const api = new WordPressAPI(wpApiUrl, { username: wpApiUsername, password: wpApiPassword });
 
 // Create renderer instance
 const renderer = new MarkdownRenderer();

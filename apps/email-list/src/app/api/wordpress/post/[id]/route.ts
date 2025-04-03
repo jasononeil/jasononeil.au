@@ -3,9 +3,11 @@ import { WordPressAPI } from '../../../../../services/wordpress-api';
 
 // Initialize WordPress API with environment variables
 const wpApiUrl = process.env.WP_API_URL || '';
+const wpApiUsername = process.env.WP_API_USERNAME || '';
+const wpApiPassword = process.env.WP_API_PASSWORD || '';
 
 // Create WordPress API instance
-const api = new WordPressAPI(wpApiUrl);
+const api = new WordPressAPI(wpApiUrl, { username: wpApiUsername, password: wpApiPassword });
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {

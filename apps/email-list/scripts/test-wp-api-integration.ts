@@ -25,6 +25,8 @@ if (!process.env.WP_API_URL) {
   process.exit(1);
 }
 const wpUrl = process.env.WP_API_URL;
+const wpUsername = process.env.WP_API_USERNAME;
+const wpPassword = process.env.WP_API_PASSWORD;
 
 // Check if a specific post ID was provided
 const specificPostId = process.argv[2] ? parseInt(process.argv[2], 10) : undefined;
@@ -101,19 +103,19 @@ async function testSpecificPost(api: WordPressAPI, renderer: MarkdownRenderer, p
 
   try {
     const result = await processPost(api, renderer, postId);
-    
+
     // Log summary
     log('\n--- Test Summary ---');
     log(`Post ID: ${postId}`);
     log(`Result: ${result.success ? 'Success' : 'Failed'}`);
-    
+
     if (result.unknownBlockTypes.length > 0) {
       log('\nUnknown block types encountered:');
       result.unknownBlockTypes.forEach((blockType) => {
         log(`  - ${blockType}`);
       });
     }
-    
+
     // Return non-zero exit code if there were any failures
     if (!result.success || result.unknownBlockTypes.length > 0) {
       process.exit(1);
@@ -155,13 +157,13 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
         // Process each post
         for (const post of posts) {
           const result = await processPost(api, renderer, post.id);
-          
+
           if (result.success) {
             successfulPosts++;
           } else {
             failedPosts++;
           }
-          
+
           // Add any unknown block types to our set
           result.unknownBlockTypes.forEach(blockType => unknownBlockTypes.add(blockType));
         }
@@ -219,7 +221,7 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
  * Main function to test the WordPress API integration
  */
 async function testWordPressApiIntegration() {
-  const api = new WordPressAPI(wpUrl);
+  const api = new WordPressAPI(wpUrl, {username: wpUsername, password: wpPassword});
   const renderer = new MarkdownRenderer();
 
   if (specificPostId) {

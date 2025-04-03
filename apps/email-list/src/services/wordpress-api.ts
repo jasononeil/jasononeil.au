@@ -125,10 +125,22 @@ export interface WPAuthor {
 
 export class WordPressAPI {
   private baseUrl: string;
+  private username?: string;
+  private password?: string;
 
-  constructor(baseUrl: string) {
+  constructor(
+    baseUrl: string, 
+    options?: { 
+      username?: string; 
+      password?: string;
+    }
+  ) {
     // Remove trailing slash if present
     this.baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    
+    // Set credentials from options or environment variables
+    this.username = options?.username || process.env.WP_API_USERNAME;
+    this.password = options?.password || process.env.WP_API_PASSWORD;
   }
 
   /**
@@ -139,7 +151,14 @@ export class WordPressAPI {
    */
   private async apiCall<T>(url: string, errorContext: string = ''): Promise<T> {
     try {
-      const response = await fetch(url);
+      // Create headers with Basic Authentication if credentials are available
+      const headers: HeadersInit = {};
+      if (this.username && this.password) {
+        const authString = Buffer.from(`${this.username}:${this.password}`).toString('base64');
+        headers['Authorization'] = `Basic ${authString}`;
+      }
+
+      const response = await fetch(url, { headers });
 
       if (!response.ok) {
         // Try to get more details from the response
