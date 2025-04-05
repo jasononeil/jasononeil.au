@@ -66,8 +66,8 @@ It turns out the Wordpress API doesn't support blocks by default.
 - [x] Use the script to save JSON examples of each block type
 - [x] Create zod decoders and typescript types for blocks
 - [x] Add tests for block decoders
-- [ ] Update block handling logic in the API and the renderer to use the new API and types
-- [ ] Run the test script to ensure we know all blocks that must be handled
+- [x] Update block handling logic in the API and the renderer to use the new API and types
+- [x] Run the test script to ensure we know all blocks that must be handled
 
 ### 4. Basic Handlebars Email Templates
 

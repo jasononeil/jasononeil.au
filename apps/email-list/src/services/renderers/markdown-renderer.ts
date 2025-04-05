@@ -6,6 +6,23 @@
  */
 
 import { Renderer, PostMetadata, RendererOptions } from './renderer.interface';
+import {
+  WpBlock,
+  WpBlocks,
+  isParagraphBlock,
+  isHeadingBlock,
+  isImageBlock,
+  isListBlock,
+  isQuoteBlock,
+  isPullquoteBlock,
+  isEmbedBlock,
+  isVideoBlock,
+  isTableBlock,
+  isGalleryBlock,
+  isSeparatorBlock,
+  isFootnotesBlock,
+  isReusableBlock,
+} from '../../types/wp-blocks';
 
 export class MarkdownRenderer implements Renderer {
   /**
@@ -67,7 +84,7 @@ export class MarkdownRenderer implements Renderer {
   /**
    * Render Gutenberg blocks to Markdown
    */
-  private renderBlocks(blocks: unknown[]): string {
+  private renderBlocks(blocks: WpBlocks): string {
     let markdown = '';
 
     for (const block of blocks) {
@@ -80,48 +97,109 @@ export class MarkdownRenderer implements Renderer {
   /**
    * Render a single Gutenberg block to Markdown
    */
-  private renderBlock(block: unknown): string {
-    const { blockName, attrs, innerBlocks, innerHTML } = block as any;
-
-    // Handle different block types
-    switch (blockName) {
-      case 'core/paragraph':
-        return this.convertHtmlToMarkdown(innerHTML);
-
-      case 'core/heading':
-        const level = attrs?.level || 2;
-        const headingText = this.stripHtml(innerHTML);
-        return '#'.repeat(level) + ' ' + headingText;
-
-      case 'core/list':
-        return this.convertHtmlToMarkdown(innerHTML);
-
-      case 'core/image':
-        if (attrs?.url) {
-          const alt = attrs.alt || '';
-          return `![${alt}](${attrs.url})`;
-        }
-        return '';
-
-      case 'core/quote':
-        const quoteText = this.stripHtml(innerHTML);
-        return `> ${quoteText.split('\n').join('\n> ')}`;
-
-      case 'core/code':
-        const code = this.stripHtml(innerHTML);
-        return '```\n' + code + '\n```';
-
-      case 'core/html':
-        // For custom HTML, we'll just convert it to markdown
-        return this.convertHtmlToMarkdown(innerHTML);
-
-      default:
-        // For unknown blocks, try to extract text content
-        if (innerBlocks && innerBlocks.length > 0) {
-          return innerBlocks.map((block) => this.renderBlock(block)).join('\n\n');
-        }
-        return this.convertHtmlToMarkdown(innerHTML);
+  private renderBlock(block: WpBlock): string {
+    // Handle different block types using type guards
+    if (isParagraphBlock(block)) {
+      return this.convertHtmlToMarkdown(block.attributes.content);
     }
+
+    if (isHeadingBlock(block)) {
+      return '#'.repeat(block.attributes.level) + ' ' + block.attributes.content;
+    }
+
+    if (isListBlock(block) && block.innerBlocks) {
+      return block.innerBlocks
+        .map((item) => {
+          if (block.attributes.ordered) {
+            return `1. ${item.attributes.content}`;
+          } else {
+            return `- ${item.attributes.content}`;
+          }
+        })
+        .join('\n');
+    }
+
+    if (isImageBlock(block)) {
+      const alt = block.attributes.alt || '';
+      return `![${alt}](${block.attributes.url})`;
+    }
+
+    if (isQuoteBlock(block)) {
+      let content = '';
+      if (block.innerBlocks) {
+        content = block.innerBlocks.map((block) => this.renderBlock(block)).join('\n\n');
+      }
+      const citation = block.attributes.citation ? `\n\n— ${block.attributes.citation}` : '';
+      return `> ${content.split('\n').join('\n> ')}${citation}`;
+    }
+
+    if (isPullquoteBlock(block)) {
+      return `> ${block.attributes.value}`;
+    }
+
+    if (isEmbedBlock(block)) {
+      return `[${block.attributes.providerNameSlug || 'Embedded content'}: ${block.attributes.url}](${block.attributes.url})`;
+    }
+
+    if (isVideoBlock(block)) {
+      const caption = block.attributes.caption ? `\n*${block.attributes.caption}*` : '';
+      return `[Video: ${block.attributes.src}](${block.attributes.src})${caption}`;
+    }
+
+    if (isTableBlock(block)) {
+      let markdown = '';
+
+      // Add header row if present
+      if (block.attributes.head && block.attributes.head.length > 0) {
+        const headerRow = block.attributes.head[0];
+        markdown += '| ' + headerRow.cells.map((cell) => cell.content).join(' | ') + ' |\n';
+        markdown += '| ' + headerRow.cells.map(() => '---').join(' | ') + ' |\n';
+      } else if (block.attributes.body.length > 0) {
+        // If no header, create a separator row based on first body row
+        const firstRow = block.attributes.body[0];
+        markdown += '| ' + firstRow.cells.map(() => '---').join(' | ') + ' |\n';
+      }
+
+      // Add body rows
+      for (const row of block.attributes.body) {
+        markdown += '| ' + row.cells.map((cell) => cell.content).join(' | ') + ' |\n';
+      }
+
+      // Add caption if present
+      if (block.attributes.caption) {
+        markdown += `\n*${block.attributes.caption}*`;
+      }
+
+      return markdown;
+    }
+
+    if (isGalleryBlock(block) && block.innerBlocks) {
+      return block.innerBlocks
+        .map((image) => {
+          if (isImageBlock(image)) {
+            const caption = image.attributes.caption ? `\n*${image.attributes.caption}*` : '';
+            return `![${image.attributes.alt || ''}](${image.attributes.url})${caption}`;
+          }
+          return '';
+        })
+        .join('\n\n');
+    }
+
+    if (isSeparatorBlock(block)) {
+      return '---';
+    }
+
+    if (isFootnotesBlock(block)) {
+      return '[Footnotes]';
+    }
+
+    if (isReusableBlock(block) && block.innerBlocks) {
+      return block.innerBlocks.map((innerBlock) => this.renderBlock(innerBlock)).join('\n\n');
+    }
+
+    // This should never happen if parseBlock throws for unknown types,
+    // but we'll keep this as a safety measure
+    throw new Error(`Unknown block type: ${block.name}`);
   }
 
   /**
@@ -159,7 +237,7 @@ export class MarkdownRenderer implements Renderer {
     });
 
     // Remove any remaining HTML tags and decode entities
-    markdown = this.stripHtml(markdown)
+    markdown = this.stripHtml(markdown);
 
     return markdown.trim();
   }
@@ -190,9 +268,7 @@ export class MarkdownRenderer implements Renderer {
       .replace(/&ldquo;/g, '“')
       .replace(/&rdquo;/g, '”')
       .replace(/&hellip;/g, '…')
-      .replace(/&bull;/g, '•')
-    ;
-
+      .replace(/&bull;/g, '•');
     // Second pass: handle numeric entities
     decoded = decoded.replace(/&#(\d+);/g, (match, dec) => {
       return String.fromCharCode(parseInt(dec, 10));

@@ -212,8 +212,6 @@ export const wpBlockSchema = z.union([
   galleryBlockSchema,
   footnotesBlockSchema,
   reusableBlockSchema,
-  // Fallback for any other block types
-  blockSchema,
 ]);
 
 // Type for an array of blocks
@@ -240,12 +238,61 @@ export type ReusableBlock = z.infer<typeof reusableBlockSchema>;
 
 // Helper function to parse blocks
 export function parseBlocks(data: unknown): WpBlocks {
-  return wpBlocksSchema.parse(data);
+  try {
+    return wpBlocksSchema.parse(data);
+  } catch (error) {
+    if (Array.isArray(data)) {
+      // Check if there are any unknown block types
+      const unknownBlocks = data.filter(block => 
+        typeof block === 'object' && 
+        block !== null && 
+        'name' in block && 
+        !isKnownBlockType(block.name as string)
+      );
+      
+      if (unknownBlocks.length > 0) {
+        const unknownTypes = unknownBlocks.map(b => (b as any).name).join(', ');
+        throw new Error(`Unknown block types encountered: ${unknownTypes}`);
+      }
+    }
+    throw error;
+  }
 }
 
 // Helper function to parse a single block
 export function parseBlock(data: unknown): WpBlock {
-  return wpBlockSchema.parse(data);
+  try {
+    return wpBlockSchema.parse(data);
+  } catch (error) {
+    if (
+      typeof data === 'object' && 
+      data !== null && 
+      'name' in data && 
+      !isKnownBlockType(data.name as string)
+    ) {
+      throw new Error(`Unknown block type: ${data.name}`);
+    }
+    throw error;
+  }
+}
+
+// Helper function to check if a block type is known
+function isKnownBlockType(name: string): boolean {
+  return [
+    'core/paragraph',
+    'core/heading',
+    'core/image',
+    'core/list',
+    'core/quote',
+    'core/pullquote',
+    'core/separator',
+    'core/embed',
+    'core/video',
+    'core/table',
+    'core/gallery',
+    'core/footnotes',
+    'core/block',
+  ].includes(name);
 }
 
 // Type guard functions

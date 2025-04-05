@@ -50,7 +50,7 @@ describe('WordPressAPI', () => {
     });
 
     await expect(api.getPost(999)).rejects.toThrow(
-      'API error (404): Not Found - Error fetching post 999 - Error fetching post 999'
+      'API error (https://example.com/wp-json/wp/v2/posts/999 404): Not Found - Error fetching post 999 - Error fetching post 999'
     );
   });
 

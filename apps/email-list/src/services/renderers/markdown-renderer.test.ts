@@ -203,43 +203,47 @@ describe('MarkdownRenderer', () => {
         tags: [],
         blocks: [
           {
-            blockName: 'core/paragraph',
-            attrs: {},
-            innerHTML: '<p>This is a paragraph block.</p>',
+            name: 'core/paragraph',
+            attributes: {
+              content: 'This is a paragraph block.',
+            },
             innerBlocks: [],
           },
           {
-            blockName: 'core/heading',
-            attrs: { level: 2 },
-            innerHTML: '<h2>This is a heading</h2>',
+            name: 'core/heading',
+            attributes: { level: 2, content: 'This is a heading' },
             innerBlocks: [],
           },
           {
-            blockName: 'core/list',
-            attrs: {},
-            innerHTML: '<ul><li>Item 1</li><li>Item 2</li></ul>',
-            innerBlocks: [],
+            name: 'core/list',
+            attributes: {
+              ordered: false,
+              items: [{ content: 'Item 1' }, { content: 'Item 2' }],
+            },
+            innerBlocks: [
+              { name: 'core/list-item', attributes: { content: 'Item 1' } },
+              { name: 'core/list-item', attributes: { content: 'Item 2' } },
+            ],
           },
           {
-            blockName: 'core/quote',
-            attrs: {},
-            innerHTML: '<blockquote>This is a quote</blockquote>',
-            innerBlocks: [],
+            name: 'core/quote',
+            attributes: {},
+            innerBlocks: [
+              {
+                name: 'core/paragraph',
+                attributes: {
+                  content: 'This is a quote',
+                  dropCap: false,
+                },
+              },
+            ],
           },
           {
-            blockName: 'core/code',
-            attrs: {},
-            innerHTML: '<pre><code>console.log("Hello world");</code></pre>',
-            innerBlocks: [],
-          },
-          {
-            blockName: 'core/image',
-            attrs: {
+            name: 'core/image',
+            attributes: {
               url: 'https://example.com/image.jpg',
               alt: 'Example image',
             },
-            innerHTML:
-              '<figure><img src="https://example.com/image.jpg" alt="Example image"></figure>',
             innerBlocks: [],
           },
         ],
@@ -268,7 +272,6 @@ describe('MarkdownRenderer', () => {
     expect(markdown).toContain('- Item 1');
     expect(markdown).toContain('- Item 2');
     expect(markdown).toContain('> This is a quote');
-    expect(markdown).toContain('```\nconsole.log("Hello world");\n```');
     expect(markdown).toContain('![Example image](https://example.com/image.jpg)');
   });
 
@@ -317,7 +320,7 @@ describe('MarkdownRenderer', () => {
     const markdown = await renderer.renderPost(postData);
 
     // Test apostrophes and quotes
-    expect(markdown).toContain("We use a tech radar that mimic’s the format.");
+    expect(markdown).toContain('We use a tech radar that mimic’s the format.');
     expect(markdown).toContain('The “radar” UI doesn’t lend itself to reading.');
 
     // Test common entities

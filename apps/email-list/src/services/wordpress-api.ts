@@ -8,6 +8,8 @@
  * and plugin-specific endpoints (/wp-json/[plugin]/[version]/...)
  */
 
+import { WpBlocks, parseBlocks } from '../types/wp-blocks';
+
 // Types for WordPress API responses
 export type WPPostStatus =
   | 'publish'
@@ -59,7 +61,7 @@ export interface WPPost {
   categories: number[];
   tags: number[];
   // Blocks will be available if using the Gutenberg editor
-  blocks?: unknown[];
+  blocks?: WpBlocks;
 }
 
 export interface WPCategory {
@@ -175,8 +177,9 @@ export class WordPressAPI {
         const authString = Buffer.from(`${this.username}:${this.password}`).toString('base64');
         headers['Authorization'] = `Basic ${authString}`;
         response = await fetch(url, { headers });
+      } else {
+        response = await fetch(url);
       }
-      response = await fetch(url);
 
       if (!response.ok) {
         // Try to get more details from the response
@@ -190,7 +193,7 @@ export class WordPressAPI {
         }
 
         throw new Error(
-          `API error (${response.status}): ${errorDetails}${
+          `API error (${url} ${response.status}): ${errorDetails}${
             errorContext ? ` - ${errorContext}` : ''
           }`
         );
@@ -327,9 +330,22 @@ export class WordPressAPI {
   /**
    * Fetch post blocks using the VIP Block Data API
    */
-  async getPostBlocks(postId: number): Promise<unknown[]> {
+  async getPostBlocks(postId: number): Promise<WpBlocks> {
     const url = this.getPluginApiUrl('vip-block-data-api', 'v1', `posts/${postId}/blocks`);
-    return this.apiCall<unknown[]>(url, `Error fetching blocks for post ${postId}`);
+    const rawBlocks = await this.apiCall<unknown[]>(
+      url,
+      `Error fetching blocks for post ${postId}`
+    );
+    
+    try {
+      return parseBlocks(rawBlocks);
+    } catch (error) {
+      if (error instanceof Error) {
+        // Add more context to the error
+        throw new Error(`Failed to parse blocks for post ${postId}: ${error.message}`);
+      }
+      throw error;
+    }
   }
 
   /**
