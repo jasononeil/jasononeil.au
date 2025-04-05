@@ -6,6 +6,21 @@ This is a small Next.js project to help deliver blog posts via email to people w
 
 I want just enough custom functionality that an off-the-shelf wordpress plugin like MailPoet wasn't my preferred option.
 
+## Requirements
+
+### WordPress Plugins
+
+#### VIP Block Data API
+This application requires the [VIP Block Data API](https://github.com/Automattic/vip-block-data-api) WordPress plugin to access block data from posts.
+
+Installation instructions:
+1. Download the ZIP file from the [GitHub repository](https://github.com/Automattic/vip-block-data-api/releases)
+2. In your WordPress admin panel, go to Plugins > Add New > Upload Plugin
+3. Choose the downloaded ZIP file and click "Install Now"
+4. After installation, activate the plugin
+
+The plugin provides an API endpoint at `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks` that this application uses to retrieve block data for rendering posts.
+
 ## Project Goals
 
 - **Improved Email Design:** Create customizable, mobile-responsive email templates that incorporate WordPress content in an email-friendly format.

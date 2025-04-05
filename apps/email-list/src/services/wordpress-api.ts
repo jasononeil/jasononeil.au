@@ -3,6 +3,9 @@
  *
  * Handles communication with the WordPress REST API to fetch posts,
  * categories, tags, media, and author information.
+ *
+ * Supports both core WordPress API endpoints (/wp-json/wp/v2/...)
+ * and plugin-specific endpoints (/wp-json/[plugin]/[version]/...)
  */
 
 // Types for WordPress API responses
@@ -125,22 +128,36 @@ export interface WPAuthor {
 
 export class WordPressAPI {
   private baseUrl: string;
+  private coreApiUrl: string;
   private username?: string;
   private password?: string;
 
   constructor(
-    baseUrl: string, 
-    options?: { 
-      username?: string; 
+    baseUrl: string,
+    options?: {
+      username?: string;
       password?: string;
     }
   ) {
     // Remove trailing slash if present
     this.baseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-    
+
+    // Set up core API URL with version (default to 'wp/v2')
+    const coreApiVersion = 'wp/v2';
+    this.coreApiUrl = `${this.baseUrl}/${coreApiVersion}`;
+
     // Set credentials from options or environment variables
     this.username = options?.username || process.env.WP_API_USERNAME;
     this.password = options?.password || process.env.WP_API_PASSWORD;
+  }
+
+  /**
+   * Get a plugin-specific API endpoint URL
+   * Format: /wp-json/[plugin]/[version]/[endpoint]
+   */
+  getPluginApiUrl(plugin: string, version: string, endpoint: string = ''): string {
+    const pluginBase = `${this.baseUrl}/${plugin}/${version}`;
+    return endpoint ? `${pluginBase}/${endpoint}` : pluginBase;
   }
 
   /**
@@ -153,12 +170,13 @@ export class WordPressAPI {
     try {
       // Create headers with Basic Authentication if credentials are available
       const headers: HeadersInit = {};
+      let response;
       if (this.username && this.password) {
         const authString = Buffer.from(`${this.username}:${this.password}`).toString('base64');
         headers['Authorization'] = `Basic ${authString}`;
+        response = await fetch(url, { headers });
       }
-
-      const response = await fetch(url, { headers });
+      response = await fetch(url);
 
       if (!response.ok) {
         // Try to get more details from the response
@@ -192,7 +210,7 @@ export class WordPressAPI {
    * Fetch a single post by ID
    */
   async getPost(id: number): Promise<WPPost> {
-    const url = `${this.baseUrl}/posts/${id}`;
+    const url = `${this.coreApiUrl}/posts/${id}`;
     return this.apiCall<WPPost>(url, `Error fetching post ${id}`);
   }
 
@@ -227,7 +245,7 @@ export class WordPressAPI {
       params.append('search', search);
     }
 
-    const url = `${this.baseUrl}/posts?${params.toString()}`;
+    const url = `${this.coreApiUrl}/posts?${params.toString()}`;
     return this.apiCall<WPPost[]>(url, `Error fetching posts (page=${page}, perPage=${perPage})`);
   }
 
@@ -235,7 +253,7 @@ export class WordPressAPI {
    * Fetch a category by ID
    */
   async getCategory(id: number): Promise<WPCategory> {
-    const url = `${this.baseUrl}/categories/${id}`;
+    const url = `${this.coreApiUrl}/categories/${id}`;
     return this.apiCall<WPCategory>(url, `Error fetching category ${id}`);
   }
 
@@ -255,7 +273,7 @@ export class WordPressAPI {
       per_page: perPage.toString(),
     });
 
-    const url = `${this.baseUrl}/categories?${params.toString()}`;
+    const url = `${this.coreApiUrl}/categories?${params.toString()}`;
     return this.apiCall<WPCategory[]>(
       url,
       `Error fetching categories (page=${page}, perPage=${perPage})`
@@ -266,7 +284,7 @@ export class WordPressAPI {
    * Fetch a tag by ID
    */
   async getTag(id: number): Promise<WPTag> {
-    const url = `${this.baseUrl}/tags/${id}`;
+    const url = `${this.coreApiUrl}/tags/${id}`;
     return this.apiCall<WPTag>(url, `Error fetching tag ${id}`);
   }
 
@@ -286,7 +304,7 @@ export class WordPressAPI {
       per_page: perPage.toString(),
     });
 
-    const url = `${this.baseUrl}/tags?${params.toString()}`;
+    const url = `${this.coreApiUrl}/tags?${params.toString()}`;
     return this.apiCall<WPTag[]>(url, `Error fetching tags (page=${page}, perPage=${perPage})`);
   }
 
@@ -294,7 +312,7 @@ export class WordPressAPI {
    * Fetch media by ID
    */
   async getMedia(id: number): Promise<WPMedia> {
-    const url = `${this.baseUrl}/media/${id}`;
+    const url = `${this.coreApiUrl}/media/${id}`;
     return this.apiCall<WPMedia>(url, `Error fetching media ${id}`);
   }
 
@@ -302,8 +320,16 @@ export class WordPressAPI {
    * Fetch author by ID
    */
   async getAuthor(id: number): Promise<WPAuthor> {
-    const url = `${this.baseUrl}/users/${id}`;
+    const url = `${this.coreApiUrl}/users/${id}`;
     return this.apiCall<WPAuthor>(url, `Error fetching author ${id}`);
+  }
+
+  /**
+   * Fetch post blocks using the VIP Block Data API
+   */
+  async getPostBlocks(postId: number): Promise<unknown[]> {
+    const url = this.getPluginApiUrl('vip-block-data-api', 'v1', `posts/${postId}/blocks`);
+    return this.apiCall<unknown[]>(url, `Error fetching blocks for post ${postId}`);
   }
 
   /**

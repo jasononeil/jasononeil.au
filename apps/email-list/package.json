@@ -13,7 +13,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/db/migrations/migrate.ts",
     "db:studio": "drizzle-kit studio",
-    "wp:test-all-posts": "tsx scripts/test-wp-api-integration.ts"
+    "wp:test-all-posts": "tsx scripts/test-wp-api-integration.ts",
+    "wp:extract-block-types": "tsx scripts/extract-block-types.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.40.0",
@@ -21,7 +22,8 @@
     "next": "15.2.2",
     "prettier": "^3.5.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

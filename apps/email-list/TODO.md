@@ -54,6 +54,21 @@ Now create a test harness
 - [x] The third pane is titled "Markdown" and should have a markdown rendering in a <pre> tag (but with word-wrapping)
 - [x] The fourth pane is titled "HTML Email" and for now just renders "coming soon"
 
+#### Fixing blocks
+
+It turns out the Wordpress API doesn't support blocks by default.
+
+- [x] Add vip-block-data-api to my website to support fetching this data. Note this requires manual installation from the zip file on the Github page.
+- [x] Add to email-list README that this plugin is required.
+- [x] Update Wordpress API helper for the fact that API versioning for the core is `/wp-json/[version]` and for plugins is `/wp-json/[plugin]/[version]`
+- [x] Add Wordpress API helper for `/wp-json/vip-block-data-api/v1/posts/<post_id>/blocks` endpoint
+- [x] Write a once off script to read blocks for every post in the database and save one example JSON response for each block type.
+- [x] Use the script to save JSON examples of each block type
+- [x] Create zod decoders and typescript types for blocks
+- [x] Add tests for block decoders
+- [ ] Update block handling logic in the API and the renderer to use the new API and types
+- [ ] Run the test script to ensure we know all blocks that must be handled
+
 ### 4. Basic Handlebars Email Templates
 
 - [ ] Set up Handlebars as the templating engine.

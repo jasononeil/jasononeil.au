@@ -8,7 +8,7 @@ describe('WordPressAPI', () => {
   let api: WordPressAPI;
 
   beforeEach(() => {
-    api = new WordPressAPI('https://example.com/wp-json/wp/v2');
+    api = new WordPressAPI('https://example.com/wp-json');
     vi.resetAllMocks();
   });
 
