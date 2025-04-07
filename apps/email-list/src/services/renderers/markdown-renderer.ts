@@ -229,14 +229,19 @@ export class MarkdownRenderer implements Renderer {
     markdown = markdown.replace(/<em>(.*?)<\/em>/gi, '*$1*');
     markdown = markdown.replace(/<i>(.*?)<\/i>/gi, '*$1*');
     markdown = markdown.replace(/<a href="(.*?)">(.*?)<\/a>/gi, '[$2]($1)');
+
+    // Handle lists with proper spacing
     markdown = markdown.replace(/<ul>(.*?)<\/ul>/gis, (match, p1) => {
-      return p1.replace(/<li>(.*?)<\/li>/gi, '- $1\n');
+      const listItems = p1.replace(/<li>(.*?)<\/li>/gi, '- $1\n');
+      return listItems + '\n';
     });
+
     markdown = markdown.replace(/<ol>(.*?)<\/ol>/gis, (match, p1) => {
       let index = 1;
-      return p1.replace(/<li>(.*?)<\/li>/gi, () => {
+      const listItems = p1.replace(/<li>(.*?)<\/li>/gi, () => {
         return `${index++}. $1\n`;
       });
+      return listItems + '\n';
     });
 
     // Remove any remaining HTML tags and decode entities
