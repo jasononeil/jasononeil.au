@@ -273,6 +273,7 @@ describe('MarkdownRenderer', () => {
     expect(markdown).toContain('- Item 2');
     expect(markdown).toContain('> This is a quote');
     expect(markdown).toContain('![Example image](https://example.com/image.jpg)');
+    expect(markdown).not.toContain('Fallback content');
   });
 
   it('should properly decode HTML entities in content', async () => {
