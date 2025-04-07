@@ -58,8 +58,8 @@ const imageAttributesSchema = z
     href: z.string().url().optional(),
     linkDestination: z.string().optional(),
     sizeSlug: z.string().optional(),
-    width: z.number().optional(),
-    height: z.number().optional(),
+    width: z.union([z.string(), z.number()]).optional(),
+    height: z.union([z.string(), z.number()]).optional(),
   })
   .passthrough();
 
@@ -207,7 +207,7 @@ const galleryAttributesSchema = z
 const galleryBlockSchema = blockSchema.extend({
   name: z.literal('core/gallery'),
   attributes: galleryAttributesSchema,
-  innerBlocks: z.array(imageBlockSchema),
+  innerBlocks: z.array(imageBlockSchema).optional(),
 });
 
 // Type for core/footnotes

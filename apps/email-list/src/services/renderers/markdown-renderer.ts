@@ -180,16 +180,26 @@ export class MarkdownRenderer implements Renderer {
       return markdown;
     }
 
-    if (isGalleryBlock(block) && block.innerBlocks) {
-      return block.innerBlocks
-        .map((image) => {
-          if (isImageBlock(image)) {
-            const caption = image.attributes.caption ? `\n*${image.attributes.caption}*` : '';
-            return `![${image.attributes.alt || ''}](${image.attributes.url})${caption}`;
-          }
-          return '';
-        })
-        .join('\n\n');
+    if (isGalleryBlock(block)) {
+      if (block.innerBlocks) {
+        return block.innerBlocks
+          .map((image) => {
+            if (isImageBlock(image)) {
+              const caption = image.attributes.caption ? `\n*${image.attributes.caption}*` : '';
+              return `![${image.attributes.alt || ''}](${image.attributes.url})${caption}`;
+            }
+            return '';
+          })
+          .join('\n\n');
+      }
+      if (block.attributes.images) {
+        return block.attributes.images
+          .map((image) => {
+            const caption = image.caption ? `\n*${image.caption}*` : '';
+            return `![${image.alt || ''}](${image.url})${caption}`;
+          })
+          .join('\n\n');
+      }
     }
 
     if (isSeparatorBlock(block)) {
