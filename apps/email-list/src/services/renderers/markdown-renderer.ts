@@ -129,8 +129,11 @@ export class MarkdownRenderer implements Renderer {
       if (block.innerBlocks) {
         content = block.innerBlocks.map((block) => this.renderBlock(block)).join('\n\n');
       }
-      const citation = block.attributes.citation ? `\n\n— ${block.attributes.citation}` : '';
-      return `> ${content.split('\n').join('\n> ')}${citation}`;
+      const quoteMarkdown = '> ' + content.split('\n').join('\n> ');
+      const citationMarkdown = block.attributes.citation
+        ? `\n>\n> — ${this.convertHtmlToMarkdown(block.attributes.citation)}`
+        : '';
+      return quoteMarkdown + citationMarkdown;
     }
 
     if (isPullquoteBlock(block)) {
