@@ -21,7 +21,9 @@ dotenv.config();
 // Get the WordPress API URL from the environment
 if (!process.env.WP_API_URL) {
   console.error('Please provide a WordPress site URL');
-  console.error('Usage: WP_API_URL=https://example.com tsx scripts/test-wp-api-integration.ts [postId]');
+  console.error(
+    'Usage: WP_API_URL=https://example.com tsx scripts/test-wp-api-integration.ts [postId]'
+  );
   process.exit(1);
 }
 const wpUrl = process.env.WP_API_URL;
@@ -57,7 +59,11 @@ function log(message: string) {
 /**
  * Process a single post by ID
  */
-async function processPost(api: WordPressAPI, renderer: MarkdownRenderer, postId: number): Promise<{
+async function processPost(
+  api: WordPressAPI,
+  renderer: MarkdownRenderer,
+  postId: number
+): Promise<{
   success: boolean;
   unknownBlockTypes: string[];
 }> {
@@ -165,7 +171,7 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
           }
 
           // Add any unknown block types to our set
-          result.unknownBlockTypes.forEach(blockType => unknownBlockTypes.add(blockType));
+          result.unknownBlockTypes.forEach((blockType) => unknownBlockTypes.add(blockType));
         }
 
         page++;
@@ -221,7 +227,7 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
  * Main function to test the WordPress API integration
  */
 async function testWordPressApiIntegration() {
-  const api = new WordPressAPI(wpUrl, {username: wpUsername, password: wpPassword});
+  const api = new WordPressAPI(wpUrl, { username: wpUsername, password: wpPassword });
   const renderer = new MarkdownRenderer();
 
   if (specificPostId) {
