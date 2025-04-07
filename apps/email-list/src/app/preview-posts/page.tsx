@@ -44,7 +44,7 @@ export default function PreviewPosts() {
           throw new Error(errorData.error || `HTTP error ${response.status}`);
         }
 
-        const fetchedPosts = await response.json();
+        const fetchedPosts: WPPost[] = await response.json();
         setPosts(fetchedPosts);
 
         // If there's a postId in the URL, select that post
