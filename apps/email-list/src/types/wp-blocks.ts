@@ -39,6 +39,15 @@ const headingBlockSchema = blockSchema.extend({
   attributes: headingAttributesSchema,
 });
 
+// Type for core/preformatted
+const preformattedAttributesSchema = z.object({
+  content: z.string(),
+});
+const preformattedBlockSchema = blockSchema.extend({
+  name: z.literal('core/preformatted'),
+  attributes: preformattedAttributesSchema,
+});
+
 // Type for core/image
 const imageAttributesSchema = z
   .object({
@@ -96,7 +105,7 @@ const quoteAttributesSchema = z
 const quoteBlockSchema = blockSchema.extend({
   name: z.literal('core/quote'),
   attributes: quoteAttributesSchema,
-  innerBlocks: z.array(paragraphBlockSchema),
+  innerBlocks: z.array(innerBlockSchema).optional(),
 });
 
 // Type for core/pullquote
@@ -225,6 +234,7 @@ const reusableBlockSchema = blockSchema.extend({
 export const wpBlockSchema = z.union([
   paragraphBlockSchema,
   headingBlockSchema,
+  preformattedBlockSchema,
   imageBlockSchema,
   listBlockSchema,
   quoteBlockSchema,
@@ -254,6 +264,7 @@ export type WpBlocks = z.infer<typeof wpBlocksSchema>;
 // Specific block types
 export type ParagraphBlock = z.infer<typeof paragraphBlockSchema>;
 export type HeadingBlock = z.infer<typeof headingBlockSchema>;
+export type PreformattedBlock = z.infer<typeof preformattedBlockSchema>;
 export type ImageBlock = z.infer<typeof imageBlockSchema>;
 export type ListBlock = z.infer<typeof listBlockSchema>;
 export type QuoteBlock = z.infer<typeof quoteBlockSchema>;
@@ -317,6 +328,7 @@ function isKnownBlockType(name: string): boolean {
   return [
     'core/paragraph',
     'core/heading',
+    'core/preformatted',
     'core/image',
     'core/list',
     'core/quote',
@@ -338,6 +350,10 @@ export function isParagraphBlock(block: WpBlock): block is ParagraphBlock {
 
 export function isHeadingBlock(block: WpBlock): block is HeadingBlock {
   return block.name === 'core/heading';
+}
+
+export function isPreformattedBlock(block: WpBlock): block is PreformattedBlock {
+  return block.name === 'core/preformatted';
 }
 
 export function isImageBlock(block: WpBlock): block is ImageBlock {

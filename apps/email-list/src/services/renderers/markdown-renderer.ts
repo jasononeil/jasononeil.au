@@ -22,6 +22,7 @@ import {
   isSeparatorBlock,
   isFootnotesBlock,
   isReusableBlock,
+  isPreformattedBlock,
 } from '../../types/wp-blocks';
 
 export class MarkdownRenderer implements Renderer {
@@ -104,6 +105,10 @@ export class MarkdownRenderer implements Renderer {
 
     if (isHeadingBlock(block)) {
       return '#'.repeat(block.attributes.level) + ' ' + block.attributes.content;
+    }
+
+    if (isPreformattedBlock(block)) {
+      return '```\n' + block.attributes.content + '\n```';
     }
 
     if (isListBlock(block) && block.innerBlocks) {
