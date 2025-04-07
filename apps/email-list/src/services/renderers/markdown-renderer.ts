@@ -132,6 +132,8 @@ export class MarkdownRenderer implements Renderer {
       let content = '';
       if (block.innerBlocks) {
         content = block.innerBlocks.map((block) => this.renderBlock(block)).join('\n\n');
+      } else if (block.attributes.value) {
+        content = this.convertHtmlToMarkdown(block.attributes.value) || '';
       }
       const quoteMarkdown = '> ' + content.split('\n').join('\n> ');
       const citationMarkdown = block.attributes.citation
