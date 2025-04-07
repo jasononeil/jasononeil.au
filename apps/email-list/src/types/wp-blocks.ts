@@ -231,7 +231,7 @@ const reusableBlockSchema = blockSchema.extend({
 });
 
 // Union of all block types
-export const wpBlockSchema = z.union([
+export const wpBlockSchema = z.discriminatedUnion('name', [
   paragraphBlockSchema,
   headingBlockSchema,
   preformattedBlockSchema,
