@@ -332,4 +332,85 @@ describe('MarkdownRenderer', () => {
     // Test numeric entities
     expect(markdown).toContain('Numeric entities: ‘ ’ “ ” … •');
   });
+
+  it('should insert correct newlines between paragraphs and lists', async () => {
+    const postData: PostMetadata = {
+      post: {
+        id: 1,
+        title: { rendered: 'Test Newlines' },
+        content: {
+          rendered: '...',
+          protected: false,
+        },
+        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
+        date: '2023-01-01T12:00:00',
+        modified: '2023-01-02T12:00:00',
+        slug: 'test-post',
+        status: 'publish',
+        type: 'post',
+        link: 'https://example.com/test-post',
+        author: 1,
+        featured_media: 0,
+        categories: [],
+        tags: [],
+        blocks: [
+          {
+            name: 'core/paragraph',
+            attributes: {
+              content: 'This is the first paragraph.',
+            },
+            innerBlocks: [],
+          },
+          {
+            name: 'core/list',
+            attributes: {
+              ordered: false,
+            },
+            innerBlocks: [
+              { name: 'core/list-item', attributes: { content: 'List item 1' } },
+              { name: 'core/list-item', attributes: { content: 'List item 2' } },
+              { name: 'core/list-item', attributes: { content: 'List item 3' } },
+            ],
+          },
+          {
+            name: 'core/paragraph',
+            attributes: {
+              content: 'This is the second paragraph after the list.',
+            },
+            innerBlocks: [],
+          },
+        ],
+      },
+      categories: [],
+      tags: [],
+      author: {
+        id: 1,
+        name: 'Test Author',
+        url: 'https://example.com',
+        description: 'Author description',
+        link: 'https://example.com/author/test-author',
+        slug: 'test-author',
+        avatar_urls: {
+          '24': 'https://example.com/avatar-24.jpg',
+          '48': 'https://example.com/avatar-48.jpg',
+          '96': 'https://example.com/avatar-96.jpg',
+        },
+      },
+    };
+
+    const markdown = await renderer.renderPost(postData);
+
+    // Check the content and spacing
+    expect(markdown).toContain(
+      [
+        'This is the first paragraph.',
+        '',
+        '- List item 1',
+        '- List item 2',
+        '- List item 3',
+        '',
+        'This is the second paragraph after the list.',
+      ].join('\n')
+    );
+  });
 });
