@@ -140,7 +140,7 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
   let hasMorePosts = true;
   let totalPosts = 0;
   let successfulPosts = 0;
-  let failedPosts = 0;
+  let failedPosts = [];
   const unknownBlockTypes = new Set<string>();
 
   log('Starting WordPress API integration test for all posts...');
@@ -167,7 +167,7 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
           if (result.success) {
             successfulPosts++;
           } else {
-            failedPosts++;
+            failedPosts.push(post);
           }
 
           // Add any unknown block types to our set
@@ -204,7 +204,10 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
     log('\n--- Test Summary ---');
     log(`Total posts processed: ${totalPosts}`);
     log(`Successful: ${successfulPosts}`);
-    log(`Failed: ${failedPosts}`);
+    log(`Failed: ${failedPosts.length}`);
+    failedPosts.forEach((post) => {
+      log(`  - Post ID: ${post.id} - "${post.title.rendered}"`);
+    });
 
     if (unknownBlockTypes.size > 0) {
       log('\nUnknown block types encountered:');
@@ -214,7 +217,7 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
     }
 
     // Return non-zero exit code if there were any failures
-    if (failedPosts > 0 || unknownBlockTypes.size > 0) {
+    if (failedPosts.length > 0 || unknownBlockTypes.size > 0) {
       process.exit(1);
     }
   } catch (error) {

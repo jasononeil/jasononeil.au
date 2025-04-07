@@ -373,7 +373,7 @@ export class WordPressAPI {
     try {
       return parseBlocks(json);
     } catch (error) {
-      throw new Error(`Blocks did not match our schema for post ${postId}: ${error}`);
+      throw new Error(`Blocks did not match our schema for post ${postId}: ${error}. URL: ${url}`);
     }
   }
 
