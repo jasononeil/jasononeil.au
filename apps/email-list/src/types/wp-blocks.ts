@@ -91,7 +91,7 @@ const listAttributesSchema = z
 const listBlockSchema = blockSchema.extend({
   name: z.literal('core/list'),
   attributes: listAttributesSchema,
-  innerBlocks: z.array(listItemBlockSchema),
+  innerBlocks: z.array(listItemBlockSchema).optional(),
 });
 
 // Type for core/quote

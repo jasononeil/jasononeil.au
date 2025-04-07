@@ -111,16 +111,26 @@ export class MarkdownRenderer implements Renderer {
       return '```\n' + block.attributes.content + '\n```';
     }
 
-    if (isListBlock(block) && block.innerBlocks) {
-      return block.innerBlocks
-        .map((item) => {
-          if (block.attributes.ordered) {
-            return `1. ${item.attributes.content}`;
-          } else {
-            return `- ${item.attributes.content}`;
-          }
-        })
-        .join('\n');
+    if (isListBlock(block)) {
+      if (block.innerBlocks) {
+        return block.innerBlocks
+          .map((item) => {
+            if (block.attributes.ordered) {
+              return `1. ${item.attributes.content}`;
+            } else {
+              return `- ${item.attributes.content}`;
+            }
+          })
+          .join('\n');
+      } else if (block.attributes.values && typeof block.attributes.values === 'string') {
+        // This is a HTML of the <li> elements
+        const listHtml = block.attributes.ordered
+          ? `<ol>${block.attributes.values}</ol>`
+          : `<ul>${block.attributes.values}</ul>`;
+        return this.convertHtmlToMarkdown(listHtml);
+      } else {
+        throw new Error('Expected either `innerBlocks` or `block.attributes.values` to be defined');
+      }
     }
 
     if (isImageBlock(block)) {
