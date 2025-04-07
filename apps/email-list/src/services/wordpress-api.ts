@@ -163,49 +163,65 @@ export class WordPressAPI {
   }
 
   /**
-   * Private helper method to make API calls with consistent error handling
+   * Private helper method to make API calls and JSON parsing with consistent error handling
    * @param url The API endpoint URL
    * @param errorContext Additional context for error messages
+   * @throws Error when the response is not a 200.
    * @returns The parsed JSON response
    */
-  private async apiCall<T>(url: string, errorContext: string = ''): Promise<T> {
+  private async jsonApiCall<T>(url: string, errorContext: string = ''): Promise<T> {
+    const response = await this.apiCall(url);
+    if (!response.ok) {
+      // Try to get more details from the response
+      let errorDetails = '';
+      try {
+        const errorData = await response.json();
+        errorDetails = JSON.stringify(errorData);
+      } catch {
+        // If we can't parse the error as JSON, use the status text
+        errorDetails = response.statusText;
+      }
+
+      throw new Error(
+        `API error (${url} [${response.status}]): ${errorDetails}${
+          errorContext ? ` - ${errorContext}` : ''
+        }`
+      );
+    }
+
     try {
-      // Create headers with Basic Authentication if credentials are available
-      const headers: HeadersInit = {};
-      let response;
-      if (this.username && this.password) {
-        const authString = Buffer.from(`${this.username}:${this.password}`).toString('base64');
-        headers['Authorization'] = `Basic ${authString}`;
-        response = await fetch(url, { headers });
-      } else {
-        response = await fetch(url);
-      }
-
-      if (!response.ok) {
-        // Try to get more details from the response
-        let errorDetails = '';
-        try {
-          const errorData = await response.json();
-          errorDetails = JSON.stringify(errorData);
-        } catch {
-          // If we can't parse the error as JSON, use the status text
-          errorDetails = response.statusText;
-        }
-
-        throw new Error(
-          `API error (${url} ${response.status}): ${errorDetails}${
-            errorContext ? ` - ${errorContext}` : ''
-          }`
-        );
-      }
-
       return await response.json();
     } catch (error) {
       // Re-throw fetch errors with more context
       if (error instanceof Error) {
-        throw new Error(`${error.message}${errorContext ? ` - ${errorContext}` : ''}`);
+        throw new Error(
+          `${errorContext}${errorContext ? ` - ` : ''} Failed to parse JSON from response: ${error.message}`
+        );
       }
       throw error;
+    }
+  }
+
+  /**
+   * Private helper method to make API calls, returning the response rather than handling errors
+   * @param url The API endpoint URL
+   * @param errorContext Additional context for error messages
+   * @throws Error if the fetch request could not be made
+   * @returns The HTTP response (not parsed, might not be a 200)
+   */
+  private async apiCall(url: string, errorContext: string = ''): Promise<Response> {
+    try {
+      // Create headers with Basic Authentication if credentials are available
+      const headers: HeadersInit = {};
+      if (this.username && this.password) {
+        const authString = Buffer.from(`${this.username}:${this.password}`).toString('base64');
+        headers['Authorization'] = `Basic ${authString}`;
+        return await fetch(url, { headers });
+      } else {
+        return await fetch(url);
+      }
+    } catch (err) {
+      throw new Error(`${errorContext}: failed to make API call to ${url} - ${err}`);
     }
   }
 
@@ -214,7 +230,7 @@ export class WordPressAPI {
    */
   async getPost(id: number): Promise<WPPost> {
     const url = `${this.coreApiUrl}/posts/${id}`;
-    return this.apiCall<WPPost>(url, `Error fetching post ${id}`);
+    return this.jsonApiCall<WPPost>(url, `Error fetching post ${id}`);
   }
 
   /**
@@ -249,7 +265,10 @@ export class WordPressAPI {
     }
 
     const url = `${this.coreApiUrl}/posts?${params.toString()}`;
-    return this.apiCall<WPPost[]>(url, `Error fetching posts (page=${page}, perPage=${perPage})`);
+    return this.jsonApiCall<WPPost[]>(
+      url,
+      `Error fetching posts (page=${page}, perPage=${perPage})`
+    );
   }
 
   /**
@@ -257,7 +276,7 @@ export class WordPressAPI {
    */
   async getCategory(id: number): Promise<WPCategory> {
     const url = `${this.coreApiUrl}/categories/${id}`;
-    return this.apiCall<WPCategory>(url, `Error fetching category ${id}`);
+    return this.jsonApiCall<WPCategory>(url, `Error fetching category ${id}`);
   }
 
   /**
@@ -277,7 +296,7 @@ export class WordPressAPI {
     });
 
     const url = `${this.coreApiUrl}/categories?${params.toString()}`;
-    return this.apiCall<WPCategory[]>(
+    return this.jsonApiCall<WPCategory[]>(
       url,
       `Error fetching categories (page=${page}, perPage=${perPage})`
     );
@@ -288,7 +307,7 @@ export class WordPressAPI {
    */
   async getTag(id: number): Promise<WPTag> {
     const url = `${this.coreApiUrl}/tags/${id}`;
-    return this.apiCall<WPTag>(url, `Error fetching tag ${id}`);
+    return this.jsonApiCall<WPTag>(url, `Error fetching tag ${id}`);
   }
 
   /**
@@ -308,7 +327,7 @@ export class WordPressAPI {
     });
 
     const url = `${this.coreApiUrl}/tags?${params.toString()}`;
-    return this.apiCall<WPTag[]>(url, `Error fetching tags (page=${page}, perPage=${perPage})`);
+    return this.jsonApiCall<WPTag[]>(url, `Error fetching tags (page=${page}, perPage=${perPage})`);
   }
 
   /**
@@ -316,7 +335,7 @@ export class WordPressAPI {
    */
   async getMedia(id: number): Promise<WPMedia> {
     const url = `${this.coreApiUrl}/media/${id}`;
-    return this.apiCall<WPMedia>(url, `Error fetching media ${id}`);
+    return this.jsonApiCall<WPMedia>(url, `Error fetching media ${id}`);
   }
 
   /**
@@ -324,27 +343,37 @@ export class WordPressAPI {
    */
   async getAuthor(id: number): Promise<WPAuthor> {
     const url = `${this.coreApiUrl}/users/${id}`;
-    return this.apiCall<WPAuthor>(url, `Error fetching author ${id}`);
+    return this.jsonApiCall<WPAuthor>(url, `Error fetching author ${id}`);
   }
 
   /**
    * Fetch post blocks using the VIP Block Data API
    */
-  async getPostBlocks(postId: number): Promise<WpBlocks> {
+  async getPostBlocks(postId: number): Promise<WpBlocks | false> {
     const url = this.getPluginApiUrl('vip-block-data-api', 'v1', `posts/${postId}/blocks`);
-    const rawBlocks = await this.apiCall<unknown[]>(
-      url,
-      `Error fetching blocks for post ${postId}`
-    );
-    
+    const response = await this.apiCall(url);
+
+    let json;
     try {
-      return parseBlocks(rawBlocks);
+      json = await response.json();
     } catch (error) {
-      if (error instanceof Error) {
-        // Add more context to the error
-        throw new Error(`Failed to parse blocks for post ${postId}: ${error.message}`);
+      throw new Error(`Failed to parse JSON from response: ${error}`);
+    }
+
+    if (!response.ok) {
+      if (response.status === 400 && json.code === 'vip-block-data-api-no-blocks') {
+        // The API has let us know this post doesn't have blocks.
+        return false;
       }
-      throw error;
+      // Re-throw other errors with more context
+      const errorDetails = JSON.stringify(json);
+      throw new Error(`Blocks API error (${url} [${response.status}]): ${errorDetails}`);
+    }
+
+    try {
+      return parseBlocks(json);
+    } catch (error) {
+      throw new Error(`Blocks did not match our schema for post ${postId}: ${error}`);
     }
   }
 
@@ -373,6 +402,9 @@ export class WordPressAPI {
       if (post.featured_media > 0) {
         featuredMedia = await this.getMedia(post.featured_media);
       }
+
+      const blocks = await this.getPostBlocks(postId);
+      post.blocks = blocks || undefined;
 
       return {
         post,

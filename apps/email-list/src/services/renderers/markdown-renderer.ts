@@ -62,8 +62,7 @@ export class MarkdownRenderer implements Renderer {
       markdown += `![${featuredMedia.alt_text || featuredMedia.title.rendered}](${featuredMedia.source_url})\n\n`;
     }
 
-    // Process content
-    if (post.blocks) {
+    if (post.blocks && post.blocks.length > 0) {
       // If Gutenberg blocks are available, process them
       markdown += this.renderBlocks(post.blocks);
     } else {

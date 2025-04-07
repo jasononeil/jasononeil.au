@@ -241,6 +241,12 @@ export const wpBlockSchema = z.union([
 // Type for an array of blocks
 export const wpBlocksSchema = z.array(wpBlockSchema);
 
+export const wpBlockApiResponseSchema = z
+  .object({
+    blocks: wpBlocksSchema,
+  })
+  .passthrough();
+
 // TypeScript types derived from the schemas
 export type WpBlock = z.infer<typeof wpBlockSchema>;
 export type WpBlocks = z.infer<typeof wpBlocksSchema>;
@@ -261,21 +267,27 @@ export type FootnotesBlock = z.infer<typeof footnotesBlockSchema>;
 export type ReusableBlock = z.infer<typeof reusableBlockSchema>;
 
 // Helper function to parse blocks
-export function parseBlocks(data: unknown): WpBlocks {
+export function parseBlocks(response: unknown): WpBlocks {
   try {
-    return wpBlocksSchema.parse(data);
+    return wpBlockApiResponseSchema.parse(response).blocks;
   } catch (error) {
-    if (Array.isArray(data)) {
+    if (
+      response &&
+      typeof response === 'object' &&
+      'blocks' in response &&
+      Array.isArray(response.blocks)
+    ) {
       // Check if there are any unknown block types
-      const unknownBlocks = data.filter(block => 
-        typeof block === 'object' && 
-        block !== null && 
-        'name' in block && 
-        !isKnownBlockType(block.name as string)
+      const unknownBlocks = response.blocks.filter(
+        (block) =>
+          typeof block === 'object' &&
+          block !== null &&
+          'name' in block &&
+          !isKnownBlockType(block.name as string)
       );
-      
+
       if (unknownBlocks.length > 0) {
-        const unknownTypes = unknownBlocks.map(b => (b as any).name).join(', ');
+        const unknownTypes = unknownBlocks.map((b) => b.name).join(', ');
         throw new Error(`Unknown block types encountered: ${unknownTypes}`);
       }
     }
