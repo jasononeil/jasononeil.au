@@ -297,9 +297,13 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isTableBlock(parsed)).toBe(true);
-      expect(parsed.attributes.body.length).toBe(2);
-      expect(parsed.attributes.body[1].cells[0].content).toBe('Accounts with >10% IE11 usage');
-      expect(parsed.attributes.caption).toContain('This table shows a huge portion of our revenue');
+      if (isTableBlock(parsed)) {
+        expect(parsed.attributes.body.length).toBe(2);
+        expect(parsed.attributes.body[1].cells[0].content).toBe('Accounts with >10% IE11 usage');
+        expect(parsed.attributes.caption).toContain(
+          'This table shows a huge portion of our revenue'
+        );
+      }
     });
   });
 

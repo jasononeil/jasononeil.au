@@ -4,9 +4,7 @@ import { z } from 'zod';
 const baseAttributesSchema = z.object({}).passthrough();
 
 // Base inner block schema (recursive)
-const innerBlockSchema: z.ZodType<any> = z.lazy(() => 
-  blockSchema
-);
+const innerBlockSchema: z.ZodType<any> = z.lazy(() => blockSchema);
 
 // Base block schema
 const blockSchema = z.object({
@@ -16,10 +14,12 @@ const blockSchema = z.object({
 });
 
 // Type for core/paragraph
-const paragraphAttributesSchema = z.object({
-  content: z.string(),
-  dropCap: z.boolean().optional(),
-}).passthrough();
+const paragraphAttributesSchema = z
+  .object({
+    content: z.string(),
+    dropCap: z.boolean().optional(),
+  })
+  .passthrough();
 
 const paragraphBlockSchema = blockSchema.extend({
   name: z.literal('core/paragraph'),
@@ -27,10 +27,12 @@ const paragraphBlockSchema = blockSchema.extend({
 });
 
 // Type for core/heading
-const headingAttributesSchema = z.object({
-  content: z.string(),
-  level: z.number().int().min(1).max(6),
-}).passthrough();
+const headingAttributesSchema = z
+  .object({
+    content: z.string(),
+    level: z.number().int().min(1).max(6),
+  })
+  .passthrough();
 
 const headingBlockSchema = blockSchema.extend({
   name: z.literal('core/heading'),
@@ -38,17 +40,19 @@ const headingBlockSchema = blockSchema.extend({
 });
 
 // Type for core/image
-const imageAttributesSchema = z.object({
-  url: z.string().url(),
-  alt: z.string().optional(),
-  caption: z.string().optional(),
-  id: z.number().optional(),
-  href: z.string().url().optional(),
-  linkDestination: z.string().optional(),
-  sizeSlug: z.string().optional(),
-  width: z.number().optional(),
-  height: z.number().optional(),
-}).passthrough();
+const imageAttributesSchema = z
+  .object({
+    url: z.string().url(),
+    alt: z.string().optional(),
+    caption: z.string().optional(),
+    id: z.number().optional(),
+    href: z.string().url().optional(),
+    linkDestination: z.string().optional(),
+    sizeSlug: z.string().optional(),
+    width: z.number().optional(),
+    height: z.number().optional(),
+  })
+  .passthrough();
 
 const imageBlockSchema = blockSchema.extend({
   name: z.literal('core/image'),
@@ -56,9 +60,11 @@ const imageBlockSchema = blockSchema.extend({
 });
 
 // Type for core/list-item
-const listItemAttributesSchema = z.object({
-  content: z.string(),
-}).passthrough();
+const listItemAttributesSchema = z
+  .object({
+    content: z.string(),
+  })
+  .passthrough();
 
 const listItemBlockSchema = blockSchema.extend({
   name: z.literal('core/list-item'),
@@ -66,10 +72,12 @@ const listItemBlockSchema = blockSchema.extend({
 });
 
 // Type for core/list
-const listAttributesSchema = z.object({
-  ordered: z.boolean().optional(),
-  values: z.string().optional(),
-}).passthrough();
+const listAttributesSchema = z
+  .object({
+    ordered: z.boolean().optional(),
+    values: z.string().optional(),
+  })
+  .passthrough();
 
 const listBlockSchema = blockSchema.extend({
   name: z.literal('core/list'),
@@ -78,10 +86,12 @@ const listBlockSchema = blockSchema.extend({
 });
 
 // Type for core/quote
-const quoteAttributesSchema = z.object({
-  citation: z.string().optional(),
-  value: z.string().optional(),
-}).passthrough();
+const quoteAttributesSchema = z
+  .object({
+    citation: z.string().optional(),
+    value: z.string().optional(),
+  })
+  .passthrough();
 
 const quoteBlockSchema = blockSchema.extend({
   name: z.literal('core/quote'),
@@ -90,9 +100,11 @@ const quoteBlockSchema = blockSchema.extend({
 });
 
 // Type for core/pullquote
-const pullquoteAttributesSchema = z.object({
-  value: z.string(),
-}).passthrough();
+const pullquoteAttributesSchema = z
+  .object({
+    value: z.string(),
+  })
+  .passthrough();
 
 const pullquoteBlockSchema = blockSchema.extend({
   name: z.literal('core/pullquote'),
@@ -100,9 +112,11 @@ const pullquoteBlockSchema = blockSchema.extend({
 });
 
 // Type for core/separator
-const separatorAttributesSchema = z.object({
-  opacity: z.string().optional(),
-}).passthrough();
+const separatorAttributesSchema = z
+  .object({
+    opacity: z.string().optional(),
+  })
+  .passthrough();
 
 const separatorBlockSchema = blockSchema.extend({
   name: z.literal('core/separator'),
@@ -110,13 +124,15 @@ const separatorBlockSchema = blockSchema.extend({
 });
 
 // Type for core/embed
-const embedAttributesSchema = z.object({
-  url: z.string().url(),
-  type: z.string().optional(),
-  providerNameSlug: z.string().optional(),
-  responsive: z.boolean().optional(),
-  className: z.string().optional(),
-}).passthrough();
+const embedAttributesSchema = z
+  .object({
+    url: z.string().url(),
+    type: z.string().optional(),
+    providerNameSlug: z.string().optional(),
+    responsive: z.boolean().optional(),
+    className: z.string().optional(),
+  })
+  .passthrough();
 
 const embedBlockSchema = blockSchema.extend({
   name: z.literal('core/embed'),
@@ -124,15 +140,17 @@ const embedBlockSchema = blockSchema.extend({
 });
 
 // Type for core/video
-const videoAttributesSchema = z.object({
-  src: z.string().url(),
-  id: z.number().optional(),
-  caption: z.string().optional(),
-  controls: z.string().optional(),
-  loop: z.string().optional(),
-  preload: z.string().optional(),
-  tracks: z.array(z.any()).optional(),
-}).passthrough();
+const videoAttributesSchema = z
+  .object({
+    src: z.string().url(),
+    id: z.number().optional(),
+    caption: z.string().optional(),
+    controls: z.string().optional(),
+    loop: z.string().optional(),
+    preload: z.string().optional(),
+    tracks: z.array(z.any()).optional(),
+  })
+  .passthrough();
 
 const videoBlockSchema = blockSchema.extend({
   name: z.literal('core/video'),
@@ -151,13 +169,15 @@ const tableRowSchema = z.object({
 });
 
 // Type for core/table
-const tableAttributesSchema = z.object({
-  body: z.array(tableRowSchema),
-  head: z.array(tableRowSchema).optional(),
-  foot: z.array(tableRowSchema).optional(),
-  caption: z.string().optional(),
-  hasFixedLayout: z.boolean().optional(),
-}).passthrough();
+const tableAttributesSchema = z
+  .object({
+    body: z.array(tableRowSchema),
+    head: z.array(tableRowSchema).optional(),
+    foot: z.array(tableRowSchema).optional(),
+    caption: z.string().optional(),
+    hasFixedLayout: z.boolean().optional(),
+  })
+  .passthrough();
 
 const tableBlockSchema = blockSchema.extend({
   name: z.literal('core/table'),
@@ -165,13 +185,15 @@ const tableBlockSchema = blockSchema.extend({
 });
 
 // Type for core/gallery
-const galleryAttributesSchema = z.object({
-  ids: z.array(z.number()).optional(),
-  images: z.array(z.any()).optional(),
-  columns: z.number().optional(),
-  linkTo: z.string().optional(),
-  sizeSlug: z.string().optional(),
-}).passthrough();
+const galleryAttributesSchema = z
+  .object({
+    ids: z.array(z.number()).optional(),
+    images: z.array(z.any()).optional(),
+    columns: z.number().optional(),
+    linkTo: z.string().optional(),
+    sizeSlug: z.string().optional(),
+  })
+  .passthrough();
 
 const galleryBlockSchema = blockSchema.extend({
   name: z.literal('core/gallery'),
@@ -188,9 +210,11 @@ const footnotesBlockSchema = blockSchema.extend({
 });
 
 // Type for core/block (reusable block)
-const reusableBlockAttributesSchema = z.object({
-  ref: z.number(),
-}).passthrough();
+const reusableBlockAttributesSchema = z
+  .object({
+    ref: z.number(),
+  })
+  .passthrough();
 
 const reusableBlockSchema = blockSchema.extend({
   name: z.literal('core/block'),
@@ -265,9 +289,9 @@ export function parseBlock(data: unknown): WpBlock {
     return wpBlockSchema.parse(data);
   } catch (error) {
     if (
-      typeof data === 'object' && 
-      data !== null && 
-      'name' in data && 
+      typeof data === 'object' &&
+      data !== null &&
+      'name' in data &&
       !isKnownBlockType(data.name as string)
     ) {
       throw new Error(`Unknown block type: ${data.name}`);
