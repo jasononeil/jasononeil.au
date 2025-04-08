@@ -11,9 +11,11 @@ I want just enough custom functionality that an off-the-shelf wordpress plugin l
 ### WordPress Plugins
 
 #### VIP Block Data API
+
 This application requires the [VIP Block Data API](https://github.com/Automattic/vip-block-data-api) WordPress plugin to access block data from posts.
 
 Installation instructions:
+
 1. Download the ZIP file from the [GitHub repository](https://github.com/Automattic/vip-block-data-api/releases)
 2. In your WordPress admin panel, go to Plugins > Add New > Upload Plugin
 3. Choose the downloaded ZIP file and click "Install Now"
@@ -39,8 +41,8 @@ The plugin provides an API endpoint at `/wp-json/vip-block-data-api/v1/posts/<po
   - The system utilizes a MySQL database (shared with the WordPress instance) to manage subscriber information, preferences, and records of sent emails.
 - **WordPress REST API Communication:**
   - A dedicated module handles communication with the WordPress REST API, ensuring blog post content, metadata, and media are fetched and transformed appropriately for email.
-- **Handlebars Templating Engine:**
-  - Handlebars is used for dynamic email content generation, allowing customizable and maintainable email templates.
+- **Plain JS template strings:**
+  - We don't need handlebars or any other templating library for this basic use case.
 - **SendGrid Email Delivery:**
   - Email sending is powered by Twilio SendGrid, because email sender reputations are hard.
 

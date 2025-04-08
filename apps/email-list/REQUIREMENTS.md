@@ -12,7 +12,7 @@ Create a standalone email delivery service that connects to WordPress via its RE
 - **Frontend**: Next.js application hosted on the same Digital Ocean VPS as the WordPress installation
 - **Database**: Separate tables/schema on the existing database for subscriber management
 - **Email Delivery**: Integration with Twilio SendGrid for sending emails
-- **Templating**: Handlebars for email templates
+- **Templating**: basic string templates for email templates
 
 ## Core Requirements
 
@@ -20,13 +20,17 @@ Create a standalone email delivery service that connects to WordPress via its RE
 
 1. Pull blog post content from WordPress via REST API
 2. Support for different content types (long-form posts, blogmarks, etc.)
-3. Process WordPress block editor content into email-friendly HTML
+3. Process WordPress block editor content into email-friendly HTML and Markdown
 4. Extract metadata (categories, tags, featured images) for inclusion in emails
-5. Handle edge cases for unsupported content blocks with appropriate fallbacks
+5. Handle edge cases for unsupported content blocks with appropriate error handling
 
 ### Email Templates
 
-1. Custom HTML/CSS templates using Handlebars
+1. Custom templates for email content. Use basic JS functions with template strings.
+
+- Markdown renderer
+- Email HTML renderer
+
 2. Sans-serif font styling to match blog aesthetics
 3. Support for featured images hosted on the WordPress server
 4. "More from the blog" section showing recent posts since the last email
@@ -179,7 +183,7 @@ sent_emails:
 - Set up Next.js application structure
 - Create subscriber database schema
 - Implement basic WordPress API integration
-- Develop simple Handlebars templates
+- Develop templates
 
 ### Phase 2: Email Generation & Delivery
 
@@ -207,7 +211,7 @@ sent_emails:
 - Next.js for the application framework
 - Node.js for backend logic
 - MySQL for database (shared with WordPress)
-- Handlebars for email templates
+- Plain JS string templates
 - Twilio SendGrid for email delivery
 - REST API for WordPress communication
 

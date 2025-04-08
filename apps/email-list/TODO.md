@@ -69,14 +69,15 @@ It turns out the Wordpress API doesn't support blocks by default.
 - [x] Update block handling logic in the API and the renderer to use the new API and types
 - [x] Run the test script to ensure we know all blocks that must be handled
 
-### 4. Basic Handlebars Email Templates
+### 4. Basic Email Templates
 
-- [ ] Set up Handlebars as the templating engine.
-- [ ] Create simple HTML/CSS templates:
-  - Header with blog name/logo
+- [x] Create a general `Renderer` interface
+- [x] Create a markdown renderer with unit tests
+- [ ] Create simple HTML/CSS templates with unit tests
+- Add header and footer to both templates
+  - Header with blog name
   - Footer with unsubscribe link and preference management
-- [ ] Ensure basic responsive and sans-serif styling.
-- [ ] Create unit tests validating template rendering with various sample data inputs.
+- [ ] Ensure basic responsive and sans-serif styling for HTML.
 
 ---
 
