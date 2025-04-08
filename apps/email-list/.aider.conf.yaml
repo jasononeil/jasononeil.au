@@ -1,0 +1,14 @@
+read:
+  - apps/email-list/AI_CONTEXT.md
+
+# For how I interact with it
+watch-files: true
+auto-commits: false
+show-diffs: false
+commit-prompt: Create a commit message that describes the intent of this change on the first line. Add extra detail in the body if the changes are not self explanatory.
+
+# Linting and fixing
+test-cmd: pnpm email-list test --run
+lint-cmd: pnpm email-list format && pnpm email-list lint --fix
+auto-lint: true
+auto-test: true
