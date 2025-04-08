@@ -1,6 +1,6 @@
 /**
  * Renderer Interface
- * 
+ *
  * Defines the contract for different content renderers.
  * Each renderer takes WordPress content and transforms it into a specific format.
  */
@@ -26,7 +26,7 @@ export interface Renderer {
    * Render a WordPress post into a specific format
    */
   renderPost(postData: PostMetadata, options?: RendererOptions): Promise<string>;
-  
+
   /**
    * Get the content type of the rendered output
    */

@@ -57,9 +57,7 @@
       "compositePrimaryKeys": {
         "email_list_sent_emails_id": {
           "name": "email_list_sent_emails_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {},
@@ -103,16 +101,11 @@
       "compositePrimaryKeys": {
         "email_list_subscriber_preferences_id": {
           "name": "email_list_subscriber_preferences_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         },
         "email_list_subscriber_preferences_subscriber_id_category_id_pk": {
           "name": "email_list_subscriber_preferences_subscriber_id_category_id_pk",
-          "columns": [
-            "subscriber_id",
-            "category_id"
-          ]
+          "columns": ["subscriber_id", "category_id"]
         }
       },
       "uniqueConstraints": {},
@@ -173,17 +166,13 @@
       "compositePrimaryKeys": {
         "email_list_subscribers_id": {
           "name": "email_list_subscribers_id",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {
         "email_list_subscribers_email_unique": {
           "name": "email_list_subscribers_email_unique",
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "checkConstraint": {}

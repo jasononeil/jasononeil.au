@@ -15,11 +15,7 @@ export default function Home() {
         />
         <ol className={styles.list}>
           <li className={styles.listItem}>
-            Get started by editing{' '}
-            <code className={styles.code}>
-              src/app/page.tsx
-            </code>
-            .
+            Get started by editing <code className={styles.code}>src/app/page.tsx</code>.
           </li>
           <li className={styles.listItem}>Save and see your changes instantly.</li>
         </ol>

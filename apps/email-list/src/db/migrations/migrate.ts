@@ -18,14 +18,14 @@ const connectionConfig = {
 // Run migrations
 async function runMigrations() {
   console.log('Running database migrations...');
-  
+
   try {
     const connection = await mysql.createConnection(connectionConfig);
     const db = drizzle(connection);
-    
+
     // This will run all migrations in the ./drizzle folder
     await migrate(db, { migrationsFolder: './drizzle' });
-    
+
     console.log('Migrations completed successfully!');
     await connection.end();
   } catch (error) {

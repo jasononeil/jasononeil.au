@@ -90,7 +90,9 @@
   font-size: 0.9rem;
 }
 
-.webPreview, .markdownPreview, .emailPreview {
+.webPreview,
+.markdownPreview,
+.emailPreview {
   flex: 1;
   overflow-y: auto;
   padding: 0;
