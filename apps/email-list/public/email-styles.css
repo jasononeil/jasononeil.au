@@ -1,0 +1,143 @@
+/* Email-friendly CSS for HTML rendering */
+.post {
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+.post h1 {
+  font-size: 24px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #222;
+}
+
+.post h2 {
+  font-size: 20px;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #222;
+}
+
+.post h3,
+.post h4,
+.post h5,
+.post h6 {
+  font-size: 18px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #222;
+}
+
+.post p {
+  margin-bottom: 16px;
+}
+
+.post a {
+  color: #0366d6;
+  text-decoration: underline;
+}
+
+.post img {
+  max-width: 100%;
+  height: auto;
+  margin: 16px 0;
+}
+
+.post figure {
+  margin: 20px 0;
+}
+
+.post figcaption {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.post blockquote {
+  border-left: 4px solid #ddd;
+  padding-left: 16px;
+  margin-left: 0;
+  color: #555;
+}
+
+.post pre {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  padding: 16px;
+  overflow: auto;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 14px;
+}
+
+.post code {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  background-color: #f6f8fa;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 14px;
+}
+
+.post ul,
+.post ol {
+  margin-bottom: 16px;
+  padding-left: 24px;
+}
+
+.post li {
+  margin-bottom: 8px;
+}
+
+.post hr {
+  height: 1px;
+  background-color: #ddd;
+  border: none;
+  margin: 24px 0;
+}
+
+.post table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.post th,
+.post td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.post th {
+  background-color: #f6f8fa;
+}
+
+.post-meta {
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #666;
+}
+
+.post-link {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  font-size: 14px;
+}
+
+.featured-image {
+  margin-bottom: 24px;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 16px;
+  margin-bottom: 24px;
+}

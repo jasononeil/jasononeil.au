@@ -1,4 +1,6 @@
 import { Renderer, PostMetadata, RendererOptions } from './renderer.interface';
+import fs from 'fs';
+import path from 'path';
 import {
   WpBlock,
   WpBlocks,
@@ -21,7 +23,6 @@ import {
   ListBlock,
   QuoteBlock,
   PullquoteBlock,
-  SeparatorBlock,
   TableBlock,
   GalleryBlock,
   VideoBlock,
@@ -37,6 +38,15 @@ export class HtmlRenderer implements Renderer {
     const { includeImages = true, maxImageWidth = 600, includeMetadata = true } = options;
 
     let html = '';
+
+    // Read CSS from public directory
+    const css = fs.readFileSync(path.join(process.cwd(), 'public', 'email-styles.css'), 'utf-8');
+
+    // Add CSS styles
+    html += `<style>\n${css}\n</style>\n\n`;
+
+    // Wrap everything in an article with post class
+    html += `<article class="post">\n`;
 
     // Add title. Note the API returns HTML that is already escaped.
     html += `<h1>${post.title.rendered}</h1>\n\n`;
@@ -93,6 +103,9 @@ export class HtmlRenderer implements Renderer {
     html += `\n<div class="post-link">\n`;
     html += `  <p><a href="${post.link}">View original post</a></p>\n`;
     html += `</div>\n`;
+
+    // Close the article tag
+    html += `</article>\n`;
 
     return html;
   }
