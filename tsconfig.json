@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "references": [{ "path": "./apps/email-list" }],
+  "files": []
+}

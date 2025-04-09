@@ -3,6 +3,12 @@
   "packageManager": "pnpm@9.1.2",
   "version": "0.0.1",
   "scripts": {
-    "email-list": "pnpm --filter email-list"
+    "email-list": "pnpm --filter email-list",
+    "format": "prettier --write .",
+    "typecheck": "tsc --build"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "typescript": "^5"
   }
 }
