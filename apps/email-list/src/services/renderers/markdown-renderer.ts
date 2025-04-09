@@ -71,6 +71,9 @@ export class MarkdownRenderer implements Renderer {
       markdown += this.convertHtmlToMarkdown(post.content.rendered);
     }
 
+    // Add a link back to the original post
+    markdown += `\n\nView original post: ${post.link}\n`;
+
     return markdown;
   }
 
