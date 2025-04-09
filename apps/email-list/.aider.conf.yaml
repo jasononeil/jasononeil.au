@@ -5,10 +5,11 @@ read:
 watch-files: true
 auto-commits: false
 show-diffs: false
-commit-prompt: Create a commit message that describes the intent of this change on the first line. Add extra detail in the body if the changes are not self explanatory.
+commit-prompt: Use the conversation history to think about the intent of this change, not just the diff. Why, not what. Create a commit message that describes the intent of this change on the first line. Add extra detail in the body about the "what" of the changes, but only if the changes are not self explanatory. If they are self explanatory, just use the first line.
 
 # Linting and fixing
-test-cmd: pnpm email-list test --run
-lint-cmd: pnpm email-list format && pnpm email-list lint --fix
-auto-lint: true
 auto-test: true
+test-cmd: pnpm typecheck
+auto-lint: true
+lint-cmd:
+  - pnpm format

@@ -2,3 +2,5 @@ node_modules/
 .devbox
 .envrc.private
 .aider*
+!.aider.conf.yaml
+tsconfig.tsbuildinfo
