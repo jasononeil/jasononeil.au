@@ -50,7 +50,7 @@ describe('WordPressAPI', () => {
     });
 
     await expect(api.getPost(999)).rejects.toThrow(
-      'API error (https://example.com/wp-json/wp/v2/posts/999 404): Not Found - Error fetching post 999 - Error fetching post 999'
+      'API error (https://example.com/wp-json/wp/v2/posts/999 [404]): Not Found - Error fetching post 999'
     );
   });
 
@@ -188,6 +188,23 @@ describe('WordPressAPI', () => {
       },
     };
 
+    const mockBlocks = [
+      {
+        name: 'core/heading',
+        attributes: {
+          content: 'Test Heading',
+          level: 2,
+        },
+      },
+      {
+        name: 'core/paragraph',
+        attributes: {
+          content: 'Test paragraph content',
+          dropCap: false,
+        },
+      },
+    ];
+
     // Mock fetch to return different responses based on the URL
     (global.fetch as any).mockImplementation((url: string) => {
       // Match the URL to determine which mock to return
@@ -226,8 +243,14 @@ describe('WordPressAPI', () => {
           ok: true,
           json: async () => mockMedia,
         };
+      } else if (url.endsWith('/vip-block-data-api/v1/posts/1/blocks')) {
+        return {
+          ok: true,
+          json: async () => ({
+            blocks: mockBlocks,
+          }),
+        };
       }
-
       // If URL doesn't match any expected pattern, throw an error
       throw new Error(`Unexpected URL in test: ${url}`);
     });

@@ -441,7 +441,7 @@ describe('WordPress Block Decoders', () => {
         },
       ];
 
-      const parsed = parseBlocks(blocks);
+      const parsed = parseBlocks({ blocks });
       expect(parsed).toEqual(blocks);
       expect(parsed.length).toBe(2);
       expect(isHeadingBlock(parsed[0])).toBe(true);
