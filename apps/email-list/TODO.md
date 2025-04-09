@@ -73,8 +73,8 @@ It turns out the Wordpress API doesn't support blocks by default.
 
 - [x] Create a general `Renderer` interface
 - [x] Create a markdown renderer with unit tests
-- [ ] Create simple HTML/CSS templates with unit tests
-- Add header and footer to both templates
+- [x] Create simple HTML/CSS templates with unit tests
+- [ ] Add header and footer to both templates
   - Header with blog name
   - Footer with unsubscribe link and preference management
 - [ ] Ensure basic responsive and sans-serif styling for HTML.
@@ -85,11 +85,11 @@ It turns out the Wordpress API doesn't support blocks by default.
 
 ### 1. Content Parsing & Transformation
 
-- [ ] Develop a parser to convert WordPress block content into email-friendly HTML and also plain text.
-- [ ] Ensure conversion logic handles:
+- [x] Develop a parser to convert WordPress block content into email-friendly HTML and also plain text.
+- [x] Ensure conversion logic handles:
   - Common block types (headers, lists, blockquotes, etc.)
   - Embedded media and fallback for unsupported blocks
-- [ ] Early Integration Test:
+- [x] Early Integration Test:
   - Use the manual trigger test to run the conversion process on all existing WordPress posts and report any parsing anomalies.
   - Write unit tests for each block type conversion scenario.
 

@@ -16,6 +16,7 @@ export default function PreviewPosts() {
   const [posts, setPosts] = useState<WPPost[]>([]);
   const [selectedPost, setSelectedPost] = useState<WPPost | null>(null);
   const [markdownContent, setMarkdownContent] = useState<string>('');
+  const [htmlContent, setHtmlContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -106,6 +107,17 @@ export default function PreviewPosts() {
 
       const markdown = await markdownResponse.text();
       setMarkdownContent(markdown);
+
+      // Fetch HTML content
+      const htmlResponse = await fetch(`/api/wordpress/html/${postId}`);
+
+      if (!htmlResponse.ok) {
+        const errorText = await htmlResponse.text();
+        throw new Error(errorText || `HTTP error ${htmlResponse.status}`);
+      }
+
+      const html = await htmlResponse.text();
+      setHtmlContent(html);
     } catch (err) {
       setError(`Failed to fetch post details: ${(err as Error).message}`);
       console.error('Error fetching post details:', err);
@@ -208,7 +220,15 @@ export default function PreviewPosts() {
       <section className={styles.column}>
         <h2 className={styles.columnTitle}>HTML Email</h2>
         <article className={styles.emailPreview}>
-          <p>Coming soon</p>
+          {selectedPost ? (
+            loading ? (
+              <p>Loading HTML email preview...</p>
+            ) : (
+              <iframe srcDoc={htmlContent} className={styles.iframe} title="HTML Email Preview" />
+            )
+          ) : (
+            <p>Select a post to view HTML email</p>
+          )}
         </article>
       </section>
     </main>
