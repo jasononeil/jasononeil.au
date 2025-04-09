@@ -74,10 +74,10 @@ It turns out the Wordpress API doesn't support blocks by default.
 - [x] Create a general `Renderer` interface
 - [x] Create a markdown renderer with unit tests
 - [x] Create simple HTML/CSS templates with unit tests
-- [ ] Add header and footer to both templates
+- [x] Add header and footer to both templates
   - Header with blog name
-  - Footer with unsubscribe link and preference management
-- [ ] Ensure basic responsive and sans-serif styling for HTML.
+  - Footer with unsubscribe link (placeholder for now)
+- [x] Ensure basic responsive and sans-serif styling for HTML.
 
 ---
 

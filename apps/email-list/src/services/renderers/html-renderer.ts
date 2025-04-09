@@ -45,6 +45,11 @@ export class HtmlRenderer implements Renderer {
     // Add CSS styles
     html += `<style>\n${css}\n</style>\n\n`;
 
+    // Add header
+    html += `<header class="blog-header">
+  <h2><a href="https://jasononeil.au">A post from Jason O'Neil's blog</a></h2>
+</header>\n\n`;
+
     // Wrap everything in an article with post class
     html += `<article class="post">\n`;
 
@@ -102,6 +107,11 @@ export class HtmlRenderer implements Renderer {
     // Add a link back to the original post
     html += `\n<div class="post-link">\n`;
     html += `  <p><a href="${post.link}">View original post</a></p>\n`;
+    html += `</div>\n`;
+
+    // Add unsubscribe link
+    html += `\n<div class="unsubscribe">\n`;
+    html += `  <p><small><a href="{{unsubscribe_url}}">Unsubscribe</a> from these emails</small></p>\n`;
     html += `</div>\n`;
 
     // Close the article tag

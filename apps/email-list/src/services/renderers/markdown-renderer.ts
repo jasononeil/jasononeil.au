@@ -35,6 +35,9 @@ export class MarkdownRenderer implements Renderer {
 
     let markdown = '';
 
+    // Add header
+    markdown += `A post from [Jason O'Neil's blog](https://jasononeil.au)\n\n`;
+
     // Add title
     markdown += `# ${post.title.rendered}\n\n`;
 
@@ -73,6 +76,9 @@ export class MarkdownRenderer implements Renderer {
 
     // Add a link back to the original post
     markdown += `\n\nView original post: ${post.link}\n`;
+
+    // Add unsubscribe link
+    markdown += `\n\n[Unsubscribe]({{unsubscribe_url}}) from these emails\n`;
 
     return markdown;
   }
