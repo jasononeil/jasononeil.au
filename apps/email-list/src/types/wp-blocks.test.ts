@@ -32,8 +32,10 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isParagraphBlock(parsed)).toBe(true);
-      expect(parsed.attributes.content).toBe(block.attributes.content);
-      expect(parsed.attributes.dropCap).toBe(false);
+      if (isParagraphBlock(parsed)) {
+        expect(parsed.attributes.content).toBe(block.attributes.content);
+        expect(parsed.attributes.dropCap).toBe(false);
+      }
     });
 
     it('should handle paragraph with missing dropCap', () => {
@@ -47,7 +49,9 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isParagraphBlock(parsed)).toBe(true);
-      expect(parsed.attributes.dropCap).toBeUndefined();
+      if (isParagraphBlock(parsed)) {
+        expect(parsed.attributes.dropCap).toBeUndefined();
+      }
     });
   });
 
@@ -64,8 +68,10 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isHeadingBlock(parsed)).toBe(true);
-      expect(parsed.attributes.content).toBe('The future is bi-vocational');
-      expect(parsed.attributes.level).toBe(3);
+      if (isHeadingBlock(parsed)) {
+        expect(parsed.attributes.content).toBe('The future is bi-vocational');
+        expect(parsed.attributes.level).toBe(3);
+      }
     });
   });
 
@@ -89,10 +95,12 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isImageBlock(parsed)).toBe(true);
-      expect(parsed.attributes.url).toBe(
-        'https://jasono.co/wp-content/uploads/2023/05/img_1254-1-768x1024.jpg'
-      );
-      expect(parsed.attributes.alt).toContain('Photo: a wide photo of the bush landscape');
+      if (isImageBlock(parsed)) {
+        expect(parsed.attributes.url).toBe(
+          'https://jasono.co/wp-content/uploads/2023/05/img_1254-1-768x1024.jpg'
+        );
+        expect(parsed.attributes.alt).toContain('Photo: a wide photo of the bush landscape');
+      }
     });
   });
 
@@ -124,12 +132,14 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isListBlock(parsed)).toBe(true);
-      expect(parsed.attributes.ordered).toBe(false);
-      expect(parsed.innerBlocks?.length).toBe(2);
-      expect(parsed.innerBlocks?.[0].name).toBe('core/list-item');
-      expect(parsed.innerBlocks?.[0].attributes.content).toContain(
-        'His birth story was pretty unexpected'
-      );
+      if (isListBlock(parsed)) {
+        expect(parsed.attributes.ordered).toBe(false);
+        expect(parsed.innerBlocks?.length).toBe(2);
+        expect(parsed.innerBlocks?.[0].name).toBe('core/list-item');
+        expect(parsed.innerBlocks?.[0].attributes.content).toContain(
+          'His birth story was pretty unexpected'
+        );
+      }
     });
   });
 
@@ -164,10 +174,14 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isQuoteBlock(parsed)).toBe(true);
-      expect(parsed.attributes.citation).toContain('The Gospel in Solentiname');
-      expect(parsed.innerBlocks?.length).toBe(2);
-      expect(parsed.innerBlocks?.[0].name).toBe('core/paragraph');
-      expect(parsed.innerBlocks?.[0].attributes.content).toContain('William: But all that perfume');
+      if (isQuoteBlock(parsed)) {
+        expect(parsed.attributes.citation).toContain('The Gospel in Solentiname');
+        expect(parsed.innerBlocks?.length).toBe(2);
+        expect(parsed.innerBlocks?.[0].name).toBe('core/paragraph');
+        expect(parsed.innerBlocks?.[0].attributes.content).toContain(
+          'William: But all that perfume'
+        );
+      }
     });
   });
 
@@ -184,7 +198,9 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isPullquoteBlock(parsed)).toBe(true);
-      expect(parsed.attributes.value).toContain('Consistently offering different prices');
+      if (isPullquoteBlock(parsed)) {
+        expect(parsed.attributes.value).toContain('Consistently offering different prices');
+      }
     });
   });
 
@@ -200,7 +216,9 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isSeparatorBlock(parsed)).toBe(true);
-      expect(parsed.attributes.opacity).toBe('alpha-channel');
+      if (isSeparatorBlock(parsed)) {
+        expect(parsed.attributes.opacity).toBe('alpha-channel');
+      }
     });
   });
 
@@ -222,8 +240,10 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isEmbedBlock(parsed)).toBe(true);
-      expect(parsed.attributes.url).toBe('https://www.youtube.com/watch?v=jYhE7HNvA8E');
-      expect(parsed.attributes.providerNameSlug).toBe('youtube');
+      if (isEmbedBlock(parsed)) {
+        expect(parsed.attributes.url).toBe('https://www.youtube.com/watch?v=jYhE7HNvA8E');
+        expect(parsed.attributes.providerNameSlug).toBe('youtube');
+      }
     });
   });
 
@@ -246,12 +266,14 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isVideoBlock(parsed)).toBe(true);
-      expect(parsed.attributes.src).toBe(
-        'https://jasono.co/wp-content/uploads/2023/06/screen-chatter-002.mp4'
-      );
-      expect(parsed.attributes.caption).toContain(
-        'A screen recording of my using a command line app'
-      );
+      if (isVideoBlock(parsed)) {
+        expect(parsed.attributes.src).toBe(
+          'https://jasono.co/wp-content/uploads/2023/06/screen-chatter-002.mp4'
+        );
+        expect(parsed.attributes.caption).toContain(
+          'A screen recording of my using a command line app'
+        );
+      }
     });
   });
 
@@ -348,10 +370,12 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isGalleryBlock(parsed)).toBe(true);
-      expect(parsed.attributes.columns).toBe(1);
-      expect(parsed.innerBlocks?.length).toBe(1);
-      expect(parsed.innerBlocks?.[0].name).toBe('core/image');
-      expect(parsed.innerBlocks?.[0].attributes.url).toContain('img_2439-1024x599.jpg');
+      if (isGalleryBlock(parsed)) {
+        expect(parsed.attributes.columns).toBe(1);
+        expect(parsed.innerBlocks?.length).toBe(1);
+        expect(parsed.innerBlocks?.[0].name).toBe('core/image');
+        expect(parsed.innerBlocks?.[0].attributes.url).toContain('img_2439-1024x599.jpg');
+      }
     });
   });
 
@@ -390,9 +414,11 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isReusableBlock(parsed)).toBe(true);
-      expect(parsed.attributes.ref).toBe(712);
-      expect(parsed.innerBlocks?.length).toBe(1);
-      expect(parsed.innerBlocks?.[0].name).toBe('core/paragraph');
+      if (isReusableBlock(parsed)) {
+        expect(parsed.attributes.ref).toBe(712);
+        expect(parsed.innerBlocks?.length).toBe(1);
+        expect(parsed.innerBlocks?.[0].name).toBe('core/paragraph');
+      }
     });
   });
 
@@ -449,8 +475,10 @@ describe('WordPress Block Decoders', () => {
       const parsed = parseBlock(block);
       expect(parsed).toEqual(block);
       expect(isParagraphBlock(parsed)).toBe(true);
-      expect(parsed.attributes.unexpectedAttribute).toBe('some value');
-      expect(parsed.attributes.anotherOne).toBe(42);
+      if (isParagraphBlock(parsed)) {
+        expect(parsed.attributes.unexpectedAttribute).toBe('some value');
+        expect(parsed.attributes.anotherOne).toBe(42);
+      }
     });
 
     it('should handle blocks with missing required attributes by throwing', () => {
