@@ -208,12 +208,9 @@ export class MarkdownRenderer implements Renderer {
           .join('\n\n');
       }
       if (block.attributes.images) {
-        return block.attributes.images
-          .map((image) => {
-            const caption = image.caption ? `\n*${image.caption}*` : '';
-            return `![${image.alt || ''}](${image.url})${caption}`;
-          })
-          .join('\n\n');
+        throw new Error(
+          `Not implemented: until now we haven't seen a case where 'images' is defined`
+        );
       }
     }
 
