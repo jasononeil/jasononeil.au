@@ -7,10 +7,10 @@ const renderer = new HtmlRenderer();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { postId: string } }
+  { params }: { params: Promise<{ postId: string }> }
 ): Promise<NextResponse> {
   try {
-    const postId = parseInt(params.postId, 10);
+    const postId = parseInt((await params).postId, 10);
     if (isNaN(postId)) {
       return NextResponse.json({ error: 'Invalid post ID' }, { status: 400 });
     }
