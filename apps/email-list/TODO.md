@@ -95,13 +95,14 @@ It turns out the Wordpress API doesn't support blocks by default.
 
 ### 2. More from the blog
 
-- [ ] Add a new service that uses the existing `wordpress-api` service that takes a Post ID, and fetches the 5 posts that came before it
-- [ ] Create a new `renderMoreFromTheBlog(posts: WPPost[])` method on the renderer interface
-- [ ] If the post is less than a certain threshold (say 100 words?) then render all the content (using `content.rendered`, not blocks). If it's longer then render the excerpt.
-- [ ] Implement for Markdown renderer including unit tests.
-- [ ] Implement for HTML renderer including unit tests.
+- [x] Add a new service that uses the existing `wordpress-api` service that takes a Post ID, and fetches the 5 posts that came before it
+- [x] Create a new `renderMoreFromTheBlog(posts: WPPost[])` method on the renderer interface
+- [x] If the post is less than a certain threshold (say 100 words?) then render all the content (using `content.rendered`, not blocks). If it's longer then render the excerpt.
+- [x] Implement for Markdown renderer including unit tests.
+- [x] Implement for HTML renderer including unit tests.
 
 Then split out the main post rendering from the overall document:
+
 - [ ] Create a new `renderEmail()` method on the renderer interface
 - [ ] In the Markdown renderer pull out the blog title and unsubscribe link to `renderEmail()`. Then have it call `renderPost()` and `renderMoreFromTheBlog()`
 - [ ] In the HTML renderer pull out the container, CSS, blog title and unsubscribe link to `renderEmail()`. Then have it call `renderPost()` and `renderMoreFromTheBlog()`

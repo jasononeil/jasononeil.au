@@ -24,6 +24,7 @@ import {
   isReusableBlock,
   isPreformattedBlock,
 } from '../../types/wp-blocks';
+import { WPPost } from '../wordpress-api';
 
 export class MarkdownRenderer implements Renderer {
   /**
@@ -86,6 +87,50 @@ export class MarkdownRenderer implements Renderer {
   /**
    * Get the content type
    */
+  /**
+   * Render a "More from the blog" section with previous posts
+   */
+  renderMoreFromTheBlog(posts: WPPost[], options: RendererOptions = {}): string {
+    if (!posts || posts.length === 0) {
+      return '';
+    }
+
+    let markdown = '## More from the blog\n\n';
+
+    for (const post of posts) {
+      // Get the post title
+      const title = post.title.rendered;
+
+      // Get the post content or excerpt
+      let content = '';
+      // Use full content as fallback
+      const fullContent = this.convertHtmlToMarkdown(post.content.rendered);
+
+      // If content is longer than 100 words, truncate it
+      const words = fullContent.split(/\s+/);
+      if (words.length > 100) {
+        content = post.excerpt.rendered;
+        content += `[Read more](${post.link})\n\n`;
+      } else {
+        content = fullContent;
+      }
+
+      // Format the post date
+      const date = new Date(post.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+
+      // Add the post to the markdown
+      markdown += `### [${title}](${post.link})\n\n`;
+      markdown += `*Published on ${date}*\n\n`;
+      markdown += `${content}\n\n`;
+    }
+
+    return markdown;
+  }
+
   getContentType(): string {
     return 'text/markdown';
   }

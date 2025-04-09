@@ -1,4 +1,5 @@
 import { Renderer, PostMetadata, RendererOptions } from './renderer.interface';
+import { WPPost } from '../wordpress-api';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -117,6 +118,55 @@ export class HtmlRenderer implements Renderer {
     // Close the article tag
     html += `</article>\n`;
 
+    return html;
+  }
+
+  /**
+   * Render a "More from the blog" section with previous posts
+   */
+  renderMoreFromTheBlog(posts: WPPost[], options: RendererOptions = {}): string {
+    if (!posts || posts.length === 0) {
+      return '';
+    }
+
+    let html = '<div class="more-from-blog">\n';
+    html += '  <h2>More from the blog</h2>\n';
+
+    for (const post of posts) {
+      // Get the post title (already HTML escaped by WordPress)
+      const title = post.title.rendered;
+
+      // Format the post date
+      const date = new Date(post.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+
+      // Start the post container
+      html += '  <div class="related-post">\n';
+      html += `    <h3><a href="${post.link}">${title}</a></h3>\n`;
+      html += `    <p class="post-date"><em>Published on ${date}</em></p>\n`;
+
+      // Get the post content or excerpt
+      // If content is longer than approximately 100 words, use the Wordpress excerpt.
+      // This is a rough estimate using a dodgy regex to strip HTML.
+      const textContent = post.content.rendered.replace(/<[^>]*>/g, '');
+      const wordCount = textContent.split(/\s+/).length;
+
+      if (wordCount > 100) {
+        // For HTML we'll just use the excerpt if available, otherwise the full content
+        // A proper implementation would use an HTML parser to safely truncate
+        html += `    <div class="post-excerpt">${post.excerpt.rendered}</div>\n`;
+        html += `    <p><a href="${post.link}">Read more...</a></p>\n`;
+      } else {
+        html += `    <div class="post-content">${post.content.rendered}</div>\n`;
+      }
+
+      html += '  </div>\n\n';
+    }
+
+    html += '</div>\n';
     return html;
   }
 

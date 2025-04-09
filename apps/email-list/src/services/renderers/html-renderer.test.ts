@@ -16,6 +16,7 @@ import {
   renderPreformattedBlock,
 } from './html-renderer';
 import { PostMetadata } from './renderer.interface';
+import { WPPost } from '../wordpress-api';
 
 describe('HtmlRenderer', () => {
   const renderer = new HtmlRenderer();
@@ -281,6 +282,60 @@ describe('HtmlRenderer', () => {
     expect(html).toContain('<li>Item 1</li>');
     expect(html).toContain('<li>Item 2</li>');
     expect(html).not.toContain('Fallback content');
+  });
+
+  it('should render "More from the blog" section', () => {
+    const posts: WPPost[] = [
+      {
+        id: 1,
+        title: { rendered: 'Previous Post 1' },
+        content: { rendered: '<p>many words</p>'.repeat(150), protected: false },
+        excerpt: { rendered: '<p>Excerpt of previous post 1.</p>', protected: false },
+        date: '2023-01-01T12:00:00',
+        modified: '2023-01-02T12:00:00',
+        slug: 'previous-post-1',
+        status: 'publish',
+        type: 'post',
+        link: 'https://example.com/previous-post-1',
+        author: 1,
+        featured_media: 0,
+        categories: [],
+        tags: [],
+      },
+      {
+        id: 2,
+        title: { rendered: 'Previous Post 2' },
+        content: { rendered: '<p>Content of previous post 2.</p>', protected: false },
+        excerpt: { rendered: '<p>Excerpt of previous post 2.</p>', protected: false },
+        date: '2022-12-15T10:00:00',
+        modified: '2022-12-16T10:00:00',
+        slug: 'previous-post-2',
+        status: 'publish',
+        type: 'post',
+        link: 'https://example.com/previous-post-2',
+        author: 1,
+        featured_media: 0,
+        categories: [],
+        tags: [],
+      },
+    ];
+
+    const html = renderer.renderMoreFromTheBlog(posts);
+
+    expect(html).toContain('<div class="more-from-blog">');
+    expect(html).toContain('<h2>More from the blog</h2>');
+    expect(html).toContain(
+      '<h3><a href="https://example.com/previous-post-1">Previous Post 1</a></h3>'
+    );
+    expect(html).toContain(
+      '<h3><a href="https://example.com/previous-post-2">Previous Post 2</a></h3>'
+    );
+    expect(html).toContain('<p class="post-date"><em>Published on January 1, 2023</em></p>');
+    expect(html).toContain('<p class="post-date"><em>Published on December 15, 2022</em></p>');
+    expect(html).toContain('<div class="post-excerpt"><p>Excerpt of previous post 1.</p></div>');
+    expect(html).toContain('<div class="post-content"><p>Content of previous post 2.</p></div>');
+    expect(html).toContain('<a href="https://example.com/previous-post-1">Read more...</a>');
+    expect(html).not.toContain('<a href="https://example.com/previous-post-2">Read more...</a>');
   });
 
   describe('renderBlock', async () => {

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { MarkdownRenderer } from './markdown-renderer';
 import { PostMetadata } from './renderer.interface';
+import { WPPost } from '../wordpress-api';
 
 describe('MarkdownRenderer', () => {
   const renderer = new MarkdownRenderer();
@@ -413,5 +414,50 @@ describe('MarkdownRenderer', () => {
         'This is the second paragraph after the list.',
       ].join('\n')
     );
+  });
+
+  it('should render more from the blog section', () => {
+    const posts = [
+      {
+        id: 1,
+        title: { rendered: 'Previous Post 1' },
+        excerpt: { rendered: '<p>This is the excerpt for post 1.</p>', protected: false },
+        content: {
+          rendered: '<p>word</p>'.repeat(150),
+          protected: false,
+        },
+        date: '2023-01-01T12:00:00',
+        link: 'https://example.com/previous-post-1',
+      } as WPPost,
+      {
+        id: 2,
+        title: { rendered: 'Previous Post 2' },
+        excerpt: { rendered: '<p>This is the excerpt for post 2.</p>', protected: false },
+        content: { rendered: '<p>This is the full content for post 2.</p>', protected: false },
+        date: '2023-01-02T12:00:00',
+        link: 'https://example.com/previous-post-2',
+      } as WPPost,
+    ];
+
+    const markdown = renderer.renderMoreFromTheBlog(posts);
+
+    // Check the section title
+    expect(markdown).toContain('## More from the blog');
+
+    // Check that each post is included
+    expect(markdown).toContain('### [Previous Post 1](https://example.com/previous-post-1)');
+    expect(markdown).toContain('### [Previous Post 2](https://example.com/previous-post-2)');
+
+    // Check that excerpts are included
+    expect(markdown).toContain('This is the excerpt for post 1.');
+    expect(markdown).toContain('This is the full content for post 2.');
+
+    // Check that dates are formatted
+    expect(markdown).toContain('Published on January 1, 2023');
+    expect(markdown).toContain('Published on January 2, 2023');
+
+    // Check that read more links are included
+    expect(markdown).toContain('[Read more](https://example.com/previous-post-1)');
+    expect(markdown).not.toContain('[Read more](https://example.com/previous-post-2)');
   });
 });
