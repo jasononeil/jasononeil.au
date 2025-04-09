@@ -1,5 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { HtmlRenderer } from './html-renderer';
+import {
+  HtmlRenderer,
+  renderBlock,
+  renderListBlock,
+  renderEmbedBlock,
+  renderImageBlock,
+  renderQuoteBlock,
+  renderTableBlock,
+  renderVideoBlock,
+  renderGalleryBlock,
+  renderHeadingBlock,
+  renderParagraphBlock,
+  renderPullquoteBlock,
+  renderSeparatorBlock,
+  renderPreformattedBlock,
+} from './html-renderer';
 import { PostMetadata } from './renderer.interface';
 
 describe('HtmlRenderer', () => {
@@ -230,11 +245,6 @@ describe('HtmlRenderer', () => {
             innerBlocks: [],
           },
           {
-            name: 'core/heading',
-            attributes: { level: 2, content: 'This is a heading' },
-            innerBlocks: [],
-          },
-          {
             name: 'core/list',
             attributes: {
               ordered: false,
@@ -244,27 +254,6 @@ describe('HtmlRenderer', () => {
               { name: 'core/list-item', attributes: { content: 'Item 1' } },
               { name: 'core/list-item', attributes: { content: 'Item 2' } },
             ],
-          },
-          {
-            name: 'core/quote',
-            attributes: {},
-            innerBlocks: [
-              {
-                name: 'core/paragraph',
-                attributes: {
-                  content: 'This is a quote',
-                  dropCap: false,
-                },
-              },
-            ],
-          },
-          {
-            name: 'core/image',
-            attributes: {
-              url: 'https://example.com/image.jpg',
-              alt: 'Example image',
-            },
-            innerBlocks: [],
           },
         ],
       },
@@ -288,100 +277,293 @@ describe('HtmlRenderer', () => {
     const html = await renderer.renderPost(postData);
 
     expect(html).toContain('<p>This is a paragraph block.</p>');
-    expect(html).toContain('<h2>This is a heading</h2>');
     expect(html).toContain('<ul>');
     expect(html).toContain('<li>Item 1</li>');
     expect(html).toContain('<li>Item 2</li>');
-    expect(html).toContain('<blockquote>');
-    expect(html).toContain('<p>This is a quote</p>');
-    expect(html).toContain('<figure class="image">');
-    expect(html).toContain('<img src="https://example.com/image.jpg" alt="Example image" />');
     expect(html).not.toContain('Fallback content');
   });
 
-  it('should handle table blocks correctly', async () => {
-    const postData: PostMetadata = {
-      post: {
-        id: 1,
-        title: { rendered: 'Test Table' },
-        content: { rendered: '<p>Fallback content</p>', protected: false },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
-        categories: [],
-        tags: [],
-        blocks: [
+  describe('renderBlock', async () => {
+    it('should work for a basic block like paragraph', async () => {
+      const html = renderBlock({
+        name: 'core/paragraph',
+        attributes: {
+          content: 'This is a <em>paragraph</em> block.',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<p>This is a <em>paragraph</em> block.</p>');
+    });
+
+    it('should throw on unknown block types', async () => {
+      expect(() =>
+        renderBlock({
+          // @ts-expect-error "this is a bogus block type that our schema/types should protect against"
+          name: 'core/super-amazing-block-that-is-unknown',
+          attributes: {},
+          innerBlocks: [],
+        })
+      ).toThrowError('Unknown block type: core/super-amazing-block-that-is-unknown');
+    });
+  });
+
+  describe('renderParagraphBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderParagraphBlock({
+        name: 'core/paragraph',
+        attributes: {
+          content: 'This is a <em>paragraph</em> block.',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<p>This is a <em>paragraph</em> block.</p>');
+    });
+  });
+
+  describe('renderHeadingBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderHeadingBlock({
+        name: 'core/heading',
+        attributes: {
+          content: 'This is a heading',
+          level: 2,
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<h2>This is a heading</h2>');
+    });
+  });
+
+  describe('renderPreformattedBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderPreformattedBlock({
+        name: 'core/preformatted',
+        attributes: {
+          content: 'This is preformatted text.',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<pre>This is preformatted text.</pre>');
+    });
+  });
+
+  describe('renderImageBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderImageBlock({
+        name: 'core/image',
+        attributes: {
+          url: 'https://example.com/image.jpg',
+          alt: 'Test image',
+          caption: 'This is a caption',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<figure class="image">');
+      expect(html).toContain('<img src="https://example.com/image.jpg" alt="Test image"');
+      expect(html).toContain('<figcaption>This is a caption</figcaption>');
+    });
+  });
+
+  describe('renderListBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderListBlock({
+        name: 'core/list',
+        attributes: {
+          ordered: false,
+          items: [{ content: 'Item 1' }, { content: 'Item 2' }],
+        },
+        innerBlocks: [
+          { name: 'core/list-item', attributes: { content: 'Item 1' } },
+          { name: 'core/list-item', attributes: { content: 'Item 2' } },
+        ],
+      });
+      expect(html).toContain('<ul>');
+      expect(html).toContain('<li>Item 1</li>');
+      expect(html).toContain('<li>Item 2</li>');
+    });
+
+    it('should work with the old style list values', () => {
+      const html = renderListBlock({
+        name: 'core/list',
+        attributes: {
+          ordered: false,
+          values: '<li>Item 1</li><li>Item 2</li>',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<ul>');
+      expect(html).toContain('<li>Item 1</li>');
+      expect(html).toContain('<li>Item 2</li>');
+    });
+  });
+
+  describe('renderQuoteBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderQuoteBlock({
+        name: 'core/quote',
+        attributes: {
+          value: 'This is a quote.',
+          citation: 'Test Citation',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<blockquote>');
+      expect(html).toContain('This is a quote.');
+      expect(html).toContain('<cite>Test Citation</cite>');
+    });
+  });
+
+  describe('renderPullquoteBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderPullquoteBlock({
+        name: 'core/pullquote',
+        attributes: {
+          value: 'This is a pullquote.',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<figure class="pullquote">');
+      expect(html).toContain('<blockquote>');
+      expect(html).toContain('This is a pullquote.');
+    });
+  });
+
+  describe('renderSeparatorBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderSeparatorBlock();
+      expect(html).toContain('<hr />');
+    });
+  });
+
+  describe('renderTableBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderTableBlock({
+        name: 'core/table',
+        attributes: {
+          caption: 'Sample Table',
+          head: [
+            {
+              cells: [
+                { tag: 'th', content: 'Header 1' },
+                { tag: 'th', content: 'Header 2' },
+              ],
+            },
+          ],
+          body: [
+            {
+              cells: [
+                { tag: 'td', content: 'Row 1, Cell 1' },
+                { tag: 'td', content: 'Row 1, Cell 2' },
+              ],
+            },
+            {
+              cells: [
+                { tag: 'td', content: 'Row 2, Cell 1' },
+                { tag: 'td', content: 'Row 2, Cell 2' },
+              ],
+            },
+          ],
+          foot: [
+            {
+              cells: [
+                { tag: 'td', content: 'Footer 1' },
+                { tag: 'td', content: 'Footer 2' },
+              ],
+            },
+          ],
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain('<table>');
+      expect(html).toContain('<caption>Sample Table</caption>');
+      expect(html).toContain('<thead>');
+      expect(html).toContain('<th>Header 1</th>');
+      expect(html).toContain('<tbody>');
+      expect(html).toContain('<td>Row 1, Cell 1</td>');
+      expect(html).toContain('<tfoot>');
+      expect(html).toContain('<td>Footer 1</td>');
+    });
+  });
+
+  describe('renderGalleryBlock', async () => {
+    it('should throw if innerBlocks is not defined', async () => {
+      expect(() =>
+        renderGalleryBlock({
+          name: 'core/gallery',
+          attributes: {
+            ids: [],
+            images: [1, 'who knows what this type is', { i: 'do not' }],
+          },
+          innerBlocks: undefined,
+        })
+      ).toThrowError('Not implemented');
+    });
+
+    it('should render when innerBlock images are set', async () => {
+      const html = renderGalleryBlock({
+        name: 'core/gallery',
+        attributes: {
+          ids: [],
+          images: [],
+        },
+        innerBlocks: [
           {
-            name: 'core/table',
+            name: 'core/image',
             attributes: {
-              caption: 'Sample Table',
-              head: [
-                {
-                  cells: [
-                    { tag: 'th', content: 'Header 1' },
-                    { tag: 'th', content: 'Header 2' },
-                  ],
-                },
-              ],
-              body: [
-                {
-                  cells: [
-                    { tag: 'td', content: 'Row 1, Cell 1' },
-                    { tag: 'td', content: 'Row 1, Cell 2' },
-                  ],
-                },
-                {
-                  cells: [
-                    { tag: 'td', content: 'Row 2, Cell 1' },
-                    { tag: 'td', content: 'Row 2, Cell 2' },
-                  ],
-                },
-              ],
-              foot: [
-                {
-                  cells: [
-                    { tag: 'td', content: 'Footer 1' },
-                    { tag: 'td', content: 'Footer 2' },
-                  ],
-                },
-              ],
+              url: 'https://example.com/image1.jpg',
+              alt: 'Image 1',
+              caption: 'Caption 1',
+            },
+            innerBlocks: [],
+          },
+          {
+            name: 'core/image',
+            attributes: {
+              url: 'https://example.com/image2.jpg',
+              alt: 'Image 2',
             },
             innerBlocks: [],
           },
         ],
-      },
-      categories: [],
-      tags: [],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
+      });
+      expect(html).toContain('<div class="gallery">');
+      expect(html).toContain('<figure class="image">');
+      expect(html).toContain('<img src="https://example.com/image1.jpg"');
+      expect(html).toContain('alt="Image 1"');
+      expect(html).toContain('<figcaption>Caption 1');
+      expect(html).toContain('<img src="https://example.com/image2.jpg"');
+      expect(html).toContain('alt="Image 2"');
+    });
+  });
+
+  describe('renderVideoBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderVideoBlock({
+        name: 'core/video',
+        attributes: {
+          src: 'https://example.com/video1.mp4',
+          caption: 'This is a video caption',
         },
-      },
-    };
+        innerBlocks: [],
+      });
+      expect(html).toContain('<figure class="video">');
+      expect(html).toContain('<video controls src="https://example.com/video1.mp4"></video>');
+      expect(html).toContain('<figcaption>This is a video caption</figcaption>');
+    });
+  });
 
-    const html = await renderer.renderPost(postData);
-
-    expect(html).toContain('<table>');
-    expect(html).toContain('<caption>Sample Table</caption>');
-    expect(html).toContain('<thead>');
-    expect(html).toContain('<th>Header 1</th>');
-    expect(html).toContain('<tbody>');
-    expect(html).toContain('<td>Row 1, Cell 1</td>');
-    expect(html).toContain('<tfoot>');
-    expect(html).toContain('<td>Footer 1</td>');
+  describe('renderEmbedBlock', async () => {
+    it('should render correctly', async () => {
+      const html = renderEmbedBlock({
+        name: 'core/embed',
+        attributes: {
+          url: 'https://example.com/embed-url',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toContain(
+        '<p><a href="https://example.com/embed-url">View embedded content</a></p>'
+      );
+    });
   });
 });

@@ -14,6 +14,18 @@ import {
   isGalleryBlock,
   isVideoBlock,
   isEmbedBlock,
+  ParagraphBlock,
+  HeadingBlock,
+  PreformattedBlock,
+  ImageBlock,
+  ListBlock,
+  QuoteBlock,
+  PullquoteBlock,
+  SeparatorBlock,
+  TableBlock,
+  GalleryBlock,
+  VideoBlock,
+  EmbedBlock,
 } from '../../types/wp-blocks';
 
 export class HtmlRenderer implements Renderer {
@@ -39,18 +51,18 @@ export class HtmlRenderer implements Renderer {
 
       html += `<div class="post-meta">\n`;
       html += `  <p><em>Published on ${date}</em></p>\n`;
-      html += `  <p><em>By ${this.escapeHtml(author.name)}</em></p>\n`;
+      html += `  <p><em>By ${escapeHtml(author.name)}</em></p>\n`;
 
       if (categories.length > 0) {
         const categoryLinks = categories
-          .map((cat) => `<a href="${cat.link}">${this.escapeHtml(cat.name)}</a>`)
+          .map((cat) => `<a href="${cat.link}">${escapeHtml(cat.name)}</a>`)
           .join(', ');
         html += `  <p><em>Categories: ${categoryLinks}</em></p>\n`;
       }
 
       if (tags.length > 0) {
         const tagNames = tags
-          .map((tag) => `<a href="${tag.link}">${this.escapeHtml(tag.name)}</a>`)
+          .map((tag) => `<a href="${tag.link}">${escapeHtml(tag.name)}</a>`)
           .join(', ');
         html += `  <p><em>Tags: ${tagNames}</em></p>\n`;
       }
@@ -62,7 +74,7 @@ export class HtmlRenderer implements Renderer {
     if (includeImages && featuredMedia) {
       const imgWidth = Math.min(maxImageWidth, featuredMedia.media_details.width);
       html += `<div class="featured-image">\n`;
-      html += `  <img src="${featuredMedia.source_url}" alt="${this.escapeHtml(
+      html += `  <img src="${featuredMedia.source_url}" alt="${escapeHtml(
         featuredMedia.alt_text || featuredMedia.title.rendered
       )}" width="${imgWidth}" />\n`;
       html += `</div>\n\n`;
@@ -71,7 +83,7 @@ export class HtmlRenderer implements Renderer {
     // Render content
     if (post.blocks && post.blocks.length > 0) {
       // If we have Gutenberg blocks, use them
-      html += this.renderBlocks(post.blocks);
+      html += renderBlocks(post.blocks);
     } else {
       // Otherwise, use the rendered HTML content
       html += post.content.rendered;
@@ -88,204 +100,245 @@ export class HtmlRenderer implements Renderer {
   getContentType(): string {
     return 'text/html';
   }
+}
 
-  private renderBlocks(blocks: WpBlocks): string {
-    let html = '';
+export function renderBlocks(blocks: WpBlocks): string {
+  let html = '';
 
-    for (const block of blocks) {
-      html += this.renderBlock(block) + '\n\n';
-    }
-
-    return html;
+  for (const block of blocks) {
+    html += renderBlock(block) + '\n\n';
   }
 
-  private renderBlock(block: WpBlock): string {
-    // Handle different block types using type guards
-    if (isParagraphBlock(block)) {
-      return `<p>${block.attributes.content}</p>`;
-    }
+  return html;
+}
 
-    if (isHeadingBlock(block)) {
-      const level = block.attributes.level;
-      return `<h${level}>${block.attributes.content}</h${level}>`;
-    }
+export function renderBlock(block: WpBlock): string {
+  // Handle different block types using type guards
+  if (isParagraphBlock(block)) {
+    return renderParagraphBlock(block);
+  }
 
-    if (isPreformattedBlock(block)) {
-      return `<pre>${this.escapeHtml(block.attributes.content)}</pre>`;
-    }
+  if (isHeadingBlock(block)) {
+    return renderHeadingBlock(block);
+  }
 
-    if (isImageBlock(block)) {
-      const alt = block.attributes.alt || '';
-      const caption = block.attributes.caption
-        ? `<figcaption>${block.attributes.caption}</figcaption>`
-        : '';
-      return `<figure class="image">
-  <img src="${block.attributes.url}" alt="${this.escapeHtml(alt)}" />
-  ${caption}
+  if (isPreformattedBlock(block)) {
+    return renderPreformattedBlock(block);
+  }
+
+  if (isImageBlock(block)) {
+    return renderImageBlock(block);
+  }
+
+  if (isListBlock(block)) {
+    return renderListBlock(block);
+  }
+
+  if (isQuoteBlock(block)) {
+    return renderQuoteBlock(block);
+  }
+
+  if (isPullquoteBlock(block)) {
+    return renderPullquoteBlock(block);
+  }
+
+  if (isSeparatorBlock(block)) {
+    return renderSeparatorBlock();
+  }
+
+  if (isTableBlock(block)) {
+    return renderTableBlock(block);
+  }
+
+  if (isGalleryBlock(block)) {
+    return renderGalleryBlock(block);
+  }
+
+  if (isVideoBlock(block)) {
+    return renderVideoBlock(block);
+  }
+
+  if (isEmbedBlock(block)) {
+    return renderEmbedBlock(block);
+  }
+
+  throw new Error(`Unknown block type: ${block.name}. Data: ${JSON.stringify(block, null, 2)}`);
+}
+
+export function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+export function renderParagraphBlock(block: ParagraphBlock): string {
+  return `<p>${block.attributes.content}</p>`;
+}
+
+export function renderHeadingBlock(block: HeadingBlock): string {
+  const level = block.attributes.level;
+  return `<h${level}>${block.attributes.content}</h${level}>`;
+}
+
+export function renderPreformattedBlock(block: PreformattedBlock): string {
+  return `<pre>${escapeHtml(block.attributes.content)}</pre>`;
+}
+
+export function renderImageBlock(block: ImageBlock): string {
+  const alt = block.attributes.alt || '';
+  const caption = block.attributes.caption
+    ? `<figcaption>${block.attributes.caption}</figcaption>`
+    : '';
+  return `<figure class="image">
+<img src="${block.attributes.url}" alt="${escapeHtml(alt)}" />
+${caption}
 </figure>`;
+}
+
+export function renderListBlock(block: ListBlock): string {
+  const tag = block.attributes.ordered ? 'ol' : 'ul';
+  let items = '';
+
+  // Handle list items from innerBlocks
+  if (block.innerBlocks && block.innerBlocks.length > 0) {
+    for (const innerBlock of block.innerBlocks) {
+      if (innerBlock.name === 'core/list-item') {
+        items += `  <li>${innerBlock.attributes.content}</li>\n`;
+      }
     }
+  }
+  // Fallback to items array if available
+  else if (block.attributes.values) {
+    items += `  ${block.attributes.values}\n`;
+  }
 
-    if (isListBlock(block)) {
-      const tag = block.attributes.ordered ? 'ol' : 'ul';
-      let items = '';
+  return `<${tag}>\n${items}</${tag}>`;
+}
 
-      // Handle list items from innerBlocks
-      if (block.innerBlocks && block.innerBlocks.length > 0) {
-        for (const innerBlock of block.innerBlocks) {
-          if (innerBlock.name === 'core/list-item') {
-            items += `  <li>${innerBlock.attributes.content}</li>\n`;
-          }
-        }
-      }
-      // Fallback to items array if available
-      else if (block.attributes.values) {
-        items += `  ${block.attributes.values}\n`;
-      }
+export function renderQuoteBlock(block: QuoteBlock): string {
+  let content = '';
 
-      return `<${tag}>\n${items}</${tag}>`;
+  // Handle quote content from innerBlocks
+  if (block.innerBlocks && block.innerBlocks.length > 0) {
+    for (const innerBlock of block.innerBlocks) {
+      content += renderBlock(innerBlock);
     }
+  }
+  // Fallback to direct content if available
+  else if (block.attributes.value) {
+    content = block.attributes.value;
+  }
 
-    if (isQuoteBlock(block)) {
-      let content = '';
+  const citation = block.attributes.citation ? `<cite>${block.attributes.citation}</cite>` : '';
 
-      // Handle quote content from innerBlocks
-      if (block.innerBlocks && block.innerBlocks.length > 0) {
-        for (const innerBlock of block.innerBlocks) {
-          content += this.renderBlock(innerBlock);
-        }
-      }
-      // Fallback to direct content if available
-      else if (block.attributes.value) {
-        content = block.attributes.value;
-      }
-
-      const citation = block.attributes.citation ? `<cite>${block.attributes.citation}</cite>` : '';
-
-      return `<blockquote>
-  ${content}
-  ${citation}
+  return `<blockquote>
+${content}
+${citation}
 </blockquote>`;
+}
+
+export function renderPullquoteBlock(block: PullquoteBlock): string {
+  let content = '';
+
+  // Handle pullquote content from innerBlocks
+  if (block.innerBlocks && block.innerBlocks.length > 0) {
+    for (const innerBlock of block.innerBlocks) {
+      content += renderBlock(innerBlock);
     }
-
-    if (isPullquoteBlock(block)) {
-      let content = '';
-
-      // Handle pullquote content from innerBlocks
-      if (block.innerBlocks && block.innerBlocks.length > 0) {
-        for (const innerBlock of block.innerBlocks) {
-          content += this.renderBlock(innerBlock);
-        }
-      }
-      // Fallback to direct content if available
-      else if (block.attributes.value) {
-        content = block.attributes.value;
-      }
-
-      return `<figure class="pullquote">
-  <blockquote>
-    ${content}
-  </blockquote>
-</figure>`;
-    }
-
-    if (isSeparatorBlock(block)) {
-      return `<hr />`;
-    }
-
-    if (isTableBlock(block)) {
-      let tableHtml = '<table>\n';
-
-      // Add caption if available
-      if (block.attributes.caption) {
-        tableHtml += `  <caption>${block.attributes.caption}</caption>\n`;
-      }
-
-      // Add header if available
-      if (block.attributes.head && block.attributes.head.length > 0) {
-        tableHtml += '  <thead>\n    <tr>\n';
-        for (const cell of block.attributes.head[0].cells) {
-          const tag = cell.tag || 'th';
-          tableHtml += `      <${tag}>${cell.content}</${tag}>\n`;
-        }
-        tableHtml += '    </tr>\n  </thead>\n';
-      }
-
-      // Add body
-      if (block.attributes.body && block.attributes.body.length > 0) {
-        tableHtml += '  <tbody>\n';
-        for (const row of block.attributes.body) {
-          tableHtml += '    <tr>\n';
-          for (const cell of row.cells) {
-            const tag = cell.tag || 'td';
-            tableHtml += `      <${tag}>${cell.content}</${tag}>\n`;
-          }
-          tableHtml += '    </tr>\n';
-        }
-        tableHtml += '  </tbody>\n';
-      }
-
-      // Add footer if available
-      if (block.attributes.foot && block.attributes.foot.length > 0) {
-        tableHtml += '  <tfoot>\n    <tr>\n';
-        for (const cell of block.attributes.foot[0].cells) {
-          const tag = cell.tag || 'td';
-          tableHtml += `      <${tag}>${cell.content}</${tag}>\n`;
-        }
-        tableHtml += '    </tr>\n  </tfoot>\n';
-      }
-
-      tableHtml += '</table>';
-      return tableHtml;
-    }
-
-    if (isGalleryBlock(block)) {
-      if (block.innerBlocks) {
-        const images = block.innerBlocks
-          .map((image) => {
-            return this.renderBlock(image);
-          })
-          .join('\n\n');
-        return `<div class="gallery">\n\n${images}\n\n</div>`;
-      }
-      if (block.attributes.images) {
-        throw new Error(
-          `Not implemented: until now we haven't seen a case where 'images' is defined`
-        );
-      }
-    }
-
-    if (isVideoBlock(block)) {
-      if (block.attributes.src) {
-        return `<figure class="video">
-  <video controls src="${block.attributes.src}"></video>
-  ${block.attributes.caption ? `<figcaption>${block.attributes.caption}</figcaption>` : ''}
-</figure>`;
-      }
-      return `<p>[Video content]</p>`;
-    }
-
-    if (isEmbedBlock(block)) {
-      // For email, we can't include iframes, so we'll just add a link
-      if (block.attributes.url) {
-        return `<p><a href="${block.attributes.url}">View embedded content</a></p>`;
-      }
-      return `<p>[Embedded content]</p>`;
-    }
-
-    // For unknown blocks, return a placeholder or the raw content if available
-    if (block.attributes.content) {
-      return `<div class="unknown-block">${block.attributes.content}</div>`;
-    }
-
-    throw new Error(`Unknown block type: ${block.name}. Data: ${JSON.stringify(block, null, 2)}`);
+  }
+  // Fallback to direct content if available
+  else if (block.attributes.value) {
+    content = block.attributes.value;
   }
 
-  private escapeHtml(text: string): string {
-    return text
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
+  return `<figure class="pullquote">
+<blockquote>
+  ${content}
+</blockquote>
+</figure>`;
+}
+
+export function renderSeparatorBlock(): string {
+  return `<hr />`;
+}
+
+export function renderTableBlock(block: TableBlock): string {
+  let tableHtml = '<table>\n';
+
+  // Add caption if available
+  if (block.attributes.caption) {
+    tableHtml += `  <caption>${block.attributes.caption}</caption>\n`;
   }
+
+  // Add header if available
+  if (block.attributes.head && block.attributes.head.length > 0) {
+    tableHtml += '  <thead>\n    <tr>\n';
+    for (const cell of block.attributes.head[0].cells) {
+      const tag = cell.tag || 'th';
+      tableHtml += `      <${tag}>${cell.content}</${tag}>\n`;
+    }
+    tableHtml += '    </tr>\n  </thead>\n';
+  }
+
+  // Add body
+  if (block.attributes.body && block.attributes.body.length > 0) {
+    tableHtml += '  <tbody>\n';
+    for (const row of block.attributes.body) {
+      tableHtml += '    <tr>\n';
+      for (const cell of row.cells) {
+        const tag = cell.tag || 'td';
+        tableHtml += `      <${tag}>${cell.content}</${tag}>\n`;
+      }
+      tableHtml += '    </tr>\n';
+    }
+    tableHtml += '  </tbody>\n';
+  }
+
+  // Add footer if available
+  if (block.attributes.foot && block.attributes.foot.length > 0) {
+    tableHtml += '  <tfoot>\n    <tr>\n';
+    for (const cell of block.attributes.foot[0].cells) {
+      const tag = cell.tag || 'td';
+      tableHtml += `      <${tag}>${cell.content}</${tag}>\n`;
+    }
+    tableHtml += '    </tr>\n  </tfoot>\n';
+  }
+
+  tableHtml += '</table>';
+  return tableHtml;
+}
+
+export function renderGalleryBlock(block: GalleryBlock): string {
+  if (block.innerBlocks) {
+    const images = block.innerBlocks
+      .map((image) => {
+        return renderBlock(image);
+      })
+      .join('\n\n');
+    return `<div class="gallery">\n\n${images}\n\n</div>`;
+  }
+  throw new Error(
+    `Not implemented: until now we haven't seen a case where 'innerBlocks' is not defined, and probably 'images' is`
+  );
+}
+
+export function renderVideoBlock(block: VideoBlock): string {
+  if (block.attributes.src) {
+    return `<figure class="video">
+<video controls src="${block.attributes.src}"></video>
+${block.attributes.caption ? `<figcaption>${block.attributes.caption}</figcaption>` : ''}
+</figure>`;
+  }
+  return `<p>[Video content]</p>`;
+}
+
+export function renderEmbedBlock(block: EmbedBlock): string {
+  // For email, we can't include iframes, so we'll just add a link
+  if (block.attributes.url) {
+    return `<p><a href="${block.attributes.url}">View embedded content</a></p>`;
+  }
+  return `<p>[Embedded content]</p>`;
 }
