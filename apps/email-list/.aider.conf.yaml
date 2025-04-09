@@ -12,4 +12,4 @@ auto-test: true
 test-cmd: pnpm typecheck && pnpm run --recursive test run
 auto-lint: true
 lint-cmd:
-  - pnpm format
+  - pnpm prettier --write

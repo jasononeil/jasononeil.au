@@ -1,2 +1,4 @@
 .gitignore
 pnpm-lock.yaml
+.next
+test-output
