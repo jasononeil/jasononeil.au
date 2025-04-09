@@ -9,7 +9,7 @@ commit-prompt: Use the conversation history to think about the intent of this ch
 
 # Linting and fixing
 auto-test: true
-test-cmd: pnpm typecheck
+test-cmd: pnpm typecheck && pnpm run --recursive test run
 auto-lint: true
 lint-cmd:
   - pnpm format
