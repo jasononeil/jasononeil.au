@@ -79,6 +79,22 @@ describe('WordPressAPI', () => {
     expect(posts).toEqual(mockPosts);
   });
 
+  it('should fetch posts with date filters', async () => {
+    (global.fetch as any).mockResolvedValueOnce({
+      ok: true,
+      json: async () => {},
+    });
+
+    await api.getPosts({
+      before: '2023-12-31T23:59:59Z',
+      after: '2023-01-01T00:00:00Z',
+    });
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      'https://example.com/wp-json/wp/v2/posts?page=1&per_page=10&before=2023-12-31T23%3A59%3A59Z&after=2023-01-01T00%3A00%3A00Z'
+    );
+  });
+
   it('should fetch a category by ID', async () => {
     const mockCategory = {
       id: 3,

@@ -243,9 +243,11 @@ export class WordPressAPI {
       categories?: number[];
       tags?: number[];
       search?: string;
+      before?: string; // ISO8601 date string
+      after?: string; // ISO8601 date string
     } = {}
   ): Promise<WPPost[]> {
-    const { page = 1, perPage = 10, categories, tags, search } = options;
+    const { page = 1, perPage = 10, categories, tags, search, before, after } = options;
 
     const params = new URLSearchParams({
       page: page.toString(),
@@ -262,6 +264,14 @@ export class WordPressAPI {
 
     if (search) {
       params.append('search', search);
+    }
+
+    if (before) {
+      params.append('before', before);
+    }
+
+    if (after) {
+      params.append('after', after);
     }
 
     const url = `${this.coreApiUrl}/posts?${params.toString()}`;

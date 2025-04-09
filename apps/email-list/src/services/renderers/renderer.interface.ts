@@ -28,6 +28,11 @@ export interface Renderer {
   renderPost(postData: PostMetadata, options?: RendererOptions): Promise<string>;
 
   /**
+   * Render a "More from the blog" section with previous posts
+   */
+  renderMoreFromTheBlog(posts: WPPost[], options?: RendererOptions): string;
+
+  /**
    * Get the content type of the rendered output
    */
   getContentType(): string;
