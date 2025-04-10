@@ -66,7 +66,7 @@ export class MarkdownRenderer implements Renderer {
 
     if (post.blocks && post.blocks.length > 0) {
       // If Gutenberg blocks are available, process them
-      markdown += this.renderBlocks(post.blocks);
+      markdown += this.renderBlocks(post.blocks, postData);
     } else {
       // Otherwise, convert HTML to Markdown
       markdown += convertHtmlToMarkdown(post.content.rendered);
@@ -160,11 +160,11 @@ export class MarkdownRenderer implements Renderer {
   /**
    * Render Gutenberg blocks to Markdown
    */
-  private renderBlocks(blocks: WpBlocks): string {
+  private renderBlocks(blocks: WpBlocks, postData: PostWithMetadata): string {
     let markdown = '';
 
     for (const block of blocks) {
-      markdown += this.renderBlock(block) + '\n\n';
+      markdown += this.renderBlock(block, postData) + '\n\n';
     }
 
     return markdown;
@@ -173,7 +173,7 @@ export class MarkdownRenderer implements Renderer {
   /**
    * Render a single Gutenberg block to Markdown
    */
-  private renderBlock(block: WpBlock): string {
+  private renderBlock(block: WpBlock, postData: PostWithMetadata): string {
     // Handle different block types using type guards
     if (isParagraphBlock(block)) {
       return convertHtmlToMarkdown(block.attributes.content);
@@ -217,7 +217,7 @@ export class MarkdownRenderer implements Renderer {
     if (isQuoteBlock(block)) {
       let content = '';
       if (block.innerBlocks) {
-        content = block.innerBlocks.map((block) => this.renderBlock(block)).join('\n\n');
+        content = block.innerBlocks.map((block) => this.renderBlock(block, postData)).join('\n\n');
       } else if (block.attributes.value) {
         content = convertHtmlToMarkdown(block.attributes.value) || '';
       }
@@ -292,11 +292,24 @@ export class MarkdownRenderer implements Renderer {
     }
 
     if (isFootnotesBlock(block)) {
-      return '[Footnotes]';
+      if (postData.footnotes && postData.footnotes.length > 0) {
+        let footnotesMd = '## Footnotes\n\n';
+
+        // Use numeric index instead of ID for plain text email format
+        postData.footnotes.forEach((footnote, index) => {
+          const numericIndex = index + 1;
+          footnotesMd += `${numericIndex}: ${convertHtmlToMarkdown(footnote.content)}\n\n`;
+        });
+
+        return footnotesMd;
+      }
+      return ''; // Don't show anything if no footnotes
     }
 
     if (isReusableBlock(block) && block.innerBlocks) {
-      return block.innerBlocks.map((innerBlock) => this.renderBlock(innerBlock)).join('\n\n');
+      return block.innerBlocks
+        .map((innerBlock) => this.renderBlock(innerBlock, postData))
+        .join('\n\n');
     }
 
     // This should never happen if parseBlock throws for unknown types,
@@ -328,6 +341,14 @@ export function convertHtmlToMarkdown(html: string): string {
   markdown = markdown.replace(/<b>(.*?)<\/b>/gi, '**$1**');
   markdown = markdown.replace(/<em>(.*?)<\/em>/gi, '*$1*');
   markdown = markdown.replace(/<i>(.*?)<\/i>/gi, '*$1*');
+
+  // Process footnotes before normal links
+  // From `<sup data-fn="abc" class="fn"><a href="#abc" id="abc-link">1</a></sup>` to `[^1]`
+  markdown = markdown.replace(
+    /<sup data-fn="[^"]*" class="fn"><a href="#[^"]*" id="[^"]*-link">(\d+)<\/a><\/sup>/gi,
+    '[^$1]'
+  );
+
   markdown = markdown.replace(/<a href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
 
   // Handle lists with proper spacing

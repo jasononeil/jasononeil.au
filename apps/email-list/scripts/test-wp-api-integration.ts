@@ -158,7 +158,7 @@ async function testAllPosts(
   let hasMorePosts = true;
   let totalPosts = 0;
   let successfulPosts = 0;
-  let failedPosts = [];
+  const failedPosts = [];
   const unknownBlockTypes = new Set<string>();
 
   log('Starting WordPress API integration test for all posts...');

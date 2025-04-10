@@ -18,6 +18,7 @@ import {
   isVideoBlock,
   isEmbedBlock,
   isReusableBlock,
+  isFootnotesBlock,
   ParagraphBlock,
   HeadingBlock,
   PreformattedBlock,
@@ -30,6 +31,7 @@ import {
   VideoBlock,
   EmbedBlock,
   ReusableBlock,
+  FootnotesBlock,
 } from '../../types/wp-blocks';
 
 export class HtmlRenderer implements Renderer {
@@ -87,7 +89,7 @@ export class HtmlRenderer implements Renderer {
     // Render content
     if (post.blocks && post.blocks.length > 0) {
       // If we have Gutenberg blocks, use them
-      html += renderBlocks(post.blocks);
+      html += renderBlocks(post.blocks, postData);
     } else {
       // Otherwise, use the rendered HTML content
       html += post.content.rendered;
@@ -199,17 +201,17 @@ export class HtmlRenderer implements Renderer {
   }
 }
 
-export function renderBlocks(blocks: WpBlocks): string {
+export function renderBlocks(blocks: WpBlocks, postData: PostWithMetadata): string {
   let html = '';
 
   for (const block of blocks) {
-    html += renderBlock(block) + '\n\n';
+    html += renderBlock(block, postData) + '\n\n';
   }
 
   return html;
 }
 
-export function renderBlock(block: WpBlock): string {
+export function renderBlock(block: WpBlock, postData: PostWithMetadata): string {
   // Handle different block types using type guards
   if (isParagraphBlock(block)) {
     return renderParagraphBlock(block);
@@ -232,11 +234,11 @@ export function renderBlock(block: WpBlock): string {
   }
 
   if (isQuoteBlock(block)) {
-    return renderQuoteBlock(block);
+    return renderQuoteBlock(block, postData);
   }
 
   if (isPullquoteBlock(block)) {
-    return renderPullquoteBlock(block);
+    return renderPullquoteBlock(block, postData);
   }
 
   if (isSeparatorBlock(block)) {
@@ -248,7 +250,7 @@ export function renderBlock(block: WpBlock): string {
   }
 
   if (isGalleryBlock(block)) {
-    return renderGalleryBlock(block);
+    return renderGalleryBlock(block, postData);
   }
 
   if (isVideoBlock(block)) {
@@ -260,7 +262,11 @@ export function renderBlock(block: WpBlock): string {
   }
 
   if (isReusableBlock(block)) {
-    return renderReusableBlock(block);
+    return renderReusableBlock(block, postData);
+  }
+
+  if (isFootnotesBlock(block) && postData) {
+    return renderFootnotesBlock(block, postData);
   }
 
   throw new Error(`Unknown block type: ${block.name}. Data: ${JSON.stringify(block, null, 2)}`);
@@ -319,13 +325,13 @@ export function renderListBlock(block: ListBlock): string {
   return `<${tag}>\n${items}</${tag}>`;
 }
 
-export function renderQuoteBlock(block: QuoteBlock): string {
+export function renderQuoteBlock(block: QuoteBlock, postData: PostWithMetadata): string {
   let content = '';
 
   // Handle quote content from innerBlocks
   if (block.innerBlocks && block.innerBlocks.length > 0) {
     for (const innerBlock of block.innerBlocks) {
-      content += renderBlock(innerBlock);
+      content += renderBlock(innerBlock, postData);
     }
   }
   // Fallback to direct content if available
@@ -341,13 +347,13 @@ ${citation}
 </blockquote>`;
 }
 
-export function renderPullquoteBlock(block: PullquoteBlock): string {
+export function renderPullquoteBlock(block: PullquoteBlock, postData: PostWithMetadata): string {
   let content = '';
 
   // Handle pullquote content from innerBlocks
   if (block.innerBlocks && block.innerBlocks.length > 0) {
     for (const innerBlock of block.innerBlocks) {
-      content += renderBlock(innerBlock);
+      content += renderBlock(innerBlock, postData);
     }
   }
   // Fallback to direct content if available
@@ -412,11 +418,11 @@ export function renderTableBlock(block: TableBlock): string {
   return tableHtml;
 }
 
-export function renderGalleryBlock(block: GalleryBlock): string {
+export function renderGalleryBlock(block: GalleryBlock, postData: PostWithMetadata): string {
   if (block.innerBlocks) {
     const images = block.innerBlocks
       .map((image) => {
-        return renderBlock(image);
+        return renderBlock(image, postData);
       })
       .join('\n\n');
     return `<div class="gallery">\n\n${images}\n\n</div>`;
@@ -444,6 +450,27 @@ export function renderEmbedBlock(block: EmbedBlock): string {
   return `<p>[Embedded content]</p>`;
 }
 
-export function renderReusableBlock(block: ReusableBlock): string {
-  return block.innerBlocks ? renderBlocks(block.innerBlocks) : '';
+export function renderReusableBlock(block: ReusableBlock, postData: PostWithMetadata): string {
+  return block.innerBlocks ? renderBlocks(block.innerBlocks, postData) : '';
+}
+
+export function renderFootnotesBlock(block: FootnotesBlock, postData: PostWithMetadata): string {
+  if (!postData.footnotes || postData.footnotes.length === 0) {
+    return ''; // Don't show anything if no footnotes
+  }
+
+  let html = '<hr />\n\n';
+  html += '<div class="footnotes">\n';
+  html += '  <h2>Footnotes</h2>\n';
+  html += '  <ol>\n';
+
+  // Create footnotes with proper IDs for anchor links
+  postData.footnotes.forEach((footnote) => {
+    html += `    <li id="${footnote.id}">${footnote.content} <a href="#${footnote.id}-link" class="footnote-backref">↩</a></li>\n`;
+  });
+
+  html += '  </ol>\n';
+  html += '</div>';
+
+  return html;
 }

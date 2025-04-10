@@ -2,46 +2,48 @@ import { describe, it, expect } from 'vitest';
 import { MarkdownRenderer, convertHtmlToMarkdown } from './markdown-renderer';
 import { WPPost, PostWithMetadata } from '../wordpress-api';
 
+const baseTestPost: PostWithMetadata = {
+  post: {
+    id: 1,
+    title: { rendered: 'Test Post' },
+    content: {
+      rendered: '<p>This is a test paragraph.</p><p>Another paragraph.</p>',
+      protected: false,
+    },
+    excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
+    date: '2023-01-01T12:00:00',
+    modified: '2023-01-02T12:00:00',
+    slug: 'test-post',
+    status: 'publish',
+    type: 'post',
+    link: 'https://example.com/test-post',
+    author: 1,
+    featured_media: 0,
+    categories: [],
+    tags: [],
+  },
+  categories: [],
+  tags: [],
+  author: {
+    id: 1,
+    name: 'Test Author',
+    url: 'https://example.com',
+    description: 'Author description',
+    link: 'https://example.com/author/test-author',
+    slug: 'test-author',
+    avatar_urls: {
+      '24': 'https://example.com/avatar-24.jpg',
+      '48': 'https://example.com/avatar-48.jpg',
+      '96': 'https://example.com/avatar-96.jpg',
+    },
+  },
+};
+
 describe('MarkdownRenderer', () => {
   const renderer = new MarkdownRenderer();
 
   it('should render a post title and content', async () => {
-    const postData: PostWithMetadata = {
-      post: {
-        id: 1,
-        title: { rendered: 'Test Post' },
-        content: {
-          rendered: '<p>This is a test paragraph.</p><p>Another paragraph.</p>',
-          protected: false,
-        },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
-        categories: [],
-        tags: [],
-      },
-      categories: [],
-      tags: [],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
-    };
+    const postData: PostWithMetadata = baseTestPost;
 
     const markdown = await renderer.renderPost(postData);
 
@@ -355,6 +357,135 @@ describe('MarkdownRenderer', () => {
         'This is the second paragraph after the list.',
       ].join('\n')
     );
+  });
+
+  it('should render footnotes correctly', async () => {
+    const paragraph1 = `This is a paragraph with a footnote<sup data-fn="abc" class="fn"><a href="#abc" id="abc-link">1</a></sup>.`;
+    const paragraph2 = `Another paragraph with a footnote<sup data-fn="def" class="fn"><a href="#def" id="def-link">2</a></sup>.`;
+    const postData: PostWithMetadata = {
+      ...baseTestPost,
+      post: {
+        ...baseTestPost.post,
+        content: {
+          rendered: `<p>${paragraph1}</p><p>${paragraph2}</p>`,
+          protected: false,
+        },
+        blocks: [
+          {
+            name: 'core/paragraph',
+            attributes: {
+              content: paragraph1,
+            },
+            innerBlocks: [],
+          },
+          {
+            name: 'core/paragraph',
+            attributes: {
+              content: paragraph2,
+            },
+            innerBlocks: [],
+          },
+          {
+            name: 'core/footnotes',
+            attributes: {},
+            innerBlocks: [],
+          },
+        ],
+      },
+      footnotes: [
+        { id: 'abd', content: 'This is the first footnote.' },
+        { id: 'def', content: 'This is the second footnote.' },
+      ],
+    };
+
+    const markdown = await renderer.renderPost(postData);
+
+    // Check that footnote references are converted to markdown format
+    expect(markdown).toContain('This is a paragraph with a footnote[^1].');
+    expect(markdown).toContain('Another paragraph with a footnote[^2].');
+
+    // Check that footnotes section is included
+    expect(markdown).toContain('## Footnotes');
+    expect(markdown).toContain('1: This is the first footnote.');
+    expect(markdown).toContain('2: This is the second footnote.');
+  });
+
+  it('should handle footnotes with HTML content', async () => {
+    const paragraph1 = `This is a paragraph with a footnote<sup data-fn="abc" class="fn"><a href="#abc" id="abc-link">1</a></sup>.`;
+    const postData: PostWithMetadata = {
+      ...baseTestPost,
+      post: {
+        ...baseTestPost.post,
+        content: {
+          rendered: `<p>${paragraph1}</p>`,
+          protected: false,
+        },
+        blocks: [
+          {
+            name: 'core/paragraph',
+            attributes: {
+              content: paragraph1,
+            },
+            innerBlocks: [],
+          },
+          {
+            name: 'core/footnotes',
+            attributes: {},
+            innerBlocks: [],
+          },
+        ],
+      },
+      footnotes: [
+        {
+          id: 'abd',
+          content:
+            'This is a <strong>formatted</strong> footnote with a <a href="https://example.com">link</a>.',
+        },
+      ],
+    };
+
+    const markdown = await renderer.renderPost(postData);
+
+    // Check that footnote references are converted to markdown format
+    expect(markdown).toContain('This is a paragraph with a footnote[^1].');
+
+    // Check that footnotes section is included with HTML converted to markdown
+    expect(markdown).toContain('## Footnotes');
+    expect(markdown).toContain(
+      '1: This is a **formatted** footnote with a [link](https://example.com).'
+    );
+  });
+
+  it('should not render footnotes section when no footnotes are present', async () => {
+    const postData: PostWithMetadata = {
+      ...baseTestPost,
+      post: {
+        ...baseTestPost.post,
+        content: {
+          rendered: '<p>This is a paragraph without footnotes.</p>',
+          protected: false,
+        },
+        blocks: [
+          {
+            name: 'core/paragraph',
+            attributes: {
+              content: 'This is a paragraph without footnotes.',
+            },
+            innerBlocks: [],
+          },
+          {
+            name: 'core/footnotes',
+            attributes: {},
+            innerBlocks: [],
+          },
+        ],
+      },
+    };
+
+    const markdown = await renderer.renderPost(postData);
+
+    // Check that the footnotes section is not included
+    expect(markdown).not.toContain('## Footnotes');
   });
 
   it('should render more from the blog section', () => {
