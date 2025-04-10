@@ -529,20 +529,49 @@ describe('HtmlRenderer', () => {
   });
 
   describe('renderGalleryBlock', () => {
-    it('should throw if innerBlocks is not defined', () => {
+    it('should throw if neither innerBlocks or attributes.images is set', () => {
       expect(() =>
         renderGalleryBlock(
           {
             name: 'core/gallery',
             attributes: {
               ids: [],
-              images: [1, 'who knows what this type is', { i: 'do not' }],
             },
-            innerBlocks: undefined,
           },
           baseTestPost
         )
-      ).toThrowError('Not implemented');
+      ).toThrowError('Gallery has neither innerBlocks or attributes.images defined');
+    });
+
+    it('should render with attributes.images', () => {
+      const html = renderGalleryBlock(
+        {
+          name: 'core/gallery',
+          attributes: {
+            ids: [],
+            images: [
+              {
+                url: 'https://example.com/image1.jpg',
+                alt: 'Image 1',
+                caption: 'Caption 1',
+              },
+              {
+                url: 'https://example.com/image2.jpg',
+                alt: 'Image 2',
+              },
+            ],
+          },
+          innerBlocks: undefined,
+        },
+        baseTestPost
+      );
+      expect(html).toContain('<div class="gallery">');
+      expect(html).toContain('<figure class="image">');
+      expect(html).toContain('<img src="https://example.com/image1.jpg"');
+      expect(html).toContain('alt="Image 1"');
+      expect(html).toContain('<figcaption>Caption 1');
+      expect(html).toContain('<img src="https://example.com/image2.jpg"');
+      expect(html).toContain('alt="Image 2"');
     });
 
     it('should render when innerBlock images are set', () => {

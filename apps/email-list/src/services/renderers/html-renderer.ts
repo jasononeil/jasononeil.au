@@ -426,9 +426,22 @@ export function renderGalleryBlock(block: GalleryBlock, postData: PostWithMetada
       })
       .join('\n\n');
     return `<div class="gallery">\n\n${images}\n\n</div>`;
+  } else if (block.attributes.images) {
+    const images = block.attributes.images
+      .map((image) => {
+        return renderBlock(
+          {
+            name: 'core/image',
+            attributes: { url: image.url, alt: image.alt, caption: image.caption },
+          },
+          postData
+        );
+      })
+      .join('\n\n');
+    return `<div class="gallery">\n\n${images}\n\n</div>`;
   }
   throw new Error(
-    `Not implemented: until now we haven't seen a case where 'innerBlocks' is not defined, and probably 'images' is`
+    `Gallery has neither innerBlocks or attributes.images defined: ${JSON.stringify(block, null, 2)}`
   );
 }
 

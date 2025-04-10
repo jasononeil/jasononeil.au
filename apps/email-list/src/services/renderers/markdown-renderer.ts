@@ -281,10 +281,16 @@ export class MarkdownRenderer implements Renderer {
           .join('\n\n');
       }
       if (block.attributes.images) {
-        throw new Error(
-          `Not implemented: until now we haven't seen a case where 'images' is defined`
-        );
+        return block.attributes.images
+          .map((image) => {
+            const caption = image.caption ? `\n*${image.caption}*` : '';
+            return `![${image.alt || ''}](${image.url})${caption}`;
+          })
+          .join('\n\n');
       }
+      throw new Error(
+        `Gallery has neither innerBlocks or attributes.images defined: ${JSON.stringify(block, null, 2)}`
+      );
     }
 
     if (isSeparatorBlock(block)) {

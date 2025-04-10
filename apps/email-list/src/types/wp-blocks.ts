@@ -228,7 +228,18 @@ const tableBlockSchema = blockSchema.extend({
 const galleryAttributesSchema = z
   .object({
     ids: z.array(z.number()).optional(),
-    images: z.array(z.any()).optional(),
+    images: z
+      .array(
+        z.object({
+          url: z.string(),
+          fullUrl: z.string().optional(),
+          link: z.string().optional(),
+          alt: z.string().optional(),
+          id: z.string().optional(),
+          caption: z.string().optional(),
+        })
+      )
+      .optional(),
     columns: z.number().optional(),
     linkTo: z.string().optional(),
     sizeSlug: z.string().optional(),
