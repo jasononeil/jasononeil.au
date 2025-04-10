@@ -15,6 +15,7 @@ import {
   isGalleryBlock,
   isFootnotesBlock,
   isReusableBlock,
+  parseFootnotes,
 } from './wp-blocks';
 
 describe('WordPress Block Decoders', () => {
@@ -446,6 +447,34 @@ describe('WordPress Block Decoders', () => {
       expect(parsed.length).toBe(2);
       expect(isHeadingBlock(parsed[0])).toBe(true);
       expect(isParagraphBlock(parsed[1])).toBe(true);
+    });
+  });
+
+  describe('parseFootnotes', () => {
+    it('should parse valid footnotes JSON string', () => {
+      const footnotes =
+        '[{"id":"1","content":"This is footnote 1"},{"id":"2","content":"This is footnote 2"}]';
+
+      const parsed = parseFootnotes(footnotes);
+      expect(parsed).toEqual([
+        { id: '1', content: 'This is footnote 1' },
+        { id: '2', content: 'This is footnote 2' },
+      ]);
+    });
+
+    it('should return undefined for empty string', () => {
+      const parsed = parseFootnotes('');
+      expect(parsed).toBeUndefined();
+    });
+
+    it('should throw for invalid JSON', () => {
+      const invalidJson = '{not valid json';
+      expect(() => parseFootnotes(invalidJson)).toThrow();
+    });
+
+    it("should throw for JSON that doesn't match the schema", () => {
+      const invalidSchema = '[{"wrong_field":"value"}]';
+      expect(() => parseFootnotes(invalidSchema)).toThrow();
     });
   });
 

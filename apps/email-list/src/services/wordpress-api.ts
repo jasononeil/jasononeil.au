@@ -8,7 +8,7 @@
  * and plugin-specific endpoints (/wp-json/[plugin]/[version]/...)
  */
 
-import { WpBlocks, parseBlocks } from '../types/wp-blocks';
+import { WpBlocks, parseBlocks, parseFootnotes, Footnote } from '../types/wp-blocks';
 
 // Types for WordPress API responses
 export type WPPostStatus =
@@ -47,6 +47,10 @@ export interface WPPost {
   link: string;
   title: {
     rendered: string;
+  };
+  meta?: {
+    /** From the footnotes plugin. JSON encoded Array<{id:string, content:string}>, or "" */
+    footnotes?: string;
   };
   content: {
     rendered: string;
@@ -396,6 +400,7 @@ export class WordPressAPI {
     tags: WPTag[];
     featuredMedia?: WPMedia;
     author: WPAuthor;
+    footnotes?: Footnote[];
   }> {
     try {
       const post = await this.getPost(postId);
@@ -416,12 +421,16 @@ export class WordPressAPI {
       const blocks = await this.getPostBlocks(postId);
       post.blocks = blocks || undefined;
 
+      // Parse footnotes from post metadata
+      const footnotes = parseFootnotes(post.meta?.footnotes);
+
       return {
         post,
         categories,
         tags,
         featuredMedia,
         author,
+        footnotes,
       };
     } catch (error) {
       console.error(`Error fetching post ${postId} with metadata:`, error);

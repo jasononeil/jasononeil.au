@@ -1,5 +1,36 @@
 import { z } from 'zod';
 
+// Footnote schema
+export const footnoteSchema = z.object({
+  id: z.string(),
+  content: z.string(),
+});
+
+export type Footnote = z.infer<typeof footnoteSchema>;
+
+export const footnotesSchema = z.array(footnoteSchema);
+
+/**
+ * Parse footnotes from a JSON string in post metadata
+ * @param footnoteJson JSON string from post.meta.footnotes
+ * @returns Array of parsed footnotes, or empty array if no footnotes
+ */
+export function parseFootnotes(footnoteJson?: string): Footnote[] | undefined {
+  if (!footnoteJson) {
+    return undefined;
+  }
+
+  try {
+    const parsed = JSON.parse(footnoteJson);
+    return footnotesSchema.parse(parsed);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Failed to parse footnotes: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
 // Base attributes that all blocks might have
 const baseAttributesSchema = z.object({}).passthrough();
 
