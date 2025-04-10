@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { MarkdownRenderer, convertHtmlToMarkdown } from './markdown-renderer';
 import { WPPost, PostWithMetadata } from '../wordpress-api';
 
+// Base test post that can be extended for specific test cases
 const baseTestPost: PostWithMetadata = {
   post: {
     id: 1,
@@ -55,24 +56,12 @@ describe('MarkdownRenderer', () => {
 
   it('should include featured image when available', async () => {
     const postData: PostWithMetadata = {
+      ...baseTestPost,
       post: {
-        id: 1,
-        title: { rendered: 'Test Post' },
+        ...baseTestPost.post,
         content: { rendered: '<p>Content with image.</p>', protected: false },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
         featured_media: 2,
-        categories: [],
-        tags: [],
       },
-      categories: [],
-      tags: [],
       featuredMedia: {
         id: 2,
         date: '2023-01-01T10:00:00',
@@ -101,19 +90,6 @@ describe('MarkdownRenderer', () => {
         },
         source_url: 'https://example.com/wp-content/uploads/test-image.jpg',
       },
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
     };
 
     const markdown = await renderer.renderPost(postData);
@@ -125,19 +101,10 @@ describe('MarkdownRenderer', () => {
 
   it('should include categories and tags when available', async () => {
     const postData: PostWithMetadata = {
+      ...baseTestPost,
       post: {
-        id: 1,
-        title: { rendered: 'Test Post' },
+        ...baseTestPost.post,
         content: { rendered: '<p>Content with categories and tags.</p>', protected: false },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
         categories: [3, 4],
         tags: [5, 6],
       },
@@ -165,19 +132,6 @@ describe('MarkdownRenderer', () => {
         { id: 5, name: 'Tag 1', slug: 'tag-1', description: '', count: 2, link: '' },
         { id: 6, name: 'Tag 2', slug: 'tag-2', description: '', count: 4, link: '' },
       ],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
     };
 
     const markdown = await renderer.renderPost(postData);
@@ -188,21 +142,11 @@ describe('MarkdownRenderer', () => {
 
   it('should handle Gutenberg blocks when available', async () => {
     const postData: PostWithMetadata = {
+      ...baseTestPost,
       post: {
-        id: 1,
+        ...baseTestPost.post,
         title: { rendered: 'Test Post with Blocks' },
         content: { rendered: '<p>Fallback content</p>', protected: false },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
-        categories: [],
-        tags: [],
         blocks: [
           {
             name: 'core/paragraph',
@@ -250,21 +194,6 @@ describe('MarkdownRenderer', () => {
           },
         ],
       },
-      categories: [],
-      tags: [],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
     };
 
     const markdown = await renderer.renderPost(postData);
@@ -280,24 +209,14 @@ describe('MarkdownRenderer', () => {
 
   it('should insert correct newlines between paragraphs and lists', async () => {
     const postData: PostWithMetadata = {
+      ...baseTestPost,
       post: {
-        id: 1,
+        ...baseTestPost.post,
         title: { rendered: 'Test Newlines' },
         content: {
           rendered: '...',
           protected: false,
         },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
-        categories: [],
-        tags: [],
         blocks: [
           {
             name: 'core/paragraph',
@@ -325,21 +244,6 @@ describe('MarkdownRenderer', () => {
             innerBlocks: [],
           },
         ],
-      },
-      categories: [],
-      tags: [],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
       },
     };
 

@@ -61,40 +61,7 @@ describe('HtmlRenderer', () => {
 
   it('should render a post title and content', async () => {
     const postData: PostWithMetadata = {
-      post: {
-        id: 1,
-        title: { rendered: 'Test Post' },
-        content: {
-          rendered: '<p>This is a test paragraph.</p><p>Another paragraph.</p>',
-          protected: false,
-        },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
-        categories: [],
-        tags: [],
-      },
-      categories: [],
-      tags: [],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
+      ...baseTestPost,
     };
 
     const html = await renderer.renderPost(postData);
@@ -108,24 +75,11 @@ describe('HtmlRenderer', () => {
 
   it('should include featured image when available', async () => {
     const postData: PostWithMetadata = {
+      ...baseTestPost,
       post: {
-        id: 1,
-        title: { rendered: 'Test Post' },
-        content: { rendered: '<p>Content with image.</p>', protected: false },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
+        ...baseTestPost.post,
         featured_media: 2,
-        categories: [],
-        tags: [],
       },
-      categories: [],
-      tags: [],
       featuredMedia: {
         id: 2,
         date: '2023-01-01T10:00:00',
@@ -154,19 +108,6 @@ describe('HtmlRenderer', () => {
         },
         source_url: 'https://example.com/wp-content/uploads/test-image.jpg',
       },
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
     };
 
     const html = await renderer.renderPost(postData);
@@ -179,19 +120,9 @@ describe('HtmlRenderer', () => {
 
   it('should include categories and tags when available', async () => {
     const postData: PostWithMetadata = {
+      ...baseTestPost,
       post: {
-        id: 1,
-        title: { rendered: 'Test Post' },
-        content: { rendered: '<p>Content with categories and tags.</p>', protected: false },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
+        ...baseTestPost.post,
         categories: [3, 4],
         tags: [5, 6],
       },
@@ -233,19 +164,6 @@ describe('HtmlRenderer', () => {
           link: 'http://example.com/tags/tag-2',
         },
       ],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
     };
 
     const html = await renderer.renderPost(postData);
@@ -260,21 +178,10 @@ describe('HtmlRenderer', () => {
 
   it('should handle Gutenberg blocks when available', async () => {
     const postData: PostWithMetadata = {
+      ...baseTestPost,
       post: {
-        id: 1,
-        title: { rendered: 'Test Post with Blocks' },
+        ...baseTestPost.post,
         content: { rendered: '<p>Fallback content</p>', protected: false },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
-        categories: [],
-        tags: [],
         blocks: [
           {
             name: 'core/paragraph',
@@ -296,21 +203,6 @@ describe('HtmlRenderer', () => {
           },
         ],
       },
-      categories: [],
-      tags: [],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
     };
 
     const html = await renderer.renderPost(postData);
@@ -324,24 +216,13 @@ describe('HtmlRenderer', () => {
 
   it('should render footnotes when available', async () => {
     const postData: PostWithMetadata = {
+      ...baseTestPost,
       post: {
-        id: 1,
-        title: { rendered: 'Test Post with Footnotes' },
+        ...baseTestPost.post,
         content: {
           rendered: '<p>Content with footnotes<sup id="fnref1"><a href="#fn1">1</a></sup>.</p>',
           protected: false,
         },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
-        categories: [],
-        tags: [],
         blocks: [
           {
             name: 'core/paragraph',
@@ -357,21 +238,6 @@ describe('HtmlRenderer', () => {
             innerBlocks: [],
           },
         ],
-      },
-      categories: [],
-      tags: [],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
       },
       footnotes: [
         {
