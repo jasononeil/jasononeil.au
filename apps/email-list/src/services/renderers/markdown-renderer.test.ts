@@ -423,7 +423,7 @@ describe('MarkdownRenderer', () => {
         title: { rendered: 'Previous Post 1' },
         excerpt: { rendered: '<p>This is the excerpt for post 1.</p>', protected: false },
         content: {
-          rendered: '<p>word</p>'.repeat(150),
+          rendered: '<p>many words</p>'.repeat(150),
           protected: false,
         },
         date: '2023-01-01T12:00:00',
@@ -457,7 +457,7 @@ describe('MarkdownRenderer', () => {
     expect(markdown).toContain('Published on January 2, 2023');
 
     // Check that read more links are included
-    expect(markdown).toContain('[Read more](https://example.com/previous-post-1)');
-    expect(markdown).not.toContain('[Read more](https://example.com/previous-post-2)');
+    expect(markdown).toContain('Read more: https://example.com/previous-post-1');
+    expect(markdown).not.toContain('Read more: https://example.com/previous-post-2');
   });
 });

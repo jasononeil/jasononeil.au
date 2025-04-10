@@ -151,10 +151,10 @@ export class HtmlRenderer implements Renderer {
       // Get the post content or excerpt
       // If content is longer than approximately 100 words, use the Wordpress excerpt.
       // This is a rough estimate using a dodgy regex to strip HTML.
-      const textContent = post.content.rendered.replace(/<[^>]*>/g, '');
+      const textContent = post.content.rendered.replace(/<[^>]*>/g, ' ');
       const wordCount = textContent.split(/\s+/).length;
 
-      if (wordCount > 100) {
+      if (wordCount > 200) {
         // For HTML we'll just use the excerpt if available, otherwise the full content
         // A proper implementation would use an HTML parser to safely truncate
         html += `    <div class="post-excerpt">${post.excerpt.rendered}</div>\n`;

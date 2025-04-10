@@ -106,11 +106,11 @@ export class MarkdownRenderer implements Renderer {
       // Use full content as fallback
       const fullContent = this.convertHtmlToMarkdown(post.content.rendered);
 
-      // If content is longer than 100 words, truncate it
+      // If content is longer than 200 words, use the excerpt
       const words = fullContent.split(/\s+/);
-      if (words.length > 100) {
-        content = post.excerpt.rendered;
-        content += `[Read more](${post.link})\n\n`;
+      if (words.length > 200) {
+        content = this.convertHtmlToMarkdown(post.excerpt.rendered);
+        content += `\n\nRead more: ${post.link}\n\n`;
       } else {
         content = fullContent;
       }
