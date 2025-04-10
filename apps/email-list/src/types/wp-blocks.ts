@@ -228,6 +228,7 @@ const reusableBlockAttributesSchema = z
 const reusableBlockSchema = blockSchema.extend({
   name: z.literal('core/block'),
   attributes: reusableBlockAttributesSchema,
+  innerBlocks: z.array(innerBlockSchema),
 });
 
 // Union of all block types

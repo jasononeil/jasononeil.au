@@ -17,6 +17,7 @@ import {
   isGalleryBlock,
   isVideoBlock,
   isEmbedBlock,
+  isReusableBlock,
   ParagraphBlock,
   HeadingBlock,
   PreformattedBlock,
@@ -28,6 +29,7 @@ import {
   GalleryBlock,
   VideoBlock,
   EmbedBlock,
+  ReusableBlock,
 } from '../../types/wp-blocks';
 
 export class HtmlRenderer implements Renderer {
@@ -257,6 +259,10 @@ export function renderBlock(block: WpBlock): string {
     return renderEmbedBlock(block);
   }
 
+  if (isReusableBlock(block)) {
+    return renderReusableBlock(block);
+  }
+
   throw new Error(`Unknown block type: ${block.name}. Data: ${JSON.stringify(block, null, 2)}`);
 }
 
@@ -436,4 +442,8 @@ export function renderEmbedBlock(block: EmbedBlock): string {
     return `<p><a href="${block.attributes.url}">View embedded content</a></p>`;
   }
   return `<p>[Embedded content]</p>`;
+}
+
+export function renderReusableBlock(block: ReusableBlock): string {
+  return block.innerBlocks ? renderBlocks(block.innerBlocks) : '';
 }
