@@ -1,6 +1,8 @@
 read:
   - apps/email-list/AI_CONTEXT.md
 
+map-tokens: 2000
+
 # For how I interact with it
 watch-files: true
 auto-commits: false
