@@ -117,12 +117,13 @@ Integrate Twilio SendGrid for sending emails.
 - [x] Create a new `email-list-mailer` service that will send the actual emails. Implement a `sendPostToTestEmail(postId)` that sends a post to the email address in the environment variable `TEST_EMAIL`.
 - [x] Create a script `pnpm run wp:send-test-post <postid>` that uses `sendPostToTestEmail` from the command line.
 
-### 4. Email Triggering Mechanism
+### 4. Sending logic
 
-- [ ] Implement a trigger mechanism via:
-  - Scheduled checks / WordPress hooks (via the API)
-  - Manual endpoint `/api/trigger-email/:postId`
-- [ ] Test triggering functionality through unit tests and early integration testing.
+Expand `email-list-mailer` with these functions:
+
+- [ ] Get all current subscribers for a post based on its categories and their preferences (filtering for only active subscriptions, ensuring no duplicates if they subscribe to more than one category and the post is in multiple categories)
+- [ ] A function to check for new posts that haven't been sent yet. (We may want a new DB table to track which posts have been sent generally, not just which posts to individual users)
+- [ ] Send a particular post to all subscribers. (Ensure idempotency: check if we've sent that post to them already in the `email_list_sent_emails` table)
 
 ---
 
@@ -130,7 +131,11 @@ Integrate Twilio SendGrid for sending emails.
 
 ### 1. Subscription Forms & API Endpoints
 
-- [ ] Develop a basic subscribe form that can be embedded in WordPress (e.g. `<form><input type="email">...`).
+Ensure each of these APIs does not give the user's unmasked email address or other sensitive data!
+
+Write unit tests for each endpoint to validate data handling and error conditions.
+
+- [ ] expand `subscribers status to include pending, active, unsubscribed, bounced, spam_report, invalid
 - [ ] Create API endpoint: `/api/subscribe`
   - Validate input and add subscriber to the database
   - Send an email to confirm
@@ -139,46 +144,29 @@ Integrate Twilio SendGrid for sending emails.
   - Update subscriber category preferences
 - [ ] Create API endpoint: `/api/unsubscribe`
   - Mark subscriber status as unsubscribed
-- [ ] Create API endpoint: `/api/sendgrid_webhooks` for handling bounce notifications and other events.
-- [ ] Write unit tests for each endpoint to validate data handling and error conditions.
+- [ ] Create API endpoint: `/api/webhooks/sendgrid` for handling bounce notifications and other events.
+- [ ] Create API endpoint: `/api/webhooks/wordpress` for an XML-RPC ping (configured as "Update Services" in Wordpress). Uses `email-list-mailer` to identify new posts and send them.
 
 ### 2. Subscription Pages
 
+- [ ] Develop a basic subscribe form structure that can be copy/pasted into WordPress (e.g. `<form><input type="email">...`). It should have category selection as a hidden field.
 - [ ] Build frontend pages for:
-  - Subscription Management
-  - Subscriber Preferences
+  - Subscription Confirmation
+  - Subscription Management (lets you choose categories, or unsubscribe)
   - Unsubscribe confirmation
-- [ ] Ensure secure handling of subscriber data.
-- [ ] Write integration tests simulating full subscriber interactions.
 
-### 3. Handle Sendgrid events
+### 3. Testing subscription flows
 
-- [ ] Expand
-
----
-
-## Phase 4: Analytics, Logging, and Testing
-
-### 1. Logging & Error Handling
-
-- [ ] Set up file-based logging for system operations and errors with timestamps and context.
-- [ ] Implement fallback mechanisms for:
-  - Unsupported WordPress blocks
-  - Email delivery issues
-- [ ] Write unit tests that simulate errors to ensure correct logging and recovery.
-
-### 2. Comprehensive Testing
-
-- [ ] End-to-End Tests:
-  - Complete subscription flow (signup → email trigger → unsubscribe)
-  - Test manual email triggering via `/api/trigger-email/:postId`
-- [ ] Configure CI with GitHub Actions:
-  - Linting, unit, and integration tests on every pull request.
-- [ ] Plan for automated deployments and database migration tests.
+- [ ] Set up basic Playwright scaffolding against local Next.js server
+- [ ] Find a way to mock emails for these tests
+- [ ] Test basic HTML form -> sends email with confirm link
+- [ ] Test click confirm link -> subscription updated
+- [ ] Test subscription management -> updated in DB
+- [ ] Test unsubscribe link -> updated in DB
 
 ---
 
-## Phase 5: Refinement & Deployment
+## Phase 4: Refinement & Deployment
 
 ### 1. Production Deployment
 
