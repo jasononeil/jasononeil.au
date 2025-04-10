@@ -336,9 +336,9 @@ export function convertHtmlToMarkdown(html: string): string {
     return listItems + '\n';
   });
 
-  markdown = markdown.replace(/<ol>(.*?)<\/ol>/gis, (match, p1) => {
+  markdown = markdown.replace(/<ol>(.*?)<\/ol>/gis, (match, p1: string) => {
     let index = 1;
-    const listItems = p1.replace(/<li>(.*?)<\/li>/gi, (content) => {
+    const listItems = p1.replace(/<li>(.*?)<\/li>/gi, (content: string) => {
       return `${index++}. ${content}\n`;
     });
     return listItems + '\n';
