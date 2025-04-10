@@ -119,9 +119,19 @@ Integrate Twilio SendGrid for sending emails.
 
 ### 4. Sending logic
 
+Expand `subscriberRepository`:
+
+- [x] `getActiveSubscribersForPost` that finds all the subscribers who will receive this post based on the post categories.
+
+And a new table / repository `email_list_sent_posts`
+
+- [x] Database table / schema. Should have `post_id`, `date`, `subject`, `plaintext` and `html`.
+- [x] Add a repository as well.
+- [x] Get `email_list_sent_emails` to link to this instead of `post_id`
+
 Expand `email-list-mailer` with these functions:
 
-- [ ] Get all current subscribers for a post based on its categories and their preferences (filtering for only active subscriptions, ensuring no duplicates if they subscribe to more than one category and the post is in multiple categories)
+- [ ] Get all current subscribers for a post based on its categories and their preferences (using the repository)
 - [ ] A function to check for new posts that haven't been sent yet. (We may want a new DB table to track which posts have been sent generally, not just which posts to individual users)
 - [ ] Send a particular post to all subscribers. (Ensure idempotency: check if we've sent that post to them already in the `email_list_sent_emails` table)
 

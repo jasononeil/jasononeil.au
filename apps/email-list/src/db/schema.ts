@@ -1,5 +1,24 @@
-import { mysqlTable, varchar, int, timestamp, mysqlEnum, primaryKey } from 'drizzle-orm/mysql-core';
+import {
+  mysqlTable,
+  varchar,
+  int,
+  timestamp,
+  mysqlEnum,
+  primaryKey,
+  text,
+} from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
+
+// Sent posts table
+export const sentPosts = mysqlTable('email_list_sent_posts', {
+  id: int('id').primaryKey().autoincrement(),
+  postId: int('post_id').notNull(),
+  date: timestamp('date').notNull().defaultNow(),
+  subject: varchar('subject', { length: 255 }).notNull(),
+  plaintext: text('plaintext').notNull(),
+  html: text('html').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
 
 // Subscribers table
 export const subscribers = mysqlTable('email_list_subscribers', {
@@ -32,7 +51,7 @@ export const subscriberPreferences = mysqlTable(
 export const sentEmails = mysqlTable('email_list_sent_emails', {
   id: int('id').primaryKey().autoincrement(),
   subscriberId: int('subscriber_id').notNull(),
-  postId: int('post_id').notNull(),
+  sentPostId: int('sent_post_id').notNull(),
   status: mysqlEnum('status', ['sent', 'failed']).notNull().default('sent'),
   sentAt: timestamp('sent_at').notNull().defaultNow(),
   errorMessage: varchar('error_message', { length: 255 }),
@@ -56,4 +75,12 @@ export const sentEmailsRelations = relations(sentEmails, ({ one }) => ({
     fields: [sentEmails.subscriberId],
     references: [subscribers.id],
   }),
+  sentPost: one(sentPosts, {
+    fields: [sentEmails.sentPostId],
+    references: [sentPosts.id],
+  }),
+}));
+
+export const sentPostsRelations = relations(sentPosts, ({ many }) => ({
+  sentEmails: many(sentEmails),
 }));

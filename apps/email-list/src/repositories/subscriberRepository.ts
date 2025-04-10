@@ -1,7 +1,8 @@
 import { db } from '@/db';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import { subscribers, subscriberPreferences, sentEmails } from '@/db/schema';
 import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
+import { WordPressAPI } from '@/services/wordpress-api';
 
 // Infer types from the schema
 type Subscriber = InferSelectModel<typeof subscribers>;
@@ -85,7 +86,7 @@ export class SubscriberRepository {
   }
 
   // Record a sent email
-  async recordSentEmail(sentEmail: SentEmail): Promise<number> {
+  async recordSentEmail(sentEmail: Omit<SentEmail, 'id'>): Promise<number> {
     const result = await db.insert(sentEmails).values(sentEmail).$returningId();
     return Number(result[0].id);
   }
@@ -100,6 +101,41 @@ export class SubscriberRepository {
       status: result.status,
       createdAt: result.createdAt,
       updatedAt: result.updatedAt,
+    }));
+  }
+
+  // Get all active subscribers who have preferences matching the categories of a post
+  async getActiveSubscribersForPost(postId: number): Promise<Subscriber[]> {
+    // 1. Get the post's categories from WordPress API
+    const wpApi = new WordPressAPI(process.env.WORDPRESS_API_URL || '');
+    const post = await wpApi.getPost(postId);
+    const postCategories = post.categories;
+
+    if (!postCategories.length) {
+      // If the post has no categories, return no users
+      return [];
+    }
+
+    // 2. Find subscribers with matching preferences
+    const results = await db
+      .select()
+      .from(subscribers)
+      .leftJoin(subscriberPreferences, eq(subscribers.id, subscriberPreferences.subscriberId))
+      .where(
+        and(
+          eq(subscribers.status, 'active'),
+          inArray(subscriberPreferences.categoryId, postCategories)
+        )
+      )
+      .groupBy(subscribers.id);
+
+    return results.map((result) => ({
+      id: result.email_list_subscribers.id,
+      email: result.email_list_subscribers.email,
+      name: result.email_list_subscribers.name,
+      status: result.email_list_subscribers.status,
+      createdAt: result.email_list_subscribers.createdAt,
+      updatedAt: result.email_list_subscribers.updatedAt,
     }));
   }
 }
