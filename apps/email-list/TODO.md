@@ -109,12 +109,13 @@ Then split out the main post rendering from the overall document:
 
 ### 3. SendGrid Integration
 
-- [ ] Integrate Twilio SendGrid for sending emails.
-- [ ] Set up configuration for SendGrid API keys and endpoints.
-- [ ] Implement sending functionality with robust error handling:
-  - Retry logic for delivery failures
-  - Logging of send status and errors
-- [ ] Write integration tests for SendGrid endpoints (possibly in sandbox mode).
+Integrate Twilio SendGrid for sending emails.
+
+- [x] Register an API key and set up environment variable `SENDGRID_API_KEY`.
+- [x] Set DNS records to authenticate with SendGrid.
+- [x] Create a new `sendgrid-api` service for sending email via Sendgrid. Something like `send(to, subject, plaintext, html)`. Ensure it never sends if `LOCAL_DEVELOPMENT` environment variable is set, except to the email `TEST_EMAIL`. Use `@sendgrid/mail`.
+- [x] Create a new `email-list-mailer` service that will send the actual emails. Implement a `sendPostToTestEmail(postId)` that sends a post to the email address in the environment variable `TEST_EMAIL`.
+- [x] Create a script `pnpm run wp:send-test-post <postid>` that uses `sendPostToTestEmail` from the command line.
 
 ### 4. Email Triggering Mechanism
 
@@ -132,10 +133,13 @@ Then split out the main post rendering from the overall document:
 - [ ] Develop a basic subscribe form that can be embedded in WordPress (e.g. `<form><input type="email">...`).
 - [ ] Create API endpoint: `/api/subscribe`
   - Validate input and add subscriber to the database
+  - Send an email to confirm
+- [ ] Create API endpoint: `/api/confirm`
 - [ ] Create API endpoint: `/api/preferences`
   - Update subscriber category preferences
 - [ ] Create API endpoint: `/api/unsubscribe`
   - Mark subscriber status as unsubscribed
+- [ ] Create API endpoint: `/api/sendgrid_webhooks` for handling bounce notifications and other events.
 - [ ] Write unit tests for each endpoint to validate data handling and error conditions.
 
 ### 2. Subscription Pages
@@ -146,6 +150,10 @@ Then split out the main post rendering from the overall document:
   - Unsubscribe confirmation
 - [ ] Ensure secure handling of subscriber data.
 - [ ] Write integration tests simulating full subscriber interactions.
+
+### 3. Handle Sendgrid events
+
+- [ ] Expand
 
 ---
 
@@ -172,13 +180,7 @@ Then split out the main post rendering from the overall document:
 
 ## Phase 5: Refinement & Deployment
 
-### 1. Template and Parsing Refinements
-
-- [ ] Optimize parsing logic for complex cases identified during early integration tests.
-- [ ] Enhance email templates for improved responsiveness and data display.
-- [ ] Incorporate user feedback from initial tests and adjust as necessary.
-
-### 2. Production Deployment
+### 1. Production Deployment
 
 - [ ] Finalize environment settings on Digital Ocean VPS.
 - [ ] Integrate deployment pipelines with GitHub Actions:
@@ -189,7 +191,6 @@ Then split out the main post rendering from the overall document:
 
 ## Future Considerations (Backlog)
 
-- [ ] Support for multiple subscription types (daily, weekly digest, etc.)
-- [ ] Enhanced analytics for open and click rates.
-- [ ] A/B testing for variant email templates.
 - [ ] Further integration with static site generation if blog architecture changes.
+- [ ] Enhanced analytics for open and click rates. Sendgrid may have this data for us.
+- [ ] Support for multiple subscription types (daily, weekly digest, etc.)

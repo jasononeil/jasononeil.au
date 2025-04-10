@@ -3,6 +3,7 @@
   "packages": ["nodejs@latest", "mysql80@latest"],
   "env": {
     "DEVBOX_COREPACK_ENABLED": "true",
+    "LOCAL_DEVELOPMENT": "true",
     "npm_config_python": "/usr/bin/python3"
   },
   "shell": {
