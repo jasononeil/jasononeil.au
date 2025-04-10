@@ -69,7 +69,7 @@ export class MarkdownRenderer implements Renderer {
       markdown += this.renderBlocks(post.blocks);
     } else {
       // Otherwise, convert HTML to Markdown
-      markdown += this.convertHtmlToMarkdown(post.content.rendered);
+      markdown += convertHtmlToMarkdown(post.content.rendered);
     }
 
     // Add a link back to the original post
@@ -123,12 +123,12 @@ export class MarkdownRenderer implements Renderer {
       // Get the post content or excerpt
       let content = '';
       // Use full content as fallback
-      const fullContent = this.convertHtmlToMarkdown(post.content.rendered);
+      const fullContent = convertHtmlToMarkdown(post.content.rendered);
 
       // If content is longer than 200 words, use the excerpt
       const words = fullContent.split(/\s+/);
       if (words.length > 200) {
-        content = this.convertHtmlToMarkdown(post.excerpt.rendered);
+        content = convertHtmlToMarkdown(post.excerpt.rendered);
         content += `\n\nRead more: ${post.link}\n\n`;
       } else {
         content = fullContent;
@@ -176,7 +176,7 @@ export class MarkdownRenderer implements Renderer {
   private renderBlock(block: WpBlock): string {
     // Handle different block types using type guards
     if (isParagraphBlock(block)) {
-      return this.convertHtmlToMarkdown(block.attributes.content);
+      return convertHtmlToMarkdown(block.attributes.content);
     }
 
     if (isHeadingBlock(block)) {
@@ -203,7 +203,7 @@ export class MarkdownRenderer implements Renderer {
         const listHtml = block.attributes.ordered
           ? `<ol>${block.attributes.values}</ol>`
           : `<ul>${block.attributes.values}</ul>`;
-        return this.convertHtmlToMarkdown(listHtml);
+        return convertHtmlToMarkdown(listHtml);
       } else {
         throw new Error('Expected either `innerBlocks` or `block.attributes.values` to be defined');
       }
@@ -219,11 +219,11 @@ export class MarkdownRenderer implements Renderer {
       if (block.innerBlocks) {
         content = block.innerBlocks.map((block) => this.renderBlock(block)).join('\n\n');
       } else if (block.attributes.value) {
-        content = this.convertHtmlToMarkdown(block.attributes.value) || '';
+        content = convertHtmlToMarkdown(block.attributes.value) || '';
       }
       const quoteMarkdown = '> ' + content.split('\n').join('\n> ');
       const citationMarkdown = block.attributes.citation
-        ? `\n>\n> — ${this.convertHtmlToMarkdown(block.attributes.citation)}`
+        ? `\n>\n> — ${convertHtmlToMarkdown(block.attributes.citation)}`
         : '';
       return quoteMarkdown + citationMarkdown;
     }
@@ -303,90 +303,90 @@ export class MarkdownRenderer implements Renderer {
     // but we'll keep this as a safety measure
     throw new Error(`Unknown block type: ${block.name}`);
   }
+}
 
-  /**
-   * Convert HTML to Markdown
-   * This is a simple implementation - in a real app, you might use a library like turndown
-   */
-  private convertHtmlToMarkdown(html: string): string {
-    // This is a very basic implementation
-    // In a real application, you would use a library like turndown
+/**
+ * Convert HTML to Markdown
+ * This is a simple implementation - in a real app, you might use a library like turndown
+ */
+export function convertHtmlToMarkdown(html: string): string {
+  // This is a very basic implementation
+  // In a real application, you would use a library like turndown
 
-    let markdown = html;
+  let markdown = html;
 
-    // Remove HTML tags but preserve line breaks
-    markdown = markdown.replace(/<br\s*\/?>/gi, '\n');
-    markdown = markdown.replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
-    markdown = markdown.replace(/<h1>(.*?)<\/h1>/gi, '# $1\n\n');
-    markdown = markdown.replace(/<h2>(.*?)<\/h2>/gi, '## $1\n\n');
-    markdown = markdown.replace(/<h3>(.*?)<\/h3>/gi, '### $1\n\n');
-    markdown = markdown.replace(/<h4>(.*?)<\/h4>/gi, '#### $1\n\n');
-    markdown = markdown.replace(/<h5>(.*?)<\/h5>/gi, '##### $1\n\n');
-    markdown = markdown.replace(/<h6>(.*?)<\/h6>/gi, '###### $1\n\n');
-    markdown = markdown.replace(/<strong>(.*?)<\/strong>/gi, '**$1**');
-    markdown = markdown.replace(/<b>(.*?)<\/b>/gi, '**$1**');
-    markdown = markdown.replace(/<em>(.*?)<\/em>/gi, '*$1*');
-    markdown = markdown.replace(/<i>(.*?)<\/i>/gi, '*$1*');
-    markdown = markdown.replace(/<a href="(.*?)">(.*?)<\/a>/gi, '[$2]($1)');
+  // Remove HTML tags but preserve line breaks
+  markdown = markdown.replace(/<br\s*\/?>/gi, '\n');
+  markdown = markdown.replace(/<p>(.*?)<\/p>/gi, '$1\n\n');
+  markdown = markdown.replace(/<h1>(.*?)<\/h1>/gi, '# $1\n\n');
+  markdown = markdown.replace(/<h2>(.*?)<\/h2>/gi, '## $1\n\n');
+  markdown = markdown.replace(/<h3>(.*?)<\/h3>/gi, '### $1\n\n');
+  markdown = markdown.replace(/<h4>(.*?)<\/h4>/gi, '#### $1\n\n');
+  markdown = markdown.replace(/<h5>(.*?)<\/h5>/gi, '##### $1\n\n');
+  markdown = markdown.replace(/<h6>(.*?)<\/h6>/gi, '###### $1\n\n');
+  markdown = markdown.replace(/<strong>(.*?)<\/strong>/gi, '**$1**');
+  markdown = markdown.replace(/<b>(.*?)<\/b>/gi, '**$1**');
+  markdown = markdown.replace(/<em>(.*?)<\/em>/gi, '*$1*');
+  markdown = markdown.replace(/<i>(.*?)<\/i>/gi, '*$1*');
+  markdown = markdown.replace(/<a href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
 
-    // Handle lists with proper spacing
-    markdown = markdown.replace(/<ul>(.*?)<\/ul>/gis, (match, p1) => {
-      const listItems = p1.replace(/<li>(.*?)<\/li>/gi, '- $1\n');
-      return listItems + '\n';
+  // Handle lists with proper spacing
+  markdown = markdown.replace(/<ul>(.*?)<\/ul>/gis, (match, p1) => {
+    const listItems = p1.replace(/<li>(.*?)<\/li>/gi, '- $1\n');
+    return listItems + '\n';
+  });
+
+  markdown = markdown.replace(/<ol>(.*?)<\/ol>/gis, (match, p1) => {
+    let index = 1;
+    const listItems = p1.replace(/<li>(.*?)<\/li>/gi, (content) => {
+      return `${index++}. ${content}\n`;
     });
+    return listItems + '\n';
+  });
 
-    markdown = markdown.replace(/<ol>(.*?)<\/ol>/gis, (match, p1) => {
-      let index = 1;
-      const listItems = p1.replace(/<li>(.*?)<\/li>/gi, () => {
-        return `${index++}. $1\n`;
-      });
-      return listItems + '\n';
-    });
+  // Remove any remaining HTML tags and decode entities
+  markdown = stripHtml(markdown);
 
-    // Remove any remaining HTML tags and decode entities
-    markdown = this.stripHtml(markdown);
+  return markdown.trim();
+}
 
-    return markdown.trim();
-  }
+/**
+ * Strip HTML tags from a string
+ */
+function stripHtml(html: string): string {
+  return decodeHtmlEntities(html.replace(/<[^>]*>/g, ''));
+}
 
-  /**
-   * Strip HTML tags from a string
-   */
-  private stripHtml(html: string): string {
-    return this.decodeHtmlEntities(html.replace(/<[^>]*>/g, ''));
-  }
+/**
+ * Decode all HTML entities in a string
+ */
+function decodeHtmlEntities(text: string): string {
+  // First pass: handle common HTML entities
+  let decoded = text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&mdash;/g, '—')
+    .replace(/&ndash;/g, '–')
+    .replace(/&lsquo;/g, '‘')
+    .replace(/&rsquo;/g, '’')
+    .replace(/&ldquo;/g, '“')
+    .replace(/&rdquo;/g, '”')
+    .replace(/&hellip;/g, '…')
+    .replace(/&bull;/g, '•');
+  // Second pass: handle numeric entities
+  decoded = decoded.replace(/&#(\d+);/g, (match, dec) => {
+    return String.fromCharCode(parseInt(dec, 10));
+  });
 
-  /**
-   * Decode all HTML entities in a string
-   */
-  private decodeHtmlEntities(text: string): string {
-    // First pass: handle common HTML entities
-    let decoded = text
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&apos;/g, "'")
-      .replace(/&mdash;/g, '—')
-      .replace(/&ndash;/g, '–')
-      .replace(/&lsquo;/g, '‘')
-      .replace(/&rsquo;/g, '’')
-      .replace(/&ldquo;/g, '“')
-      .replace(/&rdquo;/g, '”')
-      .replace(/&hellip;/g, '…')
-      .replace(/&bull;/g, '•');
-    // Second pass: handle numeric entities
-    decoded = decoded.replace(/&#(\d+);/g, (match, dec) => {
-      return String.fromCharCode(parseInt(dec, 10));
-    });
+  // Third pass: handle hexadecimal entities
+  decoded = decoded.replace(/&#x([0-9a-f]+);/gi, (match, hex) => {
+    return String.fromCharCode(parseInt(hex, 16));
+  });
 
-    // Third pass: handle hexadecimal entities
-    decoded = decoded.replace(/&#x([0-9a-f]+);/gi, (match, hex) => {
-      return String.fromCharCode(parseInt(hex, 16));
-    });
-
-    // Preserve Unicode characters that might be in the original text
-    return decoded;
-  }
+  // Preserve Unicode characters that might be in the original text
+  return decoded;
 }

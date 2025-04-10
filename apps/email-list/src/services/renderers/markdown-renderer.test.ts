@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MarkdownRenderer } from './markdown-renderer';
+import { MarkdownRenderer, convertHtmlToMarkdown } from './markdown-renderer';
 import { PostMetadata } from './renderer.interface';
 import { WPPost } from '../wordpress-api';
 
@@ -277,64 +277,6 @@ describe('MarkdownRenderer', () => {
     expect(markdown).not.toContain('Fallback content');
   });
 
-  it('should properly decode HTML entities in content', async () => {
-    const postData: PostMetadata = {
-      post: {
-        id: 1,
-        title: { rendered: 'Test HTML Entities' },
-        content: {
-          rendered: `<p>We use a tech radar that mimic&#8217;s the format.</p>
-          <p>The &#8220;radar&#8221; UI doesn&#8217;t lend itself to reading.</p>
-          <p>Common entities: &amp; &lt; &gt; &quot; &#39; &apos;</p>
-          <p>Special characters: &mdash; &ndash; &hellip; &bull;</p>
-          <p>Numeric entities: &#8216; &#8217; &#8220; &#8221; &#8230; &#8226;</p>`,
-          protected: false,
-        },
-        excerpt: { rendered: '<p>Test excerpt</p>', protected: false },
-        date: '2023-01-01T12:00:00',
-        modified: '2023-01-02T12:00:00',
-        slug: 'test-post',
-        status: 'publish',
-        type: 'post',
-        link: 'https://example.com/test-post',
-        author: 1,
-        featured_media: 0,
-        categories: [],
-        tags: [],
-      },
-      categories: [],
-      tags: [],
-      author: {
-        id: 1,
-        name: 'Test Author',
-        url: 'https://example.com',
-        description: 'Author description',
-        link: 'https://example.com/author/test-author',
-        slug: 'test-author',
-        avatar_urls: {
-          '24': 'https://example.com/avatar-24.jpg',
-          '48': 'https://example.com/avatar-48.jpg',
-          '96': 'https://example.com/avatar-96.jpg',
-        },
-      },
-    };
-
-    const markdown = await renderer.renderPost(postData);
-
-    // Test apostrophes and quotes
-    expect(markdown).toContain('We use a tech radar that mimic’s the format.');
-    expect(markdown).toContain('The “radar” UI doesn’t lend itself to reading.');
-
-    // Test common entities
-    expect(markdown).toContain(`Common entities: & < > " ' '`);
-
-    // Test special characters
-    expect(markdown).toContain('Special characters: — – … •');
-
-    // Test numeric entities
-    expect(markdown).toContain('Numeric entities: ‘ ’ “ ” … •');
-  });
-
   it('should insert correct newlines between paragraphs and lists', async () => {
     const postData: PostMetadata = {
       post: {
@@ -459,5 +401,80 @@ describe('MarkdownRenderer', () => {
     // Check that read more links are included
     expect(markdown).toContain('Read more: https://example.com/previous-post-1');
     expect(markdown).not.toContain('Read more: https://example.com/previous-post-2');
+  });
+});
+
+describe('convertHtmlToMarkdown', () => {
+  it('should do basic headers and paragraphs', () => {
+    const html = `<h1>Title</h1><p>Paragraph 1</p><p>Paragraph 2</p>`;
+    const markdown = convertHtmlToMarkdown(html);
+
+    expect(markdown).toContain('# Title\n\nParagraph 1\n\nParagraph 2');
+  });
+
+  it('should convert unordered lists to markdown format', () => {
+    const html = `<ul><li>Item 1</li><li>Item 2</li></ul>`;
+    const markdown = convertHtmlToMarkdown(html);
+
+    expect(markdown).toContain('- Item 1\n- Item 2');
+  });
+
+  it('should convert ordered lists to markdown format', () => {
+    const html = `<ol><li>Item 1</li><li>Item 2</li></ol>`;
+    const markdown = convertHtmlToMarkdown(html);
+
+    expect(markdown).toContain('1. Item 1\n2. Item 2');
+  });
+
+  it('should render bold and italics', () => {
+    const html = `<strong>Strong Text</strong><b>Bold Text</b><em>Emphasised Text</em><i>Italic Text</i>`;
+    const markdown = convertHtmlToMarkdown(html);
+
+    expect(markdown).toContain('**Strong Text**');
+    expect(markdown).toContain('**Bold Text**');
+    expect(markdown).toContain('*Emphasised Text*');
+    expect(markdown).toContain('*Italic Text*');
+  });
+
+  it('should handle links', () => {
+    const html = `<a href="https://example.com">Example Link</a>`;
+    const markdown = convertHtmlToMarkdown(html);
+
+    expect(markdown).toContain('[Example Link](https://example.com)');
+
+    const html2 = `<a href="https://example.com" id="123">Example Link</a>`;
+    const markdown2 = convertHtmlToMarkdown(html2);
+
+    expect(markdown2).toContain('[Example Link](https://example.com)');
+  });
+
+  it('should strip other html', () => {
+    const html = `<div><p>Paragraph 1</p><p>Paragraph 2</p><script>alert(0);</script></div>`;
+    const markdown = convertHtmlToMarkdown(html);
+
+    expect(markdown).toContain('Paragraph 1\n\nParagraph 2');
+  });
+
+  it('should properly decode HTML entities in content', async () => {
+    const html = `<p>We use a tech radar that mimic&#8217;s the format.</p>
+    <p>The &#8220;radar&#8221; UI doesn&#8217;t lend itself to reading.</p>
+    <p>Common entities: &amp; &lt; &gt; &quot; &#39; &apos;</p>
+    <p>Special characters: &mdash; &ndash; &hellip; &bull;</p>
+    <p>Numeric entities: &#8216; &#8217; &#8220; &#8221; &#8230; &#8226;</p>`;
+
+    const markdown = convertHtmlToMarkdown(html);
+
+    // Test apostrophes and quotes
+    expect(markdown).toContain('We use a tech radar that mimic’s the format.');
+    expect(markdown).toContain('The “radar” UI doesn’t lend itself to reading.');
+
+    // Test common entities
+    expect(markdown).toContain(`Common entities: & < > " ' '`);
+
+    // Test special characters
+    expect(markdown).toContain('Special characters: — – … •');
+
+    // Test numeric entities
+    expect(markdown).toContain('Numeric entities: ‘ ’ “ ” … •');
   });
 });
