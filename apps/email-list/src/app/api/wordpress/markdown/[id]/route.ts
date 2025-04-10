@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { WordPressAPI } from '../../../../../services/wordpress-api';
+import { RelatedPostsService } from '@/services/related-posts';
 import { MarkdownRenderer } from '../../../../../services/renderers/markdown-renderer';
 
 // Initialize WordPress API with environment variables
 const wpApiUrl = process.env.WP_API_URL || '';
-const wpApiUsername = process.env.WP_API_USERNAME || '';
-const wpApiPassword = process.env.WP_API_PASSWORD || '';
 
 // Create WordPress API instance
-const api = new WordPressAPI(wpApiUrl, { username: wpApiUsername, password: wpApiPassword });
+const api = new WordPressAPI(wpApiUrl);
+const relatedPostApi = new RelatedPostsService(api);
 
 // Create renderer instance
 const renderer = new MarkdownRenderer();
@@ -25,8 +25,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     // Fetch post with metadata from WordPress API
     const postData = await api.getPostWithMetadata(postId);
 
+    // And more from the blog
+    const recentPosts = await relatedPostApi.getPreviousPosts(postId);
+
     // Render post as markdown
-    const markdown = await renderer.renderPost(postData);
+    const markdown = await renderer.renderEmail(postData, recentPosts);
 
     // Return markdown content
     return new Response(markdown, {

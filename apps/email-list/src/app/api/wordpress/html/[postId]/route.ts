@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { WordPressAPI } from '@/services/wordpress-api';
+import { RelatedPostsService } from '@/services/related-posts';
 import { HtmlRenderer } from '@/services/renderers/html-renderer';
 
-const wpApi = new WordPressAPI(process.env.WORDPRESS_API_URL || 'https://jasononeil.au/wp-json');
+const wpApi = new WordPressAPI(process.env.WP_API_URL || '');
+const relatedPostApi = new RelatedPostsService(wpApi);
 const renderer = new HtmlRenderer();
 
 export async function GET(
@@ -18,8 +20,11 @@ export async function GET(
     // Fetch the post with all metadata
     const postWithMetadata = await wpApi.getPostWithMetadata(postId);
 
+    // And more from the blog
+    const recentPosts = await relatedPostApi.getPreviousPosts(postId);
+
     // Render the post to HTML
-    const html = await renderer.renderPost(postWithMetadata);
+    const html = await renderer.renderEmail(postWithMetadata, recentPosts);
 
     // Return the HTML content with the correct content type
     return new NextResponse(html, {

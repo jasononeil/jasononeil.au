@@ -36,9 +36,6 @@ export class MarkdownRenderer implements Renderer {
 
     let markdown = '';
 
-    // Add header
-    markdown += `A post from [Jason O'Neil's blog](https://jasononeil.au)\n\n`;
-
     // Add title
     markdown += `# ${post.title.rendered}\n\n`;
 
@@ -78,15 +75,37 @@ export class MarkdownRenderer implements Renderer {
     // Add a link back to the original post
     markdown += `\n\nView original post: ${post.link}\n`;
 
+    return markdown;
+  }
+
+  /**
+   * Render a complete email with post content and more from the blog
+   */
+  async renderEmail(
+    postData: PostMetadata,
+    morePosts: WPPost[],
+    options: RendererOptions = {}
+  ): Promise<string> {
+    let markdown = '';
+
+    // Add header
+    markdown += `A post from [Jason O'Neil's blog](https://jasononeil.au)\n\n`;
+
+    // Render the main post
+    markdown += await this.renderPost(postData, options);
+
+    // Add more from the blog if there are posts
+    if (morePosts && morePosts.length > 0) {
+      markdown += '\n\n';
+      markdown += this.renderMoreFromTheBlog(morePosts, options);
+    }
+
     // Add unsubscribe link
     markdown += `\n\n[Unsubscribe]({{unsubscribe_url}}) from these emails\n`;
 
     return markdown;
   }
 
-  /**
-   * Get the content type
-   */
   /**
    * Render a "More from the blog" section with previous posts
    */
@@ -131,6 +150,9 @@ export class MarkdownRenderer implements Renderer {
     return markdown;
   }
 
+  /**
+   * Get the content type
+   */
   getContentType(): string {
     return 'text/markdown';
   }

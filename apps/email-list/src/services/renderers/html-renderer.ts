@@ -40,20 +40,6 @@ export class HtmlRenderer implements Renderer {
 
     let html = '';
 
-    // Read CSS from public directory
-    const css = fs.readFileSync(path.join(process.cwd(), 'public', 'email-styles.css'), 'utf-8');
-
-    // Add CSS styles
-    html += `<style>\n${css}\n</style>\n\n`;
-
-    // Add header
-    html += `<header class="blog-header">
-  <h2><a href="https://jasononeil.au">A post from Jason O'Neil's blog</a></h2>
-</header>\n\n`;
-
-    // Wrap everything in an article with post class
-    html += `<article class="post">\n`;
-
     // Add title. Note the API returns HTML that is already escaped.
     html += `<h1>${post.title.rendered}</h1>\n\n`;
 
@@ -109,6 +95,42 @@ export class HtmlRenderer implements Renderer {
     html += `\n<div class="post-link">\n`;
     html += `  <p><a href="${post.link}">View original post</a></p>\n`;
     html += `</div>\n`;
+
+    return html;
+  }
+
+  /**
+   * Render a complete email with post content and more from the blog
+   */
+  async renderEmail(
+    postData: PostMetadata,
+    morePosts: WPPost[],
+    options: RendererOptions = {}
+  ): Promise<string> {
+    let html = '';
+
+    // Read CSS from public directory
+    const css = fs.readFileSync(path.join(process.cwd(), 'public', 'email-styles.css'), 'utf-8');
+
+    // Add CSS styles
+    html += `<style>\n${css}\n</style>\n\n`;
+
+    // Add header
+    html += `<header class="blog-header">
+  <h2><a href="https://jasononeil.au">A post from Jason O'Neil's blog</a></h2>
+</header>\n\n`;
+
+    // Wrap everything in an article with post class
+    html += `<article class="post">\n`;
+
+    // Render the main post
+    html += await this.renderPost(postData, options);
+
+    // Add more from the blog if there are posts
+    if (morePosts && morePosts.length > 0) {
+      html += '\n\n';
+      html += this.renderMoreFromTheBlog(morePosts, options);
+    }
 
     // Add unsubscribe link
     html += `\n<div class="unsubscribe">\n`;

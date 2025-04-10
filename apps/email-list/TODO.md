@@ -103,9 +103,9 @@ It turns out the Wordpress API doesn't support blocks by default.
 
 Then split out the main post rendering from the overall document:
 
-- [ ] Create a new `renderEmail()` method on the renderer interface
-- [ ] In the Markdown renderer pull out the blog title and unsubscribe link to `renderEmail()`. Then have it call `renderPost()` and `renderMoreFromTheBlog()`
-- [ ] In the HTML renderer pull out the container, CSS, blog title and unsubscribe link to `renderEmail()`. Then have it call `renderPost()` and `renderMoreFromTheBlog()`
+- [x] Create a new `renderEmail()` method on the renderer interface
+- [x] In the Markdown renderer pull out the blog title and unsubscribe link to `renderEmail()`. Then have it call `renderPost()` and `renderMoreFromTheBlog()`
+- [x] In the HTML renderer pull out the container, CSS, blog title and unsubscribe link to `renderEmail()`. Then have it call `renderPost()` and `renderMoreFromTheBlog()`
 
 ### 3. SendGrid Integration
 

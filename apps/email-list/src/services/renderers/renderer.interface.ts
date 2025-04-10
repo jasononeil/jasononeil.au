@@ -33,6 +33,15 @@ export interface Renderer {
   renderMoreFromTheBlog(posts: WPPost[], options?: RendererOptions): string;
 
   /**
+   * Render a complete email with post content and more from the blog
+   */
+  renderEmail(
+    postData: PostMetadata,
+    morePosts: WPPost[],
+    options?: RendererOptions
+  ): Promise<string>;
+
+  /**
    * Get the content type of the rendered output
    */
   getContentType(): string;
