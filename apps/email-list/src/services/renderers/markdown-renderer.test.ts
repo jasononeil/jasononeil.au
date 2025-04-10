@@ -1,13 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { MarkdownRenderer, convertHtmlToMarkdown } from './markdown-renderer';
-import { PostMetadata } from './renderer.interface';
-import { WPPost } from '../wordpress-api';
+import { WPPost, PostWithMetadata } from '../wordpress-api';
 
 describe('MarkdownRenderer', () => {
   const renderer = new MarkdownRenderer();
 
   it('should render a post title and content', async () => {
-    const postData: PostMetadata = {
+    const postData: PostWithMetadata = {
       post: {
         id: 1,
         title: { rendered: 'Test Post' },
@@ -53,7 +52,7 @@ describe('MarkdownRenderer', () => {
   });
 
   it('should include featured image when available', async () => {
-    const postData: PostMetadata = {
+    const postData: PostWithMetadata = {
       post: {
         id: 1,
         title: { rendered: 'Test Post' },
@@ -123,7 +122,7 @@ describe('MarkdownRenderer', () => {
   });
 
   it('should include categories and tags when available', async () => {
-    const postData: PostMetadata = {
+    const postData: PostWithMetadata = {
       post: {
         id: 1,
         title: { rendered: 'Test Post' },
@@ -186,7 +185,7 @@ describe('MarkdownRenderer', () => {
   });
 
   it('should handle Gutenberg blocks when available', async () => {
-    const postData: PostMetadata = {
+    const postData: PostWithMetadata = {
       post: {
         id: 1,
         title: { rendered: 'Test Post with Blocks' },
@@ -278,7 +277,7 @@ describe('MarkdownRenderer', () => {
   });
 
   it('should insert correct newlines between paragraphs and lists', async () => {
-    const postData: PostMetadata = {
+    const postData: PostWithMetadata = {
       post: {
         id: 1,
         title: { rendered: 'Test Newlines' },

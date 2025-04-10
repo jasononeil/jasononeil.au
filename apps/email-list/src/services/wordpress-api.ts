@@ -132,6 +132,15 @@ export interface WPAuthor {
   };
 }
 
+export interface PostWithMetadata {
+  post: WPPost;
+  categories: WPCategory[];
+  tags: WPTag[];
+  featuredMedia?: WPMedia;
+  author: WPAuthor;
+  footnotes?: Footnote[];
+}
+
 export class WordPressAPI {
   private baseUrl: string;
   private coreApiUrl: string;
@@ -394,14 +403,7 @@ export class WordPressAPI {
   /**
    * Fetch all metadata for a post (categories, tags, featured image, author)
    */
-  async getPostWithMetadata(postId: number): Promise<{
-    post: WPPost;
-    categories: WPCategory[];
-    tags: WPTag[];
-    featuredMedia?: WPMedia;
-    author: WPAuthor;
-    footnotes?: Footnote[];
-  }> {
+  async getPostWithMetadata(postId: number): Promise<PostWithMetadata> {
     try {
       const post = await this.getPost(postId);
 

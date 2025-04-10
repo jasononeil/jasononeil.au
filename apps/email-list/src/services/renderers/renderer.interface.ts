@@ -5,15 +5,7 @@
  * Each renderer takes WordPress content and transforms it into a specific format.
  */
 
-import { WPPost, WPCategory, WPTag, WPMedia, WPAuthor } from '../wordpress-api';
-
-export interface PostMetadata {
-  post: WPPost;
-  categories: WPCategory[];
-  tags: WPTag[];
-  featuredMedia?: WPMedia;
-  author: WPAuthor;
-}
+import { WPPost, PostWithMetadata } from '../wordpress-api';
 
 export interface RendererOptions {
   includeImages?: boolean;
@@ -25,7 +17,7 @@ export interface Renderer {
   /**
    * Render a WordPress post into a specific format
    */
-  renderPost(postData: PostMetadata, options?: RendererOptions): Promise<string>;
+  renderPost(postData: PostWithMetadata, options?: RendererOptions): Promise<string>;
 
   /**
    * Render a "More from the blog" section with previous posts
@@ -36,7 +28,7 @@ export interface Renderer {
    * Render a complete email with post content and more from the blog
    */
   renderEmail(
-    postData: PostMetadata,
+    postData: PostWithMetadata,
     morePosts: WPPost[],
     options?: RendererOptions
   ): Promise<string>;

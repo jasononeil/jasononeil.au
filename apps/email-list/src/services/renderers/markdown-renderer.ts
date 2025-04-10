@@ -5,7 +5,7 @@
  * Handles various block types and includes metadata.
  */
 
-import { Renderer, PostMetadata, RendererOptions } from './renderer.interface';
+import { Renderer, RendererOptions } from './renderer.interface';
 import {
   WpBlock,
   WpBlocks,
@@ -24,13 +24,13 @@ import {
   isReusableBlock,
   isPreformattedBlock,
 } from '../../types/wp-blocks';
-import { WPPost } from '../wordpress-api';
+import { WPPost, PostWithMetadata } from '../wordpress-api';
 
 export class MarkdownRenderer implements Renderer {
   /**
    * Render a WordPress post as Markdown
    */
-  async renderPost(postData: PostMetadata, options: RendererOptions = {}): Promise<string> {
+  async renderPost(postData: PostWithMetadata, options: RendererOptions = {}): Promise<string> {
     const { post, categories, tags, featuredMedia, author } = postData;
     const { includeImages = true, includeMetadata = true } = options;
 
@@ -82,7 +82,7 @@ export class MarkdownRenderer implements Renderer {
    * Render a complete email with post content and more from the blog
    */
   async renderEmail(
-    postData: PostMetadata,
+    postData: PostWithMetadata,
     morePosts: WPPost[],
     options: RendererOptions = {}
   ): Promise<string> {

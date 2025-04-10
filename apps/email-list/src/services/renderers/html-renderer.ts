@@ -1,5 +1,5 @@
-import { Renderer, PostMetadata, RendererOptions } from './renderer.interface';
-import { WPPost } from '../wordpress-api';
+import { Renderer, RendererOptions } from './renderer.interface';
+import { WPPost, PostWithMetadata } from '../wordpress-api';
 import fs from 'fs';
 import path from 'path';
 import {
@@ -36,7 +36,7 @@ export class HtmlRenderer implements Renderer {
   /**
    * Render a WordPress post as HTML
    */
-  async renderPost(postData: PostMetadata, options: RendererOptions = {}): Promise<string> {
+  async renderPost(postData: PostWithMetadata, options: RendererOptions = {}): Promise<string> {
     const { post, categories, tags, featuredMedia, author } = postData;
     const { includeImages = true, maxImageWidth = 600, includeMetadata = true } = options;
 
@@ -105,7 +105,7 @@ export class HtmlRenderer implements Renderer {
    * Render a complete email with post content and more from the blog
    */
   async renderEmail(
-    postData: PostMetadata,
+    postData: PostWithMetadata,
     morePosts: WPPost[],
     options: RendererOptions = {}
   ): Promise<string> {
