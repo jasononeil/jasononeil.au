@@ -12,7 +12,9 @@
 import fs from 'fs';
 import path from 'path';
 import { WordPressAPI } from '../src/services/wordpress-api';
+import { RelatedPostsService } from '@/services/related-posts';
 import { MarkdownRenderer } from '../src/services/renderers/markdown-renderer';
+import { HtmlRenderer } from '@/services/renderers/html-renderer';
 import * as dotenv from 'dotenv';
 
 // Load environment variables from .env file
@@ -61,7 +63,9 @@ function log(message: string) {
  */
 async function processPost(
   api: WordPressAPI,
-  renderer: MarkdownRenderer,
+  relatedPostService: RelatedPostsService,
+  mdRenderer: MarkdownRenderer,
+  htmlRenderer: HtmlRenderer,
   postId: number
 ): Promise<{
   success: boolean;
@@ -75,12 +79,15 @@ async function processPost(
     // Fetch full post data with metadata
     const postData = await api.getPostWithMetadata(post.id);
 
+    const earlierPosts = await relatedPostService.getPreviousPosts(post.id, 5);
+
     // Render post to markdown
-    const markdown = await renderer.renderPost(postData);
+    const markdown = await mdRenderer.renderEmail(postData, earlierPosts);
+    const html = await htmlRenderer.renderEmail(postData, earlierPosts);
 
     // Save markdown to file
-    const filename = `${post.id}-${post.slug}.md`;
-    fs.writeFileSync(path.join(outputDir, filename), markdown);
+    fs.writeFileSync(path.join(outputDir, `${post.id}-${post.slug}.md`), markdown);
+    fs.writeFileSync(path.join(outputDir, `${post.id}-${post.slug}.html`), html);
 
     log(`  ✓ Successfully processed post ${post.id}`);
     return { success: true, unknownBlockTypes: [] };
@@ -91,7 +98,7 @@ async function processPost(
     const unknownBlockTypes: string[] = [];
     const errorMessage = (error as Error).message;
     if (errorMessage.includes('Unknown block type')) {
-      const match = errorMessage.match(/Unknown block type: (.+)/);
+      const match = errorMessage.match(/Unknown block type: (.+)/m);
       if (match && match[1]) {
         unknownBlockTypes.push(match[1]);
       }
@@ -104,11 +111,17 @@ async function processPost(
 /**
  * Test a specific post by ID
  */
-async function testSpecificPost(api: WordPressAPI, renderer: MarkdownRenderer, postId: number) {
+async function testSpecificPost(
+  api: WordPressAPI,
+  relatedPostService: RelatedPostsService,
+  mdRenderer: MarkdownRenderer,
+  htmlRenderer: HtmlRenderer,
+  postId: number
+) {
   log(`Starting WordPress API integration test for post ID: ${postId}...`);
 
   try {
-    const result = await processPost(api, renderer, postId);
+    const result = await processPost(api, relatedPostService, mdRenderer, htmlRenderer, postId);
 
     // Log summary
     log('\n--- Test Summary ---');
@@ -135,7 +148,12 @@ async function testSpecificPost(api: WordPressAPI, renderer: MarkdownRenderer, p
 /**
  * Test all posts from the WordPress site
  */
-async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
+async function testAllPosts(
+  api: WordPressAPI,
+  relatedPostsService: RelatedPostsService,
+  mdRenderer: MarkdownRenderer,
+  htmlRenderer: HtmlRenderer
+) {
   let page = 1;
   let hasMorePosts = true;
   let totalPosts = 0;
@@ -162,7 +180,13 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
 
         // Process each post
         for (const post of posts) {
-          const result = await processPost(api, renderer, post.id);
+          const result = await processPost(
+            api,
+            relatedPostsService,
+            mdRenderer,
+            htmlRenderer,
+            post.id
+          );
 
           if (result.success) {
             successfulPosts++;
@@ -231,12 +255,14 @@ async function testAllPosts(api: WordPressAPI, renderer: MarkdownRenderer) {
  */
 async function testWordPressApiIntegration() {
   const api = new WordPressAPI(wpUrl, { username: wpUsername, password: wpPassword });
-  const renderer = new MarkdownRenderer();
+  const relatedPostsService = new RelatedPostsService(api);
+  const mdRenderer = new MarkdownRenderer();
+  const htmlRenderer = new HtmlRenderer();
 
   if (specificPostId) {
-    await testSpecificPost(api, renderer, specificPostId);
+    await testSpecificPost(api, relatedPostsService, mdRenderer, htmlRenderer, specificPostId);
   } else {
-    await testAllPosts(api, renderer);
+    await testAllPosts(api, relatedPostsService, mdRenderer, htmlRenderer);
   }
 }
 
