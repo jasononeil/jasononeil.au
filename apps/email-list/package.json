@@ -14,7 +14,8 @@
     "db:studio": "drizzle-kit studio",
     "wp:test-all-posts": "tsx scripts/test-wp-api-integration.ts",
     "wp:extract-block-types": "tsx scripts/extract-block-types.ts",
-    "wp:send-test-post": "tsx scripts/send-test-post.ts"
+    "wp:send-test-post": "tsx scripts/send-test-post.ts",
+    "wp:send-specific-post-to-manual-list": "tsx scripts/send-specific-post-to-manual-list.ts"
   },
   "dependencies": {
     "@sendgrid/mail": "^8.1.5",

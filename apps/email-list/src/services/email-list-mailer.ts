@@ -57,4 +57,42 @@ export class EmailListMailer {
       html: htmlContent,
     });
   }
+
+  /**
+   * Send a post to the test email address specified in the TEST_EMAIL environment variable
+   */
+  async sendPostToManualSubscribers(postId: number, list: string[]): Promise<boolean[]> {
+    const testEmail = process.env.TEST_EMAIL;
+
+    if (!testEmail) {
+      throw new Error('TEST_EMAIL environment variable is not set');
+    }
+
+    // Fetch the post and its metadata
+    const post = await this.wpApi.getPost(postId);
+    const postWithMetadata = await this.wpApi.getPostWithMetadata(postId);
+
+    // Fetch related posts
+    const previousPosts = await this.relatedPostsService.getPreviousPosts(postId);
+
+    // Render the post content in both HTML and plain text formats
+    const htmlContent = await this.htmlRenderer.renderEmail(postWithMetadata, previousPosts);
+    const plainTextContent = await this.markdownRenderer.renderEmail(
+      postWithMetadata,
+      previousPosts
+    );
+
+    // Send the email
+    const results = [];
+    for (const email of list) {
+      const result = await this.sendgridApi.send({
+        to: email,
+        subject: `${post.title.rendered}`,
+        text: plainTextContent,
+        html: htmlContent,
+      });
+      results.push(result);
+    }
+    return results;
+  }
 }

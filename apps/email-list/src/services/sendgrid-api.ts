@@ -5,17 +5,18 @@ export interface SendEmailOptions {
   subject: string;
   text: string;
   html: string;
-  from?: string;
+  from?: { name: string; email: string };
 }
 
 export class SendgridAPI {
-  private defaultFromEmail: string;
+  private defaultFrom: { name: string; email: string };
   private isLocalDevelopment: boolean;
   private testEmail: string | undefined;
 
   constructor() {
     const apiKey = process.env.SENDGRID_API_KEY;
     const defaultFromEmail = process.env.DEFAULT_FROM_EMAIL || 'from@example.com';
+    const defaultFromName = process.env.DEFAULT_FROM_NAME || 'Example email';
     const isLocalDevelopment = !!process.env.LOCAL_DEVELOPMENT;
     const testEmail = process.env.TEST_EMAIL || 'to@example.com';
 
@@ -25,7 +26,7 @@ export class SendgridAPI {
       throw new Error('SendGrid API is not initialized. Please provide a valid API key.');
     }
 
-    this.defaultFromEmail = defaultFromEmail;
+    this.defaultFrom = { name: defaultFromName, email: defaultFromEmail };
     this.isLocalDevelopment = isLocalDevelopment;
     this.testEmail = testEmail;
   }
@@ -37,7 +38,7 @@ export class SendgridAPI {
    * specified in the TEST_EMAIL environment variable.
    */
   async send(options: SendEmailOptions): Promise<boolean> {
-    const { to, subject, text, html, from = this.defaultFromEmail } = options;
+    const { to, subject, text, html, from = this.defaultFrom } = options;
 
     // In local development, only send to the test email
     if (this.isLocalDevelopment && to !== this.testEmail) {

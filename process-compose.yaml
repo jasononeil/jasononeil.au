@@ -5,4 +5,4 @@ processes:
     command: apps/email-list/scripts/setup_db.sh
     depends_on:
       mysql:
-        condition: process_launched
+        condition: process_healthy
