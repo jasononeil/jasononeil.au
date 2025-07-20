@@ -53,10 +53,6 @@ export class MarkdownRenderer implements Renderer {
       if (categories.length > 0) {
         markdown += `*Categories: ${categories.map((c) => c.name).join(', ')}*\n\n`;
       }
-
-      if (tags.length > 0) {
-        markdown += `*Tags: ${tags.map((t) => t.name).join(', ')}*\n\n`;
-      }
     }
 
     // Add featured image if available and requested
@@ -74,6 +70,12 @@ export class MarkdownRenderer implements Renderer {
 
     // Add a link back to the original post
     markdown += `\n\nView original post: ${post.link}\n`;
+
+    if (includeMetadata) {
+      if (tags.length > 0) {
+        markdown += `*Tags: ${tags.map((t) => t.name).join(', ')}*\n\n`;
+      }
+    }
 
     return markdown;
   }

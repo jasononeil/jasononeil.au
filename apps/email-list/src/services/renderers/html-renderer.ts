@@ -56,21 +56,13 @@ export class HtmlRenderer implements Renderer {
       });
 
       html += `<div class="post-meta">\n`;
-      html += `  <p><em>Published on ${date}</em></p>\n`;
-      html += `  <p><em>By ${escapeHtml(author.name)}</em></p>\n`;
+      html += `  <p><em>Published on ${date} by ${escapeHtml(author.name)}</em></p>\n`;
 
       if (categories.length > 0) {
         const categoryLinks = categories
           .map((cat) => `<a href="${cat.link}">${escapeHtml(cat.name)}</a>`)
           .join(', ');
         html += `  <p><em>Categories: ${categoryLinks}</em></p>\n`;
-      }
-
-      if (tags.length > 0) {
-        const tagNames = tags
-          .map((tag) => `<a href="${tag.link}">${escapeHtml(tag.name)}</a>`)
-          .join(', ');
-        html += `  <p><em>Tags: ${tagNames}</em></p>\n`;
       }
 
       html += `</div>\n\n`;
@@ -99,6 +91,19 @@ export class HtmlRenderer implements Renderer {
     html += `\n<div class="post-link">\n`;
     html += `  <p><a href="${post.link}">View original post</a></p>\n`;
     html += `</div>\n`;
+
+    if (includeMetadata) {
+      html += `<div class="post-meta">\n`;
+
+      if (tags.length > 0) {
+        const tagNames = tags
+          .map((tag) => `<a href="${tag.link}">${escapeHtml(tag.name)}</a>`)
+          .join(', ');
+        html += `  <p><em>Tags: ${tagNames}</em></p>\n`;
+      }
+
+      html += `</div>\n\n`;
+    }
 
     return html;
   }
