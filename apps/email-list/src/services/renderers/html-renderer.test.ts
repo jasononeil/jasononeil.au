@@ -67,7 +67,7 @@ describe('HtmlRenderer', () => {
     const html = await renderer.renderPost(postData);
 
     expect(html).toContain('<h1>Test Post</h1>');
-    expect(html).toContain('<em>By Test Author</em>');
+    expect(html).toContain('by Test Author');
     expect(html).toContain('<p>This is a test paragraph.</p>');
     expect(html).toContain('<p>Another paragraph.</p>');
     expect(html).toContain('<a href="https://example.com/test-post">View original post</a>');
@@ -631,16 +631,43 @@ describe('HtmlRenderer', () => {
   });
 
   describe('renderEmbedBlock', () => {
-    it('should render correctly', () => {
+    it('should render YouTube embed with specific message', () => {
       const html = renderEmbedBlock({
         name: 'core/embed',
         attributes: {
-          url: 'https://example.com/embed-url',
+          url: 'https://www.youtube.com/watch?v=abc123',
+          providerNameSlug: 'youtube',
         },
         innerBlocks: [],
       });
-      expect(html).toContain(
-        '<p><a href="https://example.com/embed-url">View embedded content</a></p>'
+      expect(html).toBe(
+        '<p>Video: <a href="https://www.youtube.com/watch?v=abc123">View on Youtube</a></p>'
+      );
+    });
+
+    it('should render Vimeo embed with specific message', () => {
+      const html = renderEmbedBlock({
+        name: 'core/embed',
+        attributes: {
+          url: 'https://vimeo.com/123456789',
+          providerNameSlug: 'vimeo',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toBe('<p>Video: <a href="https://vimeo.com/123456789">View on Vimeo</a></p>');
+    });
+
+    it('should render generic embed with URL', () => {
+      const html = renderEmbedBlock({
+        name: 'core/embed',
+        attributes: {
+          url: 'https://example.com/embed-content',
+          providerNameSlug: 'example',
+        },
+        innerBlocks: [],
+      });
+      expect(html).toBe(
+        '<p>Embedded content: <a href="https://example.com/embed-content">View at https://example.com/embed-content</a></p>'
       );
     });
   });

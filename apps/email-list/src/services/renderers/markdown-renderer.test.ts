@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { MarkdownRenderer, convertHtmlToMarkdown } from './markdown-renderer';
 import { WPPost, PostWithMetadata } from '../wordpress-api';
+import { WpBlock } from '@/types/wp-blocks';
 
 // Base test post that can be extended for specific test cases
 const baseTestPost: PostWithMetadata = {
@@ -435,6 +436,52 @@ describe('MarkdownRenderer', () => {
     // Check that read more links are included
     expect(markdown).toContain('Read more: https://example.com/previous-post-1');
     expect(markdown).not.toContain('Read more: https://example.com/previous-post-2');
+  });
+});
+
+describe('renderBlock for embed blocks', () => {
+  const renderer = new MarkdownRenderer();
+
+  it('should render YouTube embed with specific message', () => {
+    const block = {
+      name: 'core/embed' as const,
+      attributes: {
+        url: 'https://www.youtube.com/watch?v=abc123',
+        providerNameSlug: 'youtube',
+      },
+      innerBlocks: [],
+    };
+
+    const markdown = renderer['renderBlock'](block, baseTestPost);
+    expect(markdown).toBe('Youtube Video: https://www.youtube.com/watch?v=abc123');
+  });
+
+  it('should render Vimeo embed with specific message', () => {
+    const block = {
+      name: 'core/embed' as const,
+      attributes: {
+        url: 'https://vimeo.com/123456789',
+        providerNameSlug: 'vimeo',
+      },
+      innerBlocks: [],
+    };
+
+    const markdown = renderer['renderBlock'](block, baseTestPost);
+    expect(markdown).toBe('Vimeo Video: https://vimeo.com/123456789');
+  });
+
+  it('should render generic embed with URL', () => {
+    const block = {
+      name: 'core/embed' as const,
+      attributes: {
+        url: 'https://example.com/embed-content',
+        providerNameSlug: 'example',
+      },
+      innerBlocks: [],
+    };
+
+    const markdown = renderer['renderBlock'](block, baseTestPost);
+    expect(markdown).toBe('Link to content: https://example.com/embed-content');
   });
 });
 

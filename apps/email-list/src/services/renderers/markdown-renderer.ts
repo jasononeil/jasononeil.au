@@ -235,7 +235,15 @@ export class MarkdownRenderer implements Renderer {
     }
 
     if (isEmbedBlock(block)) {
-      return `[${block.attributes.providerNameSlug || 'Embedded content'}: ${block.attributes.url}](${block.attributes.url})`;
+      // For email, we can't include iframes, so we'll just add a link
+      const provider = block.attributes.providerNameSlug;
+      if (provider == 'vimeo') {
+        return `Vimeo Video: ${block.attributes.url}`;
+      }
+      if (provider == 'youtube') {
+        return `Youtube Video: ${block.attributes.url}`;
+      }
+      return `Link to content: ${block.attributes.url}`;
     }
 
     if (isVideoBlock(block)) {

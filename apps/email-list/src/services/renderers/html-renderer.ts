@@ -461,11 +461,14 @@ ${block.attributes.caption ? `<figcaption>${block.attributes.caption}</figcaptio
 }
 
 export function renderEmbedBlock(block: EmbedBlock): string {
-  // For email, we can't include iframes, so we'll just add a link
-  if (block.attributes.url) {
-    return `<p><a href="${block.attributes.url}">View embedded content</a></p>`;
+  const provider = block.attributes.providerNameSlug;
+  if (provider == 'vimeo') {
+    return `<p>Video: <a href="${block.attributes.url}">View on Vimeo</a></p>`;
   }
-  return `<p>[Embedded content]</p>`;
+  if (provider == 'youtube') {
+    return `<p>Video: <a href="${block.attributes.url}">View on Youtube</a></p>`;
+  }
+  return `<p>Embedded content: <a href="${block.attributes.url}">View at ${block.attributes.url}</a></p>`;
 }
 
 export function renderReusableBlock(block: ReusableBlock, postData: PostWithMetadata): string {
