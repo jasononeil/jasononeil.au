@@ -6,3 +6,5 @@ processes:
     depends_on:
       mysql:
         condition: process_healthy
+  email-dev:
+    command: pnpm run --filter=email-list dev
