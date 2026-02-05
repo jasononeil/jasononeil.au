@@ -26,6 +26,23 @@ export class EmailListMailer {
   }
 
   /**
+   * Delay helper to respect API rate limits
+   */
+  private async delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Calculate delay between requests based on rate limit
+   * Adds 100ms buffer for safety
+   */
+  private getDelayBetweenRequests(): number {
+    const rateLimitPerSec = parseInt(process.env.RESEND_RATE_LIMIT_PER_SEC || '2');
+    const delayMs = 1000 / rateLimitPerSec + 100;
+    return delayMs;
+  }
+
+  /**
    * Send a post to the test email address specified in the TEST_EMAIL environment variable
    */
   async sendPostToTestEmail(postId: number): Promise<boolean> {
@@ -84,7 +101,10 @@ export class EmailListMailer {
 
     // Send the email
     const results = [];
-    for (const email of list) {
+    const delayMs = this.getDelayBetweenRequests();
+
+    for (let i = 0; i < list.length; i++) {
+      const email = list[i];
       const result = await this.emailApi.send({
         to: email,
         subject: `${post.title.rendered}`,
@@ -92,6 +112,11 @@ export class EmailListMailer {
         html: htmlContent,
       });
       results.push(result);
+
+      // Add delay between sends to respect rate limit
+      if (i < list.length - 1) {
+        await this.delay(delayMs);
+      }
     }
     return results;
   }
