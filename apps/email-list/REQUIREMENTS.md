@@ -11,7 +11,7 @@ Create a standalone email delivery service that connects to WordPress via its RE
 - **Headless Architecture**: Separate JavaScript-based application that communicates with WordPress via REST API
 - **Frontend**: Next.js application hosted on the same Digital Ocean VPS as the WordPress installation
 - **Database**: Separate tables/schema on the existing database for subscriber management
-- **Email Delivery**: Integration with Twilio SendGrid for sending emails
+- **Email Delivery**: Integration with Resend for sending emails
 - **Templating**: basic string templates for email templates
 
 ## Core Requirements
@@ -50,7 +50,7 @@ Create a standalone email delivery service that connects to WordPress via its RE
 1. Automatic email generation based on WordPress categories/tags
 2. Integration with WordPress hooks or scheduled checks via the API
 3. Option to trigger emails via a simple HTTP call from WordPress
-4. SendGrid integration for reliable delivery
+4. Resend integration for reliable delivery
 5. Handling of bounces and delivery failures
 
 ### Analytics & Logging
@@ -136,7 +136,7 @@ sent_emails:
 
    - WordPress API connectivity
    - Database operations
-   - SendGrid integration
+   - Resend integration
 
 3. **End-to-End Tests**:
 
@@ -156,7 +156,7 @@ sent_emails:
    - Devbox based local environment with MySQL
    - Single command to run linting (and integrated into aider)
    - Single command to run tests (and integrated into aider)
-   - Local SendGrid API sandbox mode
+   - Local Resend API testing mode
 
 6. **CI with GitHub Actions**:
 
@@ -189,7 +189,7 @@ sent_emails:
 
 - Implement block content parsing
 - Create email composition system
-- Integrate with SendGrid
+- Integrate with Resend
 - Set up triggering mechanism
 
 ### Phase 3: Subscriber Management
@@ -212,7 +212,7 @@ sent_emails:
 - Node.js for backend logic
 - MySQL for database (shared with WordPress)
 - Plain JS string templates
-- Twilio SendGrid for email delivery
+- Resend for email delivery
 - REST API for WordPress communication
 
 This headless approach provides flexibility while leveraging the existing WordPress content management capabilities, meeting the requirement for improved email delivery with minimal friction in the content creation workflow.

@@ -28,7 +28,7 @@ The plugin provides an API endpoint at `/wp-json/vip-block-data-api/v1/posts/<po
 - **Improved Email Design:** Create customizable, mobile-responsive email templates that incorporate WordPress content in an email-friendly format.
 - **Robust Subscription Management:** Facilitate seamless subscription, preference updates, and unsubscription through dedicated API endpoints and embeddable forms.
 - **Headless Architecture:** Decouple email delivery functionality from the WordPress core, enabling independent evolution and scaling of the email system.
-- **Enhanced Delivery Reliability:** Leverage SendGrid for efficient email distribution while handling bounces and failures gracefully.
+- **Enhanced Delivery Reliability:** Leverage Resend for efficient email distribution while handling bounces and failures gracefully.
 - **Comprehensive Logging & Analytics:** Enable detailed tracking of system operations and email delivery statuses to support troubleshooting and future optimizations.
 
 ## Intended Architecture
@@ -43,8 +43,8 @@ The plugin provides an API endpoint at `/wp-json/vip-block-data-api/v1/posts/<po
   - A dedicated module handles communication with the WordPress REST API, ensuring blog post content, metadata, and media are fetched and transformed appropriately for email.
 - **Plain JS template strings:**
   - We don't need handlebars or any other templating library for this basic use case.
-- **SendGrid Email Delivery:**
-  - Email sending is powered by Twilio SendGrid, because email sender reputations are hard.
+- **Resend Email Delivery:**
+  - Email sending is powered by Resend (https://resend.com), a modern email API for developers.
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

@@ -3,21 +3,21 @@ import { EmailListMailer } from './email-list-mailer';
 import { WordPressAPI } from './wordpress-api';
 import { HtmlRenderer } from './renderers/html-renderer';
 import { MarkdownRenderer } from './renderers/markdown-renderer';
-import { SendgridAPI } from './sendgrid-api';
+import { EmailAPI } from './email-api';
 import { RelatedPostsService } from './related-posts';
 
 // Mock all dependencies
 vi.mock('../wordpress-api');
 vi.mock('../renderers/html-renderer');
 vi.mock('../renderers/markdown-renderer');
-vi.mock('../sendgrid-api');
+vi.mock('../email-api');
 vi.mock('../related-posts');
 
 describe('EmailListMailer', () => {
   let wpApi: WordPressAPI;
   let htmlRenderer: HtmlRenderer;
   let markdownRenderer: MarkdownRenderer;
-  let sendgridApi: SendgridAPI;
+  let emailApi: EmailAPI;
   let relatedPostsService: RelatedPostsService;
   let mailer: EmailListMailer;
 
@@ -78,9 +78,9 @@ describe('EmailListMailer', () => {
       renderEmail: vi.fn().mockResolvedValue('# Test Markdown email'),
     } as unknown as MarkdownRenderer;
 
-    sendgridApi = {
+    emailApi = {
       send: vi.fn().mockResolvedValue(true),
-    } as unknown as SendgridAPI;
+    } as unknown as EmailAPI;
 
     relatedPostsService = {
       getPreviousPosts: vi.fn().mockResolvedValue(mockPreviousPosts),
@@ -91,7 +91,7 @@ describe('EmailListMailer', () => {
       wpApi,
       htmlRenderer,
       markdownRenderer,
-      sendgridApi,
+      emailApi,
       relatedPostsService
     );
   });
@@ -110,7 +110,7 @@ describe('EmailListMailer', () => {
     );
 
     // Verify the email was sent with the correct parameters
-    expect(sendgridApi.send).toHaveBeenCalledWith({
+    expect(emailApi.send).toHaveBeenCalledWith({
       to: 'test@example.com',
       subject: '[TEST] Test Post Title',
       text: '# Test Markdown email',
@@ -134,9 +134,9 @@ describe('EmailListMailer', () => {
     wpApi.getPost = vi.fn().mockRejectedValue(new Error('WordPress API error'));
     await expect(mailer.sendPostToTestEmail(123)).rejects.toThrow('WordPress API error');
 
-    // Test error from SendGrid API
+    // Test error from Email API
     wpApi.getPost = vi.fn().mockResolvedValue(mockPost);
-    sendgridApi.send = vi.fn().mockRejectedValue(new Error('SendGrid API error'));
-    await expect(mailer.sendPostToTestEmail(123)).rejects.toThrow('SendGrid API error');
+    emailApi.send = vi.fn().mockRejectedValue(new Error('Email API error'));
+    await expect(mailer.sendPostToTestEmail(123)).rejects.toThrow('Email API error');
   });
 });

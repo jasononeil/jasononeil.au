@@ -1,22 +1,27 @@
 import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
-import { SendgridAPI } from './sendgrid-api';
-import sgMail from '@sendgrid/mail';
+import { EmailAPI } from './email-api';
+import { Resend } from 'resend';
 
-// Mock @sendgrid/mail
-vi.mock('@sendgrid/mail', () => ({
-  default: {
-    setApiKey: vi.fn(),
-    send: vi.fn(),
-  },
+// Create a mock send function
+const mockSend = vi.fn();
+
+// Mock resend
+vi.mock('resend', () => ({
+  Resend: vi.fn().mockImplementation(() => ({
+    emails: {
+      send: mockSend,
+    },
+  })),
 }));
 
-describe('SendgridAPI', () => {
+describe('EmailAPI', () => {
   const originalEnv = { ...process.env };
 
   beforeEach(() => {
-    vi.resetAllMocks();
-    process.env.SENDGRID_API_KEY = 'test-api-key';
+    vi.clearAllMocks();
+    process.env.RESEND_API_KEY = 'test-api-key';
     process.env.DEFAULT_FROM_EMAIL = 'test@example.com';
+    process.env.DEFAULT_FROM_NAME = 'Test Sender';
     process.env.TEST_EMAIL = 'test-recipient@example.com';
   });
 
@@ -25,21 +30,20 @@ describe('SendgridAPI', () => {
   });
 
   it('should initialize with environment variables', () => {
-    new SendgridAPI();
-    expect(sgMail.setApiKey).toHaveBeenCalledWith('test-api-key');
+    new EmailAPI();
+    expect(Resend).toHaveBeenCalledWith('test-api-key');
   });
 
   it('should initialize with constructor options', () => {
-    process.env.SENDGRID_API_KEY = 'custom-api-key';
+    process.env.RESEND_API_KEY = 'custom-api-key';
     process.env.DEFAULT_FROM_EMAIL = 'custom@example.com';
-    new SendgridAPI();
-    expect(sgMail.setApiKey).toHaveBeenCalledWith('custom-api-key');
+    new EmailAPI();
+    expect(Resend).toHaveBeenCalledWith('custom-api-key');
   });
 
   it('should send an email successfully', async () => {
-    const api = new SendgridAPI();
-    const mockedSend = sgMail.send as Mock;
-    mockedSend.mockResolvedValueOnce([{ statusCode: 202 }, {}]);
+    const api = new EmailAPI();
+    mockSend.mockResolvedValueOnce({ data: { id: 'test-id' }, error: null });
 
     const result = await api.send({
       to: 'test-recipient@example.com',
@@ -49,9 +53,9 @@ describe('SendgridAPI', () => {
     });
 
     expect(result).toBe(true);
-    expect(mockedSend).toHaveBeenCalledWith({
-      to: 'test-recipient@example.com',
-      from: 'test@example.com',
+    expect(mockSend).toHaveBeenCalledWith({
+      from: 'Test Sender <test@example.com>',
+      to: ['test-recipient@example.com'],
       subject: 'Test Subject',
       text: 'Test plain text',
       html: '<p>Test HTML</p>',
@@ -59,10 +63,11 @@ describe('SendgridAPI', () => {
   });
 
   it('should throw an error when sending fails', async () => {
-    const api = new SendgridAPI();
-    const error = new Error('SendGrid API error');
-    const mockedSend = sgMail.send as Mock;
-    mockedSend.mockRejectedValueOnce(error);
+    const api = new EmailAPI();
+    mockSend.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Resend API error' },
+    });
 
     await expect(
       api.send({
@@ -71,14 +76,12 @@ describe('SendgridAPI', () => {
         text: 'Test plain text',
         html: '<p>Test HTML</p>',
       })
-    ).rejects.toThrow('Failed to send email: SendGrid API error');
+    ).rejects.toThrow('Failed to send email: Resend API error');
   });
 
   it('should skip sending in local development mode except to test email', async () => {
     process.env.LOCAL_DEVELOPMENT = 'true';
-    const api = new SendgridAPI();
-
-    const mockedSend = sgMail.send as Mock;
+    const api = new EmailAPI();
 
     // Should skip for non-test email
     const result1 = await api.send({
@@ -89,10 +92,10 @@ describe('SendgridAPI', () => {
     });
 
     expect(result1).toBe(false);
-    expect(mockedSend).not.toHaveBeenCalled();
+    expect(mockSend).not.toHaveBeenCalled();
 
     // Should send to test email
-    mockedSend.mockResolvedValueOnce([{ statusCode: 202 }, {}]);
+    mockSend.mockResolvedValueOnce({ data: { id: 'test-id' }, error: null });
     const result2 = await api.send({
       to: 'test-recipient@example.com',
       subject: 'Test Subject',
@@ -101,12 +104,12 @@ describe('SendgridAPI', () => {
     });
 
     expect(result2).toBe(true);
-    expect(mockedSend).toHaveBeenCalled();
+    expect(mockSend).toHaveBeenCalled();
   });
 
   it('should throw an error when not initialized', async () => {
-    process.env.SENDGRID_API_KEY = '';
+    process.env.RESEND_API_KEY = '';
 
-    expect(() => new SendgridAPI()).toThrow('SendGrid API is not initialized');
+    expect(() => new EmailAPI()).toThrow('Resend API is not initialized');
   });
 });

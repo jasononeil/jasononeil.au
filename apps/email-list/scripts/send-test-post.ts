@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 import { WordPressAPI } from '../src/services/wordpress-api';
 import { HtmlRenderer } from '../src/services/renderers/html-renderer';
 import { MarkdownRenderer } from '../src/services/renderers/markdown-renderer';
-import { SendgridAPI } from '../src/services/sendgrid-api';
+import { EmailAPI } from '../src/services/email-api';
 import { RelatedPostsService } from '../src/services/related-posts';
 import { EmailListMailer } from '../src/services/email-list-mailer';
 import fs from 'fs';
@@ -40,8 +40,8 @@ async function main() {
     process.exit(1);
   }
 
-  if (!process.env.SENDGRID_API_KEY) {
-    log('SENDGRID_API_KEY environment variable is not set');
+  if (!process.env.RESEND_API_KEY) {
+    log('RESEND_API_KEY environment variable is not set');
     process.exit(1);
   }
 
@@ -55,14 +55,14 @@ async function main() {
     const wpApi = new WordPressAPI(process.env.WP_API_URL);
     const htmlRenderer = new HtmlRenderer();
     const markdownRenderer = new MarkdownRenderer();
-    const sendgridApi = new SendgridAPI();
+    const emailApi = new EmailAPI();
     const relatedPostsService = new RelatedPostsService(wpApi);
 
     const mailer = new EmailListMailer(
       wpApi,
       htmlRenderer,
       markdownRenderer,
-      sendgridApi,
+      emailApi,
       relatedPostsService
     );
 

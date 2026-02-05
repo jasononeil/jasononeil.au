@@ -107,13 +107,13 @@ Then split out the main post rendering from the overall document:
 - [x] In the Markdown renderer pull out the blog title and unsubscribe link to `renderEmail()`. Then have it call `renderPost()` and `renderMoreFromTheBlog()`
 - [x] In the HTML renderer pull out the container, CSS, blog title and unsubscribe link to `renderEmail()`. Then have it call `renderPost()` and `renderMoreFromTheBlog()`
 
-### 3. SendGrid Integration
+### 3. Resend Integration
 
-Integrate Twilio SendGrid for sending emails.
+Integrate Resend for sending emails.
 
-- [x] Register an API key and set up environment variable `SENDGRID_API_KEY`.
-- [x] Set DNS records to authenticate with SendGrid.
-- [x] Create a new `sendgrid-api` service for sending email via Sendgrid. Something like `send(to, subject, plaintext, html)`. Ensure it never sends if `LOCAL_DEVELOPMENT` environment variable is set, except to the email `TEST_EMAIL`. Use `@sendgrid/mail`.
+- [x] Register an API key and set up environment variable `RESEND_API_KEY`.
+- [x] Set DNS records to authenticate with Resend (SPF, DKIM, DMARC).
+- [x] Create a new `email-api` service for sending email via Resend. Something like `send(to, subject, plaintext, html)`. Ensure it never sends if `LOCAL_DEVELOPMENT` environment variable is set, except to the email `TEST_EMAIL`. Use `resend` package.
 - [x] Create a new `email-list-mailer` service that will send the actual emails. Implement a `sendPostToTestEmail(postId)` that sends a post to the email address in the environment variable `TEST_EMAIL`.
 - [x] Create a script `pnpm run wp:send-test-post <postid>` that uses `sendPostToTestEmail` from the command line.
 
@@ -154,7 +154,7 @@ Write unit tests for each endpoint to validate data handling and error condition
   - Update subscriber category preferences
 - [ ] Create API endpoint: `/api/unsubscribe`
   - Mark subscriber status as unsubscribed
-- [ ] Create API endpoint: `/api/webhooks/sendgrid` for handling bounce notifications and other events.
+- [ ] Create API endpoint: `/api/webhooks/resend` for handling bounce notifications and other events.
 - [ ] Create API endpoint: `/api/webhooks/wordpress` for an XML-RPC ping (configured as "Update Services" in Wordpress). Uses `email-list-mailer` to identify new posts and send them.
 
 ### 2. Subscription Pages
@@ -190,5 +190,5 @@ Write unit tests for each endpoint to validate data handling and error condition
 ## Future Considerations (Backlog)
 
 - [ ] Further integration with static site generation if blog architecture changes.
-- [ ] Enhanced analytics for open and click rates. Sendgrid may have this data for us.
+- [ ] Enhanced analytics for open and click rates. Resend may have this data for us.
 - [ ] Support for multiple subscription types (daily, weekly digest, etc.)

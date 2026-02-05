@@ -1,27 +1,27 @@
 import { WordPressAPI, PostWithMetadata } from './wordpress-api';
 import { HtmlRenderer } from './renderers/html-renderer';
 import { MarkdownRenderer } from './renderers/markdown-renderer';
-import { SendgridAPI } from './sendgrid-api';
+import { EmailAPI } from './email-api';
 import { RelatedPostsService } from './related-posts';
 
 export class EmailListMailer {
   private wpApi: WordPressAPI;
   private htmlRenderer: HtmlRenderer;
   private markdownRenderer: MarkdownRenderer;
-  private sendgridApi: SendgridAPI;
+  private emailApi: EmailAPI;
   private relatedPostsService: RelatedPostsService;
 
   constructor(
     wpApi: WordPressAPI,
     htmlRenderer: HtmlRenderer,
     markdownRenderer: MarkdownRenderer,
-    sendgridApi: SendgridAPI,
+    emailApi: EmailAPI,
     relatedPostsService: RelatedPostsService
   ) {
     this.wpApi = wpApi;
     this.htmlRenderer = htmlRenderer;
     this.markdownRenderer = markdownRenderer;
-    this.sendgridApi = sendgridApi;
+    this.emailApi = emailApi;
     this.relatedPostsService = relatedPostsService;
   }
 
@@ -50,7 +50,7 @@ export class EmailListMailer {
     );
 
     // Send the email
-    return this.sendgridApi.send({
+    return this.emailApi.send({
       to: testEmail,
       subject: `[TEST] ${post.title.rendered}`,
       text: plainTextContent,
@@ -85,7 +85,7 @@ export class EmailListMailer {
     // Send the email
     const results = [];
     for (const email of list) {
-      const result = await this.sendgridApi.send({
+      const result = await this.emailApi.send({
         to: email,
         subject: `${post.title.rendered}`,
         text: plainTextContent,

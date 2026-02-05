@@ -2,7 +2,7 @@
 
 We are building a tool to manage an email list based on a Wordpress blog.
 
-It is a Next.js app that manages subscribers in a MySQL database. It queries the Wordpress JSON API for my blog to retrieve post content, and formats it for email delivery with Sendgrid.
+It is a Next.js app that manages subscribers in a MySQL database. It queries the Wordpress JSON API for my blog to retrieve post content, and formats it for email delivery with Resend.
 
 ## Conventions
 
