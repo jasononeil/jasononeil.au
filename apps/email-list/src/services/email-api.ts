@@ -42,6 +42,9 @@ export class EmailAPI {
 
     // In local development, only send to the test email
     if (this.isLocalDevelopment && to !== this.testEmail) {
+      console.log(
+        `Local development mode: Email to ${to} was not sent. Emails are only sent to ${this.testEmail}.`
+      );
       return false;
     }
 

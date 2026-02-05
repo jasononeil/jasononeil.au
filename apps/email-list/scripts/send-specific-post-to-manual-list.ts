@@ -67,15 +67,35 @@ async function main() {
     );
 
     const list = process.env.MANUAL_LIST.split(',');
-    log(`Sending test email for post ID ${postId} to:\n  - ${list.join('\n  - ')}`);
+    log(`Sending manual email for post ID ${postId} to ${list.length} recipient(s):`);
 
-    const result = await mailer.sendPostToManualSubscribers(postId, list);
+    const results = await mailer.sendPostToManualSubscribers(
+      postId,
+      list,
+      (email, success, error) => {
+        if (success) {
+          log(`  ✓ ${email} - SUCCESS`);
+        } else {
+          log(`  ✗ ${email} - FAILED: ${error || 'Unknown error'}`);
+        }
+      }
+    );
 
-    const failures = result.filter((result) => !result);
-    if (failures.length === 0) {
-      log('Emails sent successfully!');
+    // Summary
+    const successful = results.filter((r) => r.success);
+    const failed = results.filter((r) => !r.success);
+
+    log('\n--- Summary ---');
+    log(`Total: ${results.length}`);
+    log(`Successful: ${successful.length}`);
+    log(`Failed: ${failed.length}`);
+
+    if (failed.length > 0) {
+      log('\nFailed emails:');
+      failed.forEach((r) => log(`  - ${r.email}: ${r.error}`));
+      process.exit(1);
     } else {
-      log(`${failures.length} emails were not sent.`);
+      log('\nAll emails sent successfully!');
     }
   } catch (error) {
     log(`Error sending test email: ${error instanceof Error ? error.message : String(error)}`);

@@ -139,4 +139,137 @@ describe('EmailListMailer', () => {
     emailApi.send = vi.fn().mockRejectedValue(new Error('Email API error'));
     await expect(mailer.sendPostToTestEmail(123)).rejects.toThrow('Email API error');
   });
+
+  describe('sendPostToManualSubscribers', () => {
+    it('should send emails to all recipients successfully', async () => {
+      const recipients = ['user1@example.com', 'user2@example.com', 'user3@example.com'];
+      const results = await mailer.sendPostToManualSubscribers(123, recipients);
+
+      // Verify all emails were sent
+      expect(emailApi.send).toHaveBeenCalledTimes(3);
+      expect(results).toHaveLength(3);
+
+      // Verify all results are successful
+      results.forEach((result, index) => {
+        expect(result.email).toBe(recipients[index]);
+        expect(result.success).toBe(true);
+        expect(result.error).toBeUndefined();
+      });
+
+      // Verify emails were sent with correct subject (no [TEST] prefix)
+      expect(emailApi.send).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: 'user1@example.com',
+          subject: 'Test Post Title',
+        })
+      );
+    });
+
+    it('should handle individual email failures without stopping', async () => {
+      const recipients = ['user1@example.com', 'user2@example.com', 'user3@example.com'];
+
+      // Mock second email to fail
+      emailApi.send = vi
+        .fn()
+        .mockResolvedValueOnce(true)
+        .mockRejectedValueOnce(new Error('Rate limit exceeded'))
+        .mockResolvedValueOnce(true);
+
+      const results = await mailer.sendPostToManualSubscribers(123, recipients);
+
+      // Verify all emails were attempted
+      expect(emailApi.send).toHaveBeenCalledTimes(3);
+      expect(results).toHaveLength(3);
+
+      // Verify first email succeeded
+      expect(results[0]).toEqual({
+        email: 'user1@example.com',
+        success: true,
+      });
+
+      // Verify second email failed with error
+      expect(results[1]).toEqual({
+        email: 'user2@example.com',
+        success: false,
+        error: 'Rate limit exceeded',
+      });
+
+      // Verify third email succeeded
+      expect(results[2]).toEqual({
+        email: 'user3@example.com',
+        success: true,
+      });
+    });
+
+    it('should call progress callback for each email', async () => {
+      const recipients = ['user1@example.com', 'user2@example.com'];
+      const progressCallback = vi.fn();
+
+      await mailer.sendPostToManualSubscribers(123, recipients, progressCallback);
+
+      // Verify callback was called for each email
+      expect(progressCallback).toHaveBeenCalledTimes(2);
+      expect(progressCallback).toHaveBeenNthCalledWith(1, 'user1@example.com', true, undefined);
+      expect(progressCallback).toHaveBeenNthCalledWith(2, 'user2@example.com', true, undefined);
+    });
+
+    it('should call progress callback with errors', async () => {
+      const recipients = ['user1@example.com', 'user2@example.com'];
+      const progressCallback = vi.fn();
+
+      emailApi.send = vi
+        .fn()
+        .mockResolvedValueOnce(true)
+        .mockRejectedValueOnce(new Error('Send failed'));
+
+      await mailer.sendPostToManualSubscribers(123, recipients, progressCallback);
+
+      expect(progressCallback).toHaveBeenCalledTimes(2);
+      expect(progressCallback).toHaveBeenNthCalledWith(1, 'user1@example.com', true, undefined);
+      expect(progressCallback).toHaveBeenNthCalledWith(
+        2,
+        'user2@example.com',
+        false,
+        'Send failed'
+      );
+    });
+
+    it('should handle email API returning false', async () => {
+      const recipients = ['user1@example.com'];
+
+      emailApi.send = vi.fn().mockResolvedValue(false);
+
+      const results = await mailer.sendPostToManualSubscribers(123, recipients);
+
+      expect(results[0]).toEqual({
+        email: 'user1@example.com',
+        success: false,
+        error: 'Email API returned false',
+      });
+    });
+
+    it('should respect rate limit delay between sends', async () => {
+      const recipients = ['user1@example.com', 'user2@example.com'];
+      process.env.RESEND_RATE_LIMIT_PER_SEC = '2';
+
+      const startTime = Date.now();
+      await mailer.sendPostToManualSubscribers(123, recipients);
+      const endTime = Date.now();
+
+      // Should take at least 600ms (500ms + 100ms buffer) for rate limit
+      expect(endTime - startTime).toBeGreaterThanOrEqual(550);
+    });
+
+    it('should use default rate limit if env variable not set', async () => {
+      delete process.env.RESEND_RATE_LIMIT_PER_SEC;
+
+      const recipients = ['user1@example.com', 'user2@example.com'];
+      const startTime = Date.now();
+      await mailer.sendPostToManualSubscribers(123, recipients);
+      const endTime = Date.now();
+
+      // Default is 2 req/sec, so should take at least 600ms
+      expect(endTime - startTime).toBeGreaterThanOrEqual(550);
+    });
+  });
 });

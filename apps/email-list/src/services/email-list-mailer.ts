@@ -76,9 +76,13 @@ export class EmailListMailer {
   }
 
   /**
-   * Send a post to the test email address specified in the TEST_EMAIL environment variable
+   * Send a post to a list of email addresses with detailed result tracking
    */
-  async sendPostToManualSubscribers(postId: number, list: string[]): Promise<boolean[]> {
+  async sendPostToManualSubscribers(
+    postId: number,
+    list: string[],
+    onProgress?: (email: string, success: boolean, error?: string) => void
+  ): Promise<{ email: string; success: boolean; error?: string }[]> {
     const testEmail = process.env.TEST_EMAIL;
 
     if (!testEmail) {
@@ -100,18 +104,36 @@ export class EmailListMailer {
     );
 
     // Send the email
-    const results = [];
+    const results: { email: string; success: boolean; error?: string }[] = [];
     const delayMs = this.getDelayBetweenRequests();
 
     for (let i = 0; i < list.length; i++) {
       const email = list[i];
-      const result = await this.emailApi.send({
-        to: email,
-        subject: `${post.title.rendered}`,
-        text: plainTextContent,
-        html: htmlContent,
-      });
-      results.push(result);
+      let success = false;
+      let error: string | undefined;
+
+      try {
+        success = await this.emailApi.send({
+          to: email,
+          subject: `${post.title.rendered}`,
+          text: plainTextContent,
+          html: htmlContent,
+        });
+
+        if (!success) {
+          error = 'Email API returned false';
+        }
+      } catch (err) {
+        success = false;
+        error = err instanceof Error ? err.message : String(err);
+      }
+
+      results.push({ email, success, error });
+
+      // Call progress callback if provided
+      if (onProgress) {
+        onProgress(email, success, error);
+      }
 
       // Add delay between sends to respect rate limit
       if (i < list.length - 1) {
