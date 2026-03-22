@@ -1,13 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { RelatedPostsService } from './related-posts';
 import { WordPressAPI, WPPost } from './wordpress-api';
 
 // Mock the WordPress API
-vi.mock('./wordpress-api', () => {
+mock.module('./wordpress-api', () => {
   return {
-    WordPressAPI: vi.fn().mockImplementation(() => ({
-      getPost: vi.fn(),
-      getPosts: vi.fn(),
+    WordPressAPI: mock().mockImplementation(() => ({
+      getPost: mock(),
+      getPosts: mock(),
     })),
   };
 });
@@ -40,8 +40,8 @@ describe('RelatedPostsService', () => {
     ];
 
     // Set up mock implementations
-    vi.mocked(mockWpApi.getPost).mockResolvedValue(currentPost);
-    vi.mocked(mockWpApi.getPosts).mockResolvedValue(mockPosts);
+    (mockWpApi.getPost as ReturnType<typeof mock>).mockResolvedValue(currentPost);
+    (mockWpApi.getPosts as ReturnType<typeof mock>).mockResolvedValue(mockPosts);
 
     // Call the method
     const result = await relatedPostsService.getPreviousPosts(100, 5);
@@ -69,8 +69,8 @@ describe('RelatedPostsService', () => {
     ];
 
     // Set up mock implementations
-    vi.mocked(mockWpApi.getPost).mockResolvedValue(currentPost);
-    vi.mocked(mockWpApi.getPosts).mockResolvedValue(mockPosts);
+    (mockWpApi.getPost as ReturnType<typeof mock>).mockResolvedValue(currentPost);
+    (mockWpApi.getPosts as ReturnType<typeof mock>).mockResolvedValue(mockPosts);
 
     // Call the method requesting 5 posts
     const result = await relatedPostsService.getPreviousPosts(100, 5);
@@ -83,7 +83,7 @@ describe('RelatedPostsService', () => {
 
   it('should throw an error when API calls fail', async () => {
     // Mock API error
-    vi.mocked(mockWpApi.getPost).mockRejectedValue(new Error('API error'));
+    (mockWpApi.getPost as ReturnType<typeof mock>).mockRejectedValue(new Error('API error'));
 
     // Verify the error is propagated
     await expect(relatedPostsService.getPreviousPosts(100)).rejects.toThrow(

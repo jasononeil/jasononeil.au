@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'bun:test';
 import { GET } from './route';
 
 describe('Health API endpoint', () => {

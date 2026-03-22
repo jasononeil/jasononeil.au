@@ -1,15 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { WordPressAPI } from './wordpress-api';
 
 // Mock fetch
-global.fetch = vi.fn();
+const mockFetch = mock();
+global.fetch = mockFetch as any;
 
 describe('WordPressAPI', () => {
   let api: WordPressAPI;
 
   beforeEach(() => {
     api = new WordPressAPI('https://example.com/wp-json');
-    vi.resetAllMocks();
+    mockFetch.mockReset();
   });
 
   it('should fetch a post by ID', async () => {
@@ -31,7 +32,7 @@ describe('WordPressAPI', () => {
     };
 
     // Mock the fetch response
-    (global.fetch as any).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockPost,
     });
@@ -43,7 +44,7 @@ describe('WordPressAPI', () => {
   });
 
   it('should handle errors when fetching a post', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 404,
       statusText: 'Not Found',
@@ -60,7 +61,7 @@ describe('WordPressAPI', () => {
       { id: 2, title: { rendered: 'Post 2' } },
     ];
 
-    (global.fetch as any).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockPosts,
     });
@@ -80,7 +81,7 @@ describe('WordPressAPI', () => {
   });
 
   it('should fetch posts with date filters', async () => {
-    (global.fetch as any).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => {},
     });
@@ -106,7 +107,7 @@ describe('WordPressAPI', () => {
       parent: 0,
     };
 
-    (global.fetch as any).mockResolvedValueOnce({
+    mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => mockCategory,
     });
@@ -222,7 +223,7 @@ describe('WordPressAPI', () => {
     ];
 
     // Mock fetch to return different responses based on the URL
-    (global.fetch as any).mockImplementation((url: string) => {
+    mockFetch.mockImplementation((url: string) => {
       // Match the URL to determine which mock to return
       if (url.endsWith('/posts/1')) {
         return {

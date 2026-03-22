@@ -1,6 +1,54 @@
 {
   "lockfile_version": "1",
   "packages": {
+    "bun@latest": {
+      "last_modified": "2026-03-10T02:35:18Z",
+      "resolved": "github:NixOS/nixpkgs/e607cb5360ff1234862ac9f8839522becb853bb9#bun",
+      "source": "devbox-search",
+      "version": "1.3.10",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/421j82pv4gjmh9n2gchb4cs40hqfj20d-bun-1.3.10",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/421j82pv4gjmh9n2gchb4cs40hqfj20d-bun-1.3.10"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ffdcfkl3kpdwagswlwlff6qazxkj4cag-bun-1.3.10",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ffdcfkl3kpdwagswlwlff6qazxkj4cag-bun-1.3.10"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/k6gj0kvvy9nrs87i646qxj9hr6fkchix-bun-1.3.10",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/k6gj0kvvy9nrs87i646qxj9hr6fkchix-bun-1.3.10"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ffgyf7g2n4gbhi1zgbcphssivfah1c4s-bun-1.3.10",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ffgyf7g2n4gbhi1zgbcphssivfah1c4s-bun-1.3.10"
+        }
+      }
+    },
     "github:NixOS/nixpkgs/nixpkgs-unstable": {
       "resolved": "github:NixOS/nixpkgs/573c650e8a14b2faa0041645ab18aed7e60f0c9a?lastModified=1741865919&narHash=sha256-4thdbnP6dlbdq%2BqZWTsm4ffAwoS8Tiq1YResB%2BRP6WE%3D"
     },
@@ -66,71 +114,6 @@
             }
           ],
           "store_path": "/nix/store/jf96298nqcvb3c93q99skk0wr4nlh730-mysql-8.0.41"
-        }
-      }
-    },
-    "nodejs@latest": {
-      "last_modified": "2024-05-17T18:08:26Z",
-      "plugin_version": "0.0.2",
-      "resolved": "github:NixOS/nixpkgs/0837fbf227364d79cbae8fff2378125526905cbe#nodejs_22",
-      "source": "devbox-search",
-      "version": "22.2.0",
-      "systems": {
-        "aarch64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/g2mifb3z2wka9fhlzff0qzvjwxnhnig1-nodejs-22.2.0",
-              "default": true
-            },
-            {
-              "name": "libv8",
-              "path": "/nix/store/hjffpl4s3j5qv8iinqlvcwx95pfr2ddi-nodejs-22.2.0-libv8"
-            }
-          ],
-          "store_path": "/nix/store/g2mifb3z2wka9fhlzff0qzvjwxnhnig1-nodejs-22.2.0"
-        },
-        "aarch64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/01d6ijxb8cjqfbs4xab1x9kf48bvwz7s-nodejs-22.2.0",
-              "default": true
-            },
-            {
-              "name": "libv8",
-              "path": "/nix/store/6lfcrb10vjw77vyyqq1pl88nk3cv36f7-nodejs-22.2.0-libv8"
-            }
-          ],
-          "store_path": "/nix/store/01d6ijxb8cjqfbs4xab1x9kf48bvwz7s-nodejs-22.2.0"
-        },
-        "x86_64-darwin": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/lms38zag8ar0qinik8qbzpcwl7j5il7y-nodejs-22.2.0",
-              "default": true
-            },
-            {
-              "name": "libv8",
-              "path": "/nix/store/as38kl6lz476v0aqzmqfs3m7dhi1v9bj-nodejs-22.2.0-libv8"
-            }
-          ],
-          "store_path": "/nix/store/lms38zag8ar0qinik8qbzpcwl7j5il7y-nodejs-22.2.0"
-        },
-        "x86_64-linux": {
-          "outputs": [
-            {
-              "name": "out",
-              "path": "/nix/store/m27q12bf02cz5d430382nbd700d0fx8z-nodejs-22.2.0",
-              "default": true
-            },
-            {
-              "name": "libv8",
-              "path": "/nix/store/3yhqvipi5hrxg9ykrvksxb9lm63xrfib-nodejs-22.2.0-libv8"
-            }
-          ],
-          "store_path": "/nix/store/m27q12bf02cz5d430382nbd700d0fx8z-nodejs-22.2.0"
         }
       }
     }

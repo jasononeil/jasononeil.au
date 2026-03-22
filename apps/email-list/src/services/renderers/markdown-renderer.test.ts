@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'bun:test';
 import { MarkdownRenderer, convertHtmlToMarkdown } from './markdown-renderer';
 import { WPPost, PostWithMetadata } from '../wordpress-api';
 import { WpBlock } from '@/types/wp-blocks';

@@ -1,10 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetpack-io/devbox/0.10.4/.schema/devbox.schema.json",
-  "packages": ["nodejs@latest", "mysql80@8.0.41"],
+  "packages": ["bun@latest", "mysql80@8.0.41"],
   "env": {
-    "DEVBOX_COREPACK_ENABLED": "true",
-    "LOCAL_DEVELOPMENT": "true",
-    "npm_config_python": "/usr/bin/python3"
+    "LOCAL_DEVELOPMENT": "true"
   },
   "shell": {
     "init_hook": ["test -e .envrc.private || cp .envrc.example .envrc.private"]

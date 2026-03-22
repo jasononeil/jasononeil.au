@@ -7,4 +7,4 @@ processes:
       mysql:
         condition: process_healthy
   email-dev:
-    command: pnpm run --filter=email-list dev
+    command: bun run --filter email-list dev

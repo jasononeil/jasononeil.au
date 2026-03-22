@@ -13,7 +13,7 @@ const relatedPostApi = new RelatedPostsService(api);
 // Create renderer instance
 const renderer = new MarkdownRenderer();
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const postId = parseInt(id, 10);

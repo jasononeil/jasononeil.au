@@ -1,24 +1,26 @@
-import { describe, it, expect, vi, beforeEach, afterEach, Mock } from 'vitest';
-import { EmailAPI } from './email-api';
+import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { Resend } from 'resend';
 
 // Create a mock send function
-const mockSend = vi.fn();
+const mockSend = mock();
 
 // Mock resend
-vi.mock('resend', () => ({
-  Resend: vi.fn().mockImplementation(() => ({
+mock.module('resend', () => ({
+  Resend: mock().mockImplementation(() => ({
     emails: {
       send: mockSend,
     },
   })),
 }));
 
+// Re-import after mock setup
+const { EmailAPI } = await import('./email-api');
+
 describe('EmailAPI', () => {
   const originalEnv = { ...process.env };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mockSend.mockReset();
     process.env.RESEND_API_KEY = 'test-api-key';
     process.env.DEFAULT_FROM_EMAIL = 'test@example.com';
     process.env.DEFAULT_FROM_NAME = 'Test Sender';

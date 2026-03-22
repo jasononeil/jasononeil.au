@@ -1,9 +1,9 @@
 {
   "name": "jasononeil.au",
-  "packageManager": "pnpm@9.1.2",
   "version": "0.0.1",
+  "workspaces": ["apps/*"],
   "scripts": {
-    "email-list": "pnpm --filter email-list",
+    "email-list": "bun run --filter email-list",
     "format": "prettier --write .",
     "typecheck": "tsc --build"
   },

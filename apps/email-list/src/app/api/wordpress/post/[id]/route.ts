@@ -9,7 +9,7 @@ const wpApiPassword = process.env.WP_API_PASSWORD || '';
 // Create WordPress API instance
 const api = new WordPressAPI(wpApiUrl, { username: wpApiUsername, password: wpApiPassword });
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const postId = parseInt(id, 10);

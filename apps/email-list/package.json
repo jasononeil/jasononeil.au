@@ -7,15 +7,14 @@
     "typecheck": "tsc --build",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "test": "vitest",
+    "test": "bun test",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/db/migrations/migrate.ts",
+    "db:migrate": "bun src/db/migrations/migrate.ts",
     "db:studio": "drizzle-kit studio",
-    "wp:test-all-posts": "tsx scripts/test-wp-api-integration.ts",
-    "wp:extract-block-types": "tsx scripts/extract-block-types.ts",
-    "wp:send-test-post": "tsx scripts/send-test-post.ts",
-    "wp:send-specific-post-to-manual-list": "tsx scripts/send-specific-post-to-manual-list.ts"
+    "wp:test-all-posts": "bun scripts/test-wp-api-integration.ts",
+    "wp:extract-block-types": "bun scripts/extract-block-types.ts",
+    "wp:send-test-post": "bun scripts/send-test-post.ts",
+    "wp:send-specific-post-to-manual-list": "bun scripts/send-specific-post-to-manual-list.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.40.0",
@@ -27,15 +26,11 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@types/bun": "latest",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "dotenv": "^16.4.7",
-    "drizzle-kit": "^0.30.5",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.2",
-    "tsx": "^4.19.3",
-    "vitest": "^3.0.8"
+    "drizzle-kit": "^0.30.5"
   }
 }

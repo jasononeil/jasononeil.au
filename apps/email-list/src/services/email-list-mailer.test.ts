@@ -1,17 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { EmailListMailer } from './email-list-mailer';
 import { WordPressAPI } from './wordpress-api';
 import { HtmlRenderer } from './renderers/html-renderer';
 import { MarkdownRenderer } from './renderers/markdown-renderer';
 import { EmailAPI } from './email-api';
 import { RelatedPostsService } from './related-posts';
-
-// Mock all dependencies
-vi.mock('../wordpress-api');
-vi.mock('../renderers/html-renderer');
-vi.mock('../renderers/markdown-renderer');
-vi.mock('../email-api');
-vi.mock('../related-posts');
 
 describe('EmailListMailer', () => {
   let wpApi: WordPressAPI;
@@ -58,32 +51,29 @@ describe('EmailListMailer', () => {
   ];
 
   beforeEach(() => {
-    // Reset mocks
-    vi.resetAllMocks();
-
     // Set up environment variables
     process.env.TEST_EMAIL = 'test@example.com';
 
     // Create mock instances
     wpApi = {
-      getPost: vi.fn().mockResolvedValue(mockPost),
-      getPostWithMetadata: vi.fn().mockResolvedValue(mockPostWithMetadata),
+      getPost: mock().mockResolvedValue(mockPost),
+      getPostWithMetadata: mock().mockResolvedValue(mockPostWithMetadata),
     } as unknown as WordPressAPI;
 
     htmlRenderer = {
-      renderEmail: vi.fn().mockResolvedValue('<html>Test HTML email</html>'),
+      renderEmail: mock().mockResolvedValue('<html>Test HTML email</html>'),
     } as unknown as HtmlRenderer;
 
     markdownRenderer = {
-      renderEmail: vi.fn().mockResolvedValue('# Test Markdown email'),
+      renderEmail: mock().mockResolvedValue('# Test Markdown email'),
     } as unknown as MarkdownRenderer;
 
     emailApi = {
-      send: vi.fn().mockResolvedValue(true),
+      send: mock().mockResolvedValue(true),
     } as unknown as EmailAPI;
 
     relatedPostsService = {
-      getPreviousPosts: vi.fn().mockResolvedValue(mockPreviousPosts),
+      getPreviousPosts: mock().mockResolvedValue(mockPreviousPosts),
     } as unknown as RelatedPostsService;
 
     // Create the mailer instance
@@ -131,12 +121,12 @@ describe('EmailListMailer', () => {
 
   it('should propagate errors from dependencies', async () => {
     // Test error from WordPress API
-    wpApi.getPost = vi.fn().mockRejectedValue(new Error('WordPress API error'));
+    wpApi.getPost = mock().mockRejectedValue(new Error('WordPress API error'));
     await expect(mailer.sendPostToTestEmail(123)).rejects.toThrow('WordPress API error');
 
     // Test error from Email API
-    wpApi.getPost = vi.fn().mockResolvedValue(mockPost);
-    emailApi.send = vi.fn().mockRejectedValue(new Error('Email API error'));
+    wpApi.getPost = mock().mockResolvedValue(mockPost);
+    emailApi.send = mock().mockRejectedValue(new Error('Email API error'));
     await expect(mailer.sendPostToTestEmail(123)).rejects.toThrow('Email API error');
   });
 
@@ -169,8 +159,7 @@ describe('EmailListMailer', () => {
       const recipients = ['user1@example.com', 'user2@example.com', 'user3@example.com'];
 
       // Mock second email to fail
-      emailApi.send = vi
-        .fn()
+      emailApi.send = mock()
         .mockResolvedValueOnce(true)
         .mockRejectedValueOnce(new Error('Rate limit exceeded'))
         .mockResolvedValueOnce(true);
@@ -203,7 +192,7 @@ describe('EmailListMailer', () => {
 
     it('should call progress callback for each email', async () => {
       const recipients = ['user1@example.com', 'user2@example.com'];
-      const progressCallback = vi.fn();
+      const progressCallback = mock();
 
       await mailer.sendPostToManualSubscribers(123, recipients, progressCallback);
 
@@ -215,10 +204,9 @@ describe('EmailListMailer', () => {
 
     it('should call progress callback with errors', async () => {
       const recipients = ['user1@example.com', 'user2@example.com'];
-      const progressCallback = vi.fn();
+      const progressCallback = mock();
 
-      emailApi.send = vi
-        .fn()
+      emailApi.send = mock()
         .mockResolvedValueOnce(true)
         .mockRejectedValueOnce(new Error('Send failed'));
 
@@ -237,7 +225,7 @@ describe('EmailListMailer', () => {
     it('should handle email API returning false', async () => {
       const recipients = ['user1@example.com'];
 
-      emailApi.send = vi.fn().mockResolvedValue(false);
+      emailApi.send = mock().mockResolvedValue(false);
 
       const results = await mailer.sendPostToManualSubscribers(123, recipients);
 

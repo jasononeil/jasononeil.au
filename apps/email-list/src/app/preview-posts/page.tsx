@@ -1,11 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
 import { WPPost } from '@/services/wordpress-api';
 
 export default function PreviewPosts() {
+  return (
+    <Suspense fallback={<p>Loading...</p>}>
+      <PreviewPostsContent />
+    </Suspense>
+  );
+}
+
+function PreviewPostsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
